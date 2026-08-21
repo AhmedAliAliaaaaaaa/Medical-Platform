@@ -1,0 +1,473 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{% trans "التسجيل كطبيب" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    
+.pricing-section {
+    background: linear-gradient(135deg, oklab(77.423% 0.02201 0.00692) 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 2px solid #a7acb0;
+}
+
+.pricing-section h5 {
+    color: #9da4ac;
+    font-weight: 600;
+}
+
+.pricing-input {
+    position: relative;
+}
+
+.pricing-input input {
+    padding-right: 40px;
+}
+
+.currency-symbol {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #b6c1ca;
+    font-weight: bold;
+}
+
+.price-preview {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+    border: 1px solid #dee2e6;
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.price-item:last-child {
+    border-bottom: none;
+}
+
+.price-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.price-value {
+    font-weight: bold;
+    color: #28a745;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    border: 1px solid #b6d4da;
+    color: #cedbb5;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card-custom">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2><i class="fas fa-stethoscope me-2"></i>{% trans "انضم كطبيب" %}</h2>
+                        {% if is_existing_user %}
+                            <p class="text-muted">{% trans "مرحباً" %} {{ user.get_full_name }}، {% trans "أكمل بياناتك المهنية للانضمام كطبيب" %}</p>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {% trans "ستتمكن من الوصول لحسابك الحالي بعد الموافقة على طلبك" %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">{% trans "انضم إلى فريق الأطباء المعتمدين في المنصة الطبية" %}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if not is_existing_user %}
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <h5 class="text-primary"><i class="fas fa-user me-2"></i>{% trans "المعلومات الشخصية" %}</h5>
+                                <hr>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{{ form.full_name.label }}</label>
+                            {{ form.full_name }}
+                            {% if form.full_name.errors %}
+                                <div class="text-danger small">{{ form.full_name.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">أدخل اسمك الكامل كما يظهر في الترخيص الطبي</div>
+                            <div class="alert alert-info mt-2 py-2"><i class="fas fa-info-circle me-1"></i> بعد الضغط على "إرسال الطلب للانضمام" ستظهر لك رسالة: سيتم مراجعة ملفك من قبل الإدارة للقبول.</div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "اسم المستخدم" %}</label>
+                                <div class="input-group">
+                                    {{ form.username }}
+                                    <button class="btn btn-outline-secondary" type="button" id="check-username-btn">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">يمكنك اختيار اسم مستخدم جديد لإنشاء حسابك كطبيب.</div>
+                                <div id="username-feedback" class="small mt-1"></div>
+                                {% if form.username.errors %}
+                                    <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "البريد الإلكتروني" %}</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "كلمة المرور" %}</label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                    <div class="text-danger small">{{ form.password1.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "تأكيد كلمة المرور" %}</label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                    <div class="text-danger small">{{ form.password2.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <div class="alert alert-success">
+                                    <i class="fas fa-user-check me-2"></i>
+                                    <strong>{% trans "المعلومات الشخصية" %}:</strong>
+                                    {{ user.get_full_name }} ({{ user.email }})
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-12 mb-4 mt-4">
+                                <h5 class="text-primary"><i class="fas fa-certificate me-2"></i>{% trans "المعلومات المهنية" %}</h5>
+                                <hr>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "التخصص" %}</label>
+                                {{ form.specialization }}
+                                {% if form.specialization.errors %}
+                                    <div class="text-danger small">{{ form.specialization.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "الدولة" %}</label>
+                                {{ form.country }}
+                                {% if form.country.errors %}
+                                    <div class="text-danger small">{{ form.country.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "رقم الترخيص" %}</label>
+                                {{ form.license_number }}
+                                {% if form.license_number.errors %}
+                                    <div class="text-danger small">{{ form.license_number.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{% trans "سنوات الخبرة" %}</label>
+                                {{ form.experience_years }}
+                                {% if form.experience_years.errors %}
+                                    <div class="text-danger small">{{ form.experience_years.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "صورة الترخيص" %}</label>
+                            {{ form.license_image }}
+                            {% if form.license_image.errors %}
+                                <div class="text-danger small">{{ form.license_image.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">{% trans "يرجى رفع صورة واضحة لترخيص مزاولة المهنة" %}</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">{% trans "نبذة عن الطبيب" %}</label>
+                            {{ form.bio }}
+                            {% if form.bio.errors %}
+                                <div class="text-danger small">{{ form.bio.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">{% trans "اكتب نبذة مختصرة عن خبرتك ومؤهلاتك" %}</div>
+                        </div>
+                        
+                        <!-- قسم الأسعار -->
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <h5 class="text-primary"><i class="fas fa-money-bill-wave me-2"></i>الأسعار والرسوم</h5>
+                                <hr>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    حدد أسعار خدماتك الطبية. يمكنك تعديل هذه الأسعار لاحقاً من لوحة التحكم.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.currency.label }}</label>
+                                {{ form.currency }}
+                                {% if form.currency.errors %}
+                                    <div class="text-danger small">{{ form.currency.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.consultation_fee.label }} <span class="text-danger">*</span></label>
+                                {{ form.consultation_fee }}
+                                {% if form.consultation_fee.errors %}
+                                    <div class="text-danger small">{{ form.consultation_fee.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">السعر الأساسي للاستشارة العادية</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.emergency_fee.label }}</label>
+                                {{ form.emergency_fee }}
+                                {% if form.emergency_fee.errors %}
+                                    <div class="text-danger small">{{ form.emergency_fee.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">رسوم الاستشارات العاجلة (اتركه فارغاً إذا لم تقدم هذه الخدمة)</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.follow_up_fee.label }}</label>
+                                {{ form.follow_up_fee }}
+                                {% if form.follow_up_fee.errors %}
+                                    <div class="text-danger small">{{ form.follow_up_fee.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">رسوم المتابعة (عادة أقل من الاستشارة العادية)</div>
+                            </div>
+                        </div>
+                        
+                        <!-- معاينة الأسعار -->
+                        <div class="price-preview" id="pricePreview" style="display: none;">
+                            <h6><i class="fas fa-eye me-2"></i>معاينة الأسعار</h6>
+                            <div id="priceList">
+                                <!-- سيتم ملؤها بـ JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>{% trans "ملاحظة" %}:</strong> {% trans "سيتم مراجعة طلبك من قبل فريق الإدارة خلال 24-48 ساعة" %}.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            {% if is_existing_user %}
+                                {% trans "إرسال طلب الانضمام كطبيب" %}
+                            {% else %}
+                                {% trans "إرسال الطلب للانضمام" %}
+                            {% endif %}
+                        </button>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <div class="d-flex justify-content-center gap-3">
+                            {% if is_existing_user %}
+                                <a href="{% url 'accounts:profile' %}" class="text-muted">
+                                    <i class="fas fa-user-cog me-1"></i>
+                                    {% trans "الملف الشخصي" %}
+                                </a>
+                                <span class="text-muted">|</span>
+                                <a href="{% url 'core:home' %}" class="text-muted">
+                                    <i class="fas fa-home me-1"></i>
+                                    {% trans "الصفحة الرئيسية" %}
+                                </a>
+                            {% else %}
+                                <a href="{% url 'accounts:register' %}" class="text-muted">
+                                    <i class="fas fa-user me-1"></i>
+                                    {% trans "التسجيل كمريض" %}
+                                </a>
+                                <span class="text-muted">|</span>
+                                <a href="{% url 'accounts:login' %}" class="text-muted">
+                                    <i class="fas fa-sign-in-alt me-1"></i>
+                                    {% trans "تسجيل الدخول" %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const consultationFeeInput = document.querySelector('input[name="consultation_fee"]');
+    const emergencyFeeInput = document.querySelector('input[name="emergency_fee"]');
+    const followUpFeeInput = document.querySelector('input[name="follow_up_fee"]');
+    const currencySelect = document.querySelector('select[name="currency"]');
+    const pricePreview = document.getElementById('pricePreview');
+    const priceList = document.getElementById('priceList');
+    
+    function updatePricePreview() {
+        const consultationFee = parseFloat(consultationFeeInput.value) || 0;
+        const emergencyFee = parseFloat(emergencyFeeInput.value) || 0;
+        const followUpFee = parseFloat(followUpFeeInput.value) || 0;
+        const currency = currencySelect.value;
+        
+        let html = '';
+        
+        if (consultationFee > 0) {
+            html += `
+                <div class="price-item">
+                    <span class="price-label">استشارة عادية:</span>
+                    <span class="price-value">${consultationFee} ${currency}</span>
+                </div>
+            `;
+        }
+        
+        if (emergencyFee > 0) {
+            html += `
+                <div class="price-item">
+                    <span class="price-label">استشارة طوارئ:</span>
+                    <span class="price-value text-danger">${emergencyFee} ${currency}</span>
+                </div>
+            `;
+        }
+        
+        if (followUpFee > 0) {
+            html += `
+                <div class="price-item">
+                    <span class="price-label">متابعة:</span>
+                    <span class="price-value text-info">${followUpFee} ${currency}</span>
+                </div>
+            `;
+        }
+        
+        if (html) {
+            priceList.innerHTML = html;
+            pricePreview.style.display = 'block';
+        } else {
+            pricePreview.style.display = 'none';
+        }
+        
+        // التحقق من صحة الأسعار
+        validatePrices(consultationFee, emergencyFee, followUpFee);
+    }
+    
+    function validatePrices(consultation, emergency, followUp) {
+        // إزالة الرسائل السابقة
+        document.querySelectorAll('.price-validation-error').forEach(el => el.remove());
+        
+        // التحقق من رسوم الطوارئ
+        if (emergency > 0 && emergency <= consultation) {
+            showValidationError(emergencyFeeInput, 'رسوم الطوارئ يجب أن تكون أعلى من الاستشارة العادية');
+        }
+        
+        // التحقق من رسوم المتابعة
+        if (followUp > 0 && followUp >= consultation) {
+            showValidationError(followUpFeeInput, 'رسوم المتابعة يجب أن تكون أقل من الاستشارة العادية');
+        }
+    }
+    
+    function showValidationError(input, message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'text-danger small price-validation-error';
+        errorDiv.textContent = message;
+        input.parentNode.appendChild(errorDiv);
+    }
+    
+    // إضافة مستمعي الأحداث
+    [consultationFeeInput, emergencyFeeInput, followUpFeeInput, currencySelect].forEach(input => {
+        if (input) {
+            input.addEventListener('input', updatePricePreview);
+            input.addEventListener('change', updatePricePreview);
+        }
+    });
+    
+    // تحديث أولي
+    updatePricePreview();
+    
+    console.log('💰 Price preview system loaded');
+
+    // Username availability check
+    const checkBtn = document.getElementById('check-username-btn');
+    const usernameInput = document.querySelector('input[name="username"]');
+    const feedback = document.getElementById('username-feedback');
+    let debounceTimer;
+
+    function checkAvailability() {
+        const username = usernameInput.value.trim();
+        if (!username) {
+            feedback.textContent = 'الرجاء إدخال اسم مستخدم';
+            feedback.className = 'small mt-1 text-muted';
+            return;
+        }
+        feedback.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> جارِ التحقق...';
+        feedback.className = 'small mt-1 text-muted';
+        fetch('{% url "accounts:check_username" %}?username=' + encodeURIComponent(username))
+            .then(r => r.json())
+            .then(data => {
+                if (data.available) {
+                    feedback.innerHTML = '<i class="fas fa-check text-success me-1"></i> الاسم متاح';
+                    feedback.className = 'small mt-1 text-success';
+                } else {
+                    feedback.innerHTML = '<i class="fas fa-times text-danger me-1"></i> الاسم مستخدم بالفعل';
+                    feedback.className = 'small mt-1 text-danger';
+                }
+            })
+            .catch(() => {
+                feedback.textContent = 'تعذر التحقق حالياً';
+                feedback.className = 'small mt-1 text-warning';
+            });
+    }
+
+    if (checkBtn && usernameInput) {
+        checkBtn.addEventListener('click', checkAvailability);
+        usernameInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(checkAvailability, 600);
+        });
+        usernameInput.addEventListener('blur', checkAvailability);
+    }
+});
+</script>
+{% endblock %}

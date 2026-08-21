@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "تعديل الحالة" %} - {% trans "لوحة الإدارة" %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-edit me-2"></i>
+                    {% trans "تعديل الحالة" %} #{{ object.id }}
+                </h2>
+                <a href="{% url 'admin_panel:case_detail' object.id %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    {% trans "العودة للحالة" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        {% trans "تعديل معلومات الحالة" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">
+                                    <i class="fas fa-heading me-1"></i>
+                                    {% trans "عنوان الحالة" %}
+                                </label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="text-danger">{{ form.title.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.priority.id_for_label }}" class="form-label">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    {% trans "الأولوية" %}
+                                </label>
+                                {{ form.priority }}
+                                {% if form.priority.errors %}
+                                    <div class="text-danger">{{ form.priority.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    {% trans "حالة الطلب" %}
+                                </label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="text-danger">{{ form.status.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.doctor.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user-md me-1"></i>
+                                    {% trans "الطبيب المعين" %}
+                                </label>
+                                <select name="doctor" class="form-select" id="{{ form.doctor.id_for_label }}">
+                                    <option value="">{% trans "لا يوجد طبيب معين" %}</option>
+                                    {% for doctor in available_doctors %}
+                                        <option value="{{ doctor.id }}" {% if object.doctor.id == doctor.id %}selected{% endif %}>
+                                            د. {{ doctor.user.get_full_name }} - {{ doctor.get_specialization_display }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                {% if form.doctor.errors %}
+                                    <div class="text-danger">{{ form.doctor.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                <i class="fas fa-align-left me-1"></i>
+                                {% trans "وصف الحالة" %}
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'admin_panel:case_detail' object.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>
+                                {% trans "إلغاء" %}
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-1"></i>
+                                {% trans "حفظ التغييرات" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Current Case Info -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {% trans "معلومات الحالة الحالية" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>{% trans "المريض" %}:</strong> {{ object.patient.user.get_full_name }}</p>
+                    <p><strong>{% trans "تاريخ الإنشاء" %}:</strong> {{ object.created_at|date:"d/m/Y H:i" }}</p>
+                    <p><strong>{% trans "آخر تحديث" %}:</strong> {{ object.updated_at|date:"d/m/Y H:i" }}</p>
+                    
+                    {% if object.expected_response_time %}
+                    <p><strong>{% trans "وقت الرد المتوقع" %}:</strong> {{ object.expected_response_time|date:"d/m/Y H:i" }}</p>
+                    {% endif %}
+                    
+                    {% if object.attachments.all %}
+                    <p><strong>{% trans "المرفقات" %}:</strong> {{ object.attachments.count }} {% trans "ملف" %}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+</style>
+{% endblock %}

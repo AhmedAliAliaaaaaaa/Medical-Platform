@@ -1,0 +1,422 @@
+/* Premium Typography System */
+
+/* Root Variables for Typography */
+:root {
+    /* Arabic Fonts */
+    --font-arabic-primary: 'Tajawal', 'IBM Plex Sans Arabic', 'Almarai', sans-serif;
+    --font-arabic-secondary: 'Noto Kufi Arabic', 'Almarai', sans-serif;
+    --font-arabic-display: 'Almarai', 'Tajawal', sans-serif;
+    
+    /* English Fonts */
+    --font-english-primary: 'Poppins', 'Montserrat', 'Nunito', sans-serif;
+    --font-english-secondary: 'Nunito', 'Poppins', sans-serif;
+    --font-english-display: 'Montserrat', 'Poppins', sans-serif;
+    
+    /* Font Weights */
+    --font-weight-light: 300;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --font-weight-black: 900;
+    
+    /* Font Sizes */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+    --font-size-5xl: 3rem;
+    --font-size-6xl: 3.75rem;
+    --font-size-7xl: 4.5rem;
+    
+    /* Line Heights */
+    --line-height-tight: 1.25;
+    --line-height-snug: 1.375;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.625;
+    --line-height-loose: 2;
+    
+    /* Letter Spacing */
+    --letter-spacing-tighter: -0.05em;
+    --letter-spacing-tight: -0.025em;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 0.025em;
+    --letter-spacing-wider: 0.05em;
+    --letter-spacing-widest: 0.1em;
+}
+
+/* Base Typography */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    font-family: var(--font-arabic-primary);
+    font-weight: var(--font-weight-regular);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    letter-spacing: var(--letter-spacing-normal);
+    color: #1a202c;
+    background-color: #ffffff;
+}
+
+/* English Text */
+[lang="en"], .lang-en {
+    font-family: var(--font-english-primary);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: var(--font-arabic-display);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    margin-bottom: 0.5em;
+    color: #2d3748;
+}
+
+[lang="en"] h1, [lang="en"] h2, [lang="en"] h3, [lang="en"] h4, [lang="en"] h5, [lang="en"] h6,
+.lang-en h1, .lang-en h2, .lang-en h3, .lang-en h4, .lang-en h5, .lang-en h6 {
+    font-family: var(--font-english-display);
+}
+
+h1, .h1 {
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-extrabold);
+    line-height: var(--line-height-tight);
+}
+
+h2, .h2 {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+}
+
+h3, .h3 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+}
+
+h4, .h4 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+}
+
+h5, .h5 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+}
+
+h6, .h6 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Display Text */
+.display-1 {
+    font-size: var(--font-size-7xl);
+    font-weight: var(--font-weight-black);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tighter);
+}
+
+.display-2 {
+    font-size: var(--font-size-6xl);
+    font-weight: var(--font-weight-extrabold);
+    line-height: var(--line-height-tight);
+}
+
+.display-3 {
+    font-size: var(--font-size-5xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-snug);
+}
+
+.display-4 {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-snug);
+}
+
+/* Body Text */
+p, .text-body {
+    font-family: var(--font-arabic-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    margin-bottom: 1rem;
+    color: #4a5568;
+}
+
+[lang="en"] p, .lang-en p {
+    font-family: var(--font-english-primary);
+}
+
+.lead {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-relaxed);
+    color: #2d3748;
+}
+
+/* Text Sizes */
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+.text-4xl { font-size: var(--font-size-4xl); }
+.text-5xl { font-size: var(--font-size-5xl); }
+
+/* Font Weights */
+.font-light { font-weight: var(--font-weight-light); }
+.font-normal { font-weight: var(--font-weight-regular); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-extrabold { font-weight: var(--font-weight-extrabold); }
+.font-black { font-weight: var(--font-weight-black); }
+
+/* Line Heights */
+.leading-tight { line-height: var(--line-height-tight); }
+.leading-snug { line-height: var(--line-height-snug); }
+.leading-normal { line-height: var(--line-height-normal); }
+.leading-relaxed { line-height: var(--line-height-relaxed); }
+.leading-loose { line-height: var(--line-height-loose); }
+
+/* Letter Spacing */
+.tracking-tighter { letter-spacing: var(--letter-spacing-tighter); }
+.tracking-tight { letter-spacing: var(--letter-spacing-tight); }
+.tracking-normal { letter-spacing: var(--letter-spacing-normal); }
+.tracking-wide { letter-spacing: var(--letter-spacing-wide); }
+.tracking-wider { letter-spacing: var(--letter-spacing-wider); }
+.tracking-widest { letter-spacing: var(--letter-spacing-widest); }
+
+/* Navigation Typography */
+.navbar-brand {
+    font-family: var(--font-arabic-display);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-xl);
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.nav-link {
+    font-family: var(--font-arabic-primary);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-base);
+    letter-spacing: var(--letter-spacing-normal);
+}
+
+/* Button Typography */
+.btn {
+    font-family: var(--font-arabic-primary);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+    letter-spacing: var(--letter-spacing-wide);
+    text-transform: none;
+}
+
+.btn-lg {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+}
+
+.btn-sm {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Card Typography */
+.card-title {
+    font-family: var(--font-arabic-display);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-snug);
+    color: #2d3748;
+}
+
+.card-text {
+    font-family: var(--font-arabic-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: #4a5568;
+}
+
+/* Form Typography */
+.form-label {
+    font-family: var(--font-arabic-primary);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    color: #2d3748;
+}
+
+.form-control, .form-select {
+    font-family: var(--font-arabic-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+}
+
+/* Alert Typography */
+.alert {
+    font-family: var(--font-arabic-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+}
+
+/* Badge Typography */
+.badge {
+    font-family: var(--font-arabic-primary);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-xs);
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+/* Table Typography */
+.table th {
+    font-family: var(--font-arabic-display);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
+    letter-spacing: var(--letter-spacing-wide);
+    text-transform: uppercase;
+}
+
+.table td {
+    font-family: var(--font-arabic-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+}
+
+/* Breadcrumb Typography */
+.breadcrumb-item {
+    font-family: var(--font-arabic-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Pagination Typography */
+.page-link {
+    font-family: var(--font-arabic-primary);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-base);
+}
+
+/* Modal Typography */
+.modal-title {
+    font-family: var(--font-arabic-display);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-xl);
+}
+
+.modal-body {
+    font-family: var(--font-arabic-primary);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+}
+
+/* Tooltip Typography */
+.tooltip {
+    font-family: var(--font-arabic-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+    :root {
+        --font-size-5xl: 2.5rem;
+        --font-size-4xl: 2rem;
+        --font-size-3xl: 1.5rem;
+        --font-size-2xl: 1.25rem;
+        --font-size-xl: 1.125rem;
+    }
+    
+    h1, .h1 { font-size: var(--font-size-4xl); }
+    h2, .h2 { font-size: var(--font-size-3xl); }
+    h3, .h3 { font-size: var(--font-size-2xl); }
+    
+    .display-1 { font-size: var(--font-size-5xl); }
+    .display-2 { font-size: var(--font-size-4xl); }
+    .display-3 { font-size: var(--font-size-3xl); }
+    .display-4 { font-size: var(--font-size-2xl); }
+}
+
+@media (max-width: 576px) {
+    :root {
+        --font-size-5xl: 2rem;
+        --font-size-4xl: 1.75rem;
+        --font-size-3xl: 1.375rem;
+        --font-size-2xl: 1.125rem;
+    }
+    
+    body {
+        font-size: var(--font-size-sm);
+    }
+    
+    h1, .h1 { font-size: var(--font-size-3xl); }
+    h2, .h2 { font-size: var(--font-size-2xl); }
+    h3, .h3 { font-size: var(--font-size-xl); }
+}
+
+/* Special Typography Classes */
+.text-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: var(--font-weight-bold);
+}
+
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.text-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+/* Arabic Text Improvements */
+[dir="rtl"] {
+    text-align: right;
+}
+
+[dir="rtl"] .text-center {
+    text-align: center !important;
+}
+
+[dir="rtl"] .text-left {
+    text-align: right !important;
+}
+
+[dir="rtl"] .text-right {
+    text-align: left !important;
+}
+
+/* Enhanced Readability */
+.text-readable {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-relaxed);
+    color: #2d3748;
+    max-width: 65ch;
+}
+
+.text-compact {
+    line-height: var(--line-height-snug);
+    letter-spacing: var(--letter-spacing-tight);
+}
+
+.text-airy {
+    line-height: var(--line-height-loose);
+    letter-spacing: var(--letter-spacing-wide);
+}

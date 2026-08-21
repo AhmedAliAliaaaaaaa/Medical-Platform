@@ -1,0 +1,425 @@
+﻿{% extends 'base.html' %}
+{% load arabic_tags %}
+
+{% block title %}
+{% ar "تفاصيل الحالة" %} - {% ar "المنصة الطبية" %}
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>
+          <i class="fas fa-file-medical me-2"></i>
+          {% ar "تفاصيل الحالة الطبية" %}
+        </h2>
+        <a
+          href="{% url 'patients:dashboard' %}"
+          class="btn btn-outline-primary"
+        >
+          <i class="fas fa-arrow-left me-2"></i>
+          {% ar "العودة للوحة التحكم" %}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8 mb-4">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h6 class="text-primary mb-3">
+            <i class="fas fa-route me-2"></i>
+            {% ar "مراحل الحالة" %}
+          </h6>
+          <div class="progress-steps">
+            <div
+              class="step {% if case.status == 'pending' or case.status == 'in_progress' or case.status == 'completed' %}active{% endif %}"
+            >
+              <div class="step-icon">
+                <i class="fas fa-plus"></i>
+              </div>
+              <div class="step-content">
+                <h6>{% ar "إنشاء الحالة" %}</h6>
+                <small class="text-muted"
+                  >{{ case.created_at|date:"d/m/Y H:i" }}</small
+                >
+              </div>
+            </div>
+
+            <div
+              class="step {% if case.doctor and case.status != 'pending' %}active{% endif %}"
+            >
+              <div class="step-icon">
+                <i class="fas fa-user-md"></i>
+              </div>
+              <div class="step-content">
+                <h6>{% ar "تعيين طبيب" %}</h6>
+                <small class="text-muted">
+                  {% if case.doctor %}
+                    د. {{ case.doctor.user.get_full_name }}
+                  {% else %}
+                    {% ar "لم يتم التعيين بعد" %}
+                  {% endif %}
+                </small>
+              </div>
+            </div>
+
+            <div
+              class="step {% if case.status == 'in_progress' or case.status == 'completed' %}active{% endif %}"
+            >
+              <div class="step-icon">
+                <i class="fas fa-stethoscope"></i>
+              </div>
+              <div class="step-content">
+                <h6>{% ar "قيد المراجعة" %}</h6>
+                <small class="text-muted">
+                  {% if case.status == 'in_progress' or case.status == 'completed' %}
+                    {% ar "جاري المراجعة" %}
+                  {% else %}
+                    {% ar "في الانتظار" %}
+                  {% endif %}
+                </small>
+              </div>
+            </div>
+
+            <div
+              class="step {% if case.status == 'completed' %}active{% endif %}"
+            >
+              <div class="step-icon">
+                <i class="fas fa-check"></i>
+              </div>
+              <div class="step-content">
+                <h6>{% ar "مكتملة" %}</h6>
+                <small class="text-muted">
+                  {% if case.status == 'completed' %}
+                    {% ar "تم الانتهاء" %}
+                  {% else %}
+                    {% ar "لم تكتمل بعد" %}
+                  {% endif %}
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            {% ar "معلومات الحالة" %}
+          </h5>
+          <div>
+            {% if case.status == 'pending' %}
+            <span class="badge bg-warning fs-6">
+              <i class="fas fa-clock me-1"></i>
+              {% ar "في الانتظار" %}
+            </span>
+            {% elif case.status == 'in_progress' %}
+            <span class="badge bg-info fs-6">
+              <i class="fas fa-spinner me-1"></i>
+              {% ar "قيد المراجعة" %}
+            </span>
+            {% elif case.status == 'completed' %}
+            <span class="badge bg-success fs-6">
+              <i class="fas fa-check me-1"></i>
+              {% ar "مكتملة" %}
+            </span>
+            {% elif case.status == 'cancelled' %}
+            <span class="badge bg-danger fs-6">
+              <i class="fas fa-times me-1"></i>
+              {% ar "ملغية" %}
+            </span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <h6 class="text-primary">
+                <i class="fas fa-heading me-2"></i>
+                {% ar "عنوان الحالة" %}:
+              </h6>
+              <p class="mb-0">{{ case.title }}</p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <h6 class="text-primary">
+                <i class="fas fa-calendar me-2"></i>
+                {% ar "تاريخ الإرسال" %}:
+              </h6>
+              <p class="mb-0">{{ case.created_at|date:"d/m/Y H:i" }}</p>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <h6 class="text-primary">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {% ar "الأولوية" %}:
+              </h6>
+              <p class="mb-0">
+                {% if case.priority == 'urgent' %}
+                <span class="badge bg-danger">
+                  <i class="fas fa-exclamation-triangle me-1"></i>
+                  {% ar "عاجل" %}
+                </span>
+                {% elif case.priority == 'normal' %}
+                <span class="badge bg-primary">
+                  <i class="fas fa-clock me-1"></i>
+                  {% ar "عادي" %}
+                </span>
+                {% else %}
+                <span class="badge bg-secondary">
+                  <i class="fas fa-hourglass-half me-1"></i>
+                  {% ar "غير عاجل" %}
+                </span>
+                {% endif %}
+              </p>
+            </div>
+            <div class="col-md-6 mb-3">
+              <h6 class="text-primary">
+                <i class="fas fa-stethoscope me-2"></i>
+                {% ar "التخصص المطلوب" %}:
+              </h6>
+              <p class="mb-0">{{ case.get_specialization_display }}</p>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-12">
+              <h6 class="text-primary">
+                <i class="fas fa-file-alt me-2"></i>
+                {% ar "وصف الحالة" %}:
+              </h6>
+              <div class="bg-light p-3 rounded">
+                <p class="mb-0">{{ case.description|linebreaks }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if case.symptoms %}
+      <div class="card mt-4">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-thermometer-half me-2"></i>
+            {% ar "الأعراض" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="bg-light p-3 rounded">
+            <p class="mb-0">{{ case.symptoms|linebreaks }}</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if case.attachments.exists %}
+      <div class="card mt-4">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-paperclip me-2"></i>
+            {% ar "المرفقات" %} ({{ case.attachments.count }})
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            {% for attachment in case.attachments.all %}
+            <div class="col-md-4 mb-3">
+              <div class="card h-100">
+                {% if attachment.file_type == 'image' %}
+                <img
+                  src="{{ attachment.file.url }}"
+                  class="card-img-top"
+                  alt="{% ar 'مرفق' %}"
+                  style="height: 200px; object-fit: cover"
+                />
+                {% else %}
+                <div
+                  class="card-img-top d-flex align-items-center justify-content-center bg-light"
+                  style="height: 200px"
+                >
+                  {% if attachment.file_type == 'pdf' %}
+                  <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                  {% else %}
+                  <i class="fas fa-file fa-3x text-secondary"></i>
+                  {% endif %}
+                </div>
+                {% endif %}
+                <div class="card-body text-center">
+                  <div class="btn-group">
+                    <a
+                      href="{{ attachment.file.url }}"
+                      target="_blank"
+                      class="btn btn-sm btn-outline-primary"
+                    >
+                      <i class="fas fa-eye me-1"></i>
+                      {% ar "عرض" %}
+                    </a>
+                    <a
+                      href="{{ attachment.file.url }}"
+                      download
+                      class="btn btn-sm btn-outline-success"
+                    >
+                      <i class="fas fa-download me-1"></i>
+                      {% ar "تحميل" %}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      
+      {% if case.status == 'completed' and case.responses.exists %}
+      <div class="card mt-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-user-md me-2"></i>
+            {% ar "رد الطبيب" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          {% for response in case.responses.all %}
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="text-success mb-0">
+                <i class="fas fa-user-md me-2"></i>
+                د. {{ response.doctor.user.get_full_name }}
+              </h6>
+              <small class="text-muted"
+                >{{ response.created_at|date:"d/m/Y H:i" }}</small
+              >
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <h6 class="text-primary">
+                  <i class="fas fa-diagnoses me-2"></i>
+                  {% ar "التشخيص" %}:
+                </h6>
+                <div class="bg-light p-3 rounded">
+                  <p class="mb-0">{{ response.diagnosis|linebreaks }}</p>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <h6 class="text-primary">
+                  <i class="fas fa-pills me-2"></i>
+                  {% ar "العلاج المقترح" %}:
+                </h6>
+                <div class="bg-light p-3 rounded">
+                  <p class="mb-0">{{ response.treatment_plan|linebreaks }}</p>
+                </div>
+              </div>
+            </div>
+
+            {% if response.notes %}
+            <div class="row">
+              <div class="col-12 mb-3">
+                <h6 class="text-primary">
+                  <i class="fas fa-sticky-note me-2"></i>
+                  {% ar "ملاحظات إضافية" %}:
+                </h6>
+                <div class="bg-light p-3 rounded">
+                  <p class="mb-0">{{ response.notes|linebreaks }}</p>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+      {% if case.doctor %}
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-user-md me-2"></i>
+            {% ar "الطبيب المعالج" %}
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          <div class="mb-3">
+            {% if case.doctor.user.profile_pic %}
+            <img
+              src="{{ case.doctor.user.profile_pic.url }}"
+              alt="{% ar 'صورة الطبيب' %}"
+              class="rounded-circle"
+              style="width: 80px; height: 80px; object-fit: cover"
+            />
+            {% else %}
+            <div
+              class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white mx-auto"
+              style="width: 80px; height: 80px"
+            >
+              <i class="fas fa-user-md fa-2x"></i>
+            </div>
+            {% endif %}
+          </div>
+          <h6 class="mb-1">د. {{ case.doctor.user.get_full_name }}</h6>
+          <p class="text-muted mb-2">
+            {{ case.doctor.get_specialization_display }}
+          </p>
+          <p class="text-muted small mb-3">
+            <i class="fas fa-map-marker-alt me-1"></i>
+            {{ case.doctor.country|default:"غير محدد" }}
+          </p>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-cogs me-2"></i>
+            {% ar "إجراءات سريعة" %}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            {% if case.status == 'completed' and case.doctor %}
+              {% if not case.doctorrating_set.all %}
+              <a
+                href="{% url 'patients:rate_doctor' case.id %}"
+                class="btn btn-warning btn-sm"
+              >
+                <i class="fas fa-star me-2"></i>
+                {% ar "تقييم الطبيب" %}
+              </a>
+              {% endif %}
+            {% endif %}
+
+            <a
+              href="{% url 'patients:all_cases' %}"
+              class="btn btn-outline-primary btn-sm"
+            >
+              <i class="fas fa-list me-2"></i>
+              {% ar "جميع الحالات" %}
+            </a>
+
+            <a
+              href="{% url 'patients:new_case' %}"
+              class="btn btn-success btn-sm"
+            >
+              <i class="fas fa-plus me-2"></i>
+              {% ar "حالة جديدة" %}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

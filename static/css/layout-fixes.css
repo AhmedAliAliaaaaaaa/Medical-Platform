@@ -1,0 +1,198 @@
+/* ===========================================
+   Layout Fixes & Utilities
+   =========================================== */
+
+/* RTL Specific Fixes */
+[dir="rtl"] .me-1 {
+  margin-left: 0.25rem !important;
+  margin-right: 0 !important;
+}
+[dir="rtl"] .me-2 {
+  margin-left: 0.5rem !important;
+  margin-right: 0 !important;
+}
+[dir="rtl"] .me-3 {
+  margin-left: 1rem !important;
+  margin-right: 0 !important;
+}
+[dir="rtl"] .ms-1 {
+  margin-right: 0.25rem !important;
+  margin-left: 0 !important;
+}
+[dir="rtl"] .ms-2 {
+  margin-right: 0.5rem !important;
+  margin-left: 0 !important;
+}
+[dir="rtl"] .ms-3 {
+  margin-right: 1rem !important;
+  margin-left: 0 !important;
+}
+[dir="rtl"] .pe-1 {
+  padding-left: 0.25rem !important;
+  padding-right: 0 !important;
+}
+[dir="rtl"] .pe-2 {
+  padding-left: 0.5rem !important;
+  padding-right: 0 !important;
+}
+[dir="rtl"] .ps-1 {
+  padding-right: 0.25rem !important;
+  padding-left: 0 !important;
+}
+[dir="rtl"] .ps-2 {
+  padding-right: 0.5rem !important;
+  padding-left: 0 !important;
+}
+
+/* Font Awesome RTL */
+[dir="rtl"] .fa-arrow-left:before {
+  content: "\f061";
+}
+[dir="rtl"] .fa-arrow-right:before {
+  content: "\f060";
+}
+[dir="rtl"] .fa-chevron-left:before {
+  content: "\f054";
+}
+[dir="rtl"] .fa-chevron-right:before {
+  content: "\f053";
+}
+[dir="rtl"] .fa-angle-left:before {
+  content: "\f105";
+}
+[dir="rtl"] .fa-angle-right:before {
+  content: "\f104";
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Selection Color */
+::selection {
+  background: rgba(26, 86, 219, 0.2);
+  color: #1e293b;
+}
+
+/* Focus Ring */
+*:focus-visible {
+  outline: 2px solid rgba(26, 86, 219, 0.4);
+  outline-offset: 2px;
+}
+
+/* Placeholder Color */
+::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1;
+}
+
+/* Responsive Table Wrapper */
+.table-responsive-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Card Hover Effect */
+.card-hover-effect {
+  transition: all 0.3s ease;
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading Spinner */
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-state i {
+  font-size: 48px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.empty-state h5 {
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+
+/* Toast Messages */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 11000;
+}
+
+.toast-message {
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: white;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideInLeft 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.toast-message.success {
+  background: #059669;
+}
+.toast-message.error {
+  background: #dc2626;
+}
+.toast-message.warning {
+  background: #d97706;
+}
+.toast-message.info {
+  background: #0284c7;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

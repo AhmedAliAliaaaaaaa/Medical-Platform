@@ -1,0 +1,760 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "لوحة الطبيب" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% load static %}
+
+{% block extra_css %}
+<link href="{% static 'css/doctor-enhanced.css' %}" rel="stylesheet">
+<style>
+/* Enhanced Doctor Dashboard Colors */
+.doctor-card-header {
+    background: linear-gradient(135deg, #1E3A8A 0%, #F97316 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(16, 24, 40, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.doctor-card-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: doctorFloat 8s ease-in-out infinite;
+}
+
+@keyframes doctorFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(180deg); }
+}
+
+.doctor-card-header h2 {
+    font-family: 'Almarai', 'Montserrat', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.doctor-card-header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* Enhanced Doctor Statistics Grid */
+.doctor-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.doctor-stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.doctor-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #2E86AB, #A23B72, #F18F01);
+}
+
+.doctor-stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.doctor-stat-card:nth-child(1):hover {
+    box-shadow: 0 15px 40px rgba(46, 134, 171, 0.3);
+}
+
+.doctor-stat-card:nth-child(2):hover {
+    box-shadow: 0 15px 40px rgba(162, 59, 114, 0.3);
+}
+
+.doctor-stat-card:nth-child(3):hover {
+    box-shadow: 0 15px 40px rgba(241, 143, 1, 0.3);
+}
+
+.doctor-stat-card:nth-child(4):hover {
+    box-shadow: 0 15px 40px rgba(255, 193, 7, 0.3);
+}
+
+.doctor-stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.doctor-stat-card:nth-child(1) .doctor-stat-icon {
+    color: #2E86AB;
+}
+
+.doctor-stat-card:nth-child(2) .doctor-stat-icon {
+    color: #A23B72;
+}
+
+.doctor-stat-card:nth-child(3) .doctor-stat-icon {
+    color: #F18F01;
+}
+
+.doctor-stat-card:nth-child(4) .doctor-stat-icon {
+    color: #FFC107;
+}
+
+.doctor-stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #2C3E50;
+}
+
+.doctor-stat-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2C3E50;
+    margin-bottom: 0.5rem;
+}
+
+/* Enhanced Case Cards for Doctors */
+.doctor-case-card {
+    background: white;
+    border: 1px solid #E9ECEF;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.doctor-case-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #2E86AB, #A23B72);
+    transition: all 0.3s ease;
+}
+
+.doctor-case-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(46, 134, 171, 0.15);
+    border-color: #2E86AB;
+}
+
+.doctor-case-card:hover::before {
+    width: 6px;
+}
+
+.doctor-case-priority-urgent {
+    border-left: 4px solid #DC3545;
+}
+
+.doctor-case-priority-urgent::before {
+    background: linear-gradient(180deg, #DC3545, #E57373);
+}
+
+/* Enhanced Doctor Buttons */
+.doctor-btn-primary {
+    background: linear-gradient(135deg, #2E86AB, #4A9BC7);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(46, 134, 171, 0.3);
+    transition: all 0.3s ease;
+}
+
+.doctor-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 134, 171, 0.4);
+    background: linear-gradient(135deg, #4A9BC7, #2E86AB);
+}
+
+.doctor-btn-success {
+    background: linear-gradient(135deg, #28A745, #34CE57);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+}
+
+.doctor-btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.doctor-btn-outline {
+    border: 2px solid #2E86AB;
+    color: #2E86AB;
+    background: transparent;
+    font-weight: 500;
+    padding: 0.6rem 1.5rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.doctor-btn-outline:hover {
+    background: linear-gradient(135deg, #2E86AB, #4A9BC7);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(46, 134, 171, 0.3);
+}
+
+/* Enhanced Doctor Profile Section */
+.doctor-profile-card {
+    background: linear-gradient(135deg, #F8F9FA 0%, #FFFFFF 100%);
+    border: 1px solid rgba(46, 134, 171, 0.1);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.doctor-profile-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid #2E86AB;
+    box-shadow: 0 4px 15px rgba(46, 134, 171, 0.2);
+    margin-bottom: 1rem;
+}
+
+.doctor-profile-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2E86AB, #4A9BC7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    margin: 0 auto 1rem;
+    box-shadow: 0 4px 15px rgba(46, 134, 171, 0.2);
+}
+
+.doctor-specialization-badge {
+    background: linear-gradient(135deg, #A23B72, #C85A8E);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 0.5rem;
+}
+
+/* Animation Classes */
+.doctor-fade-in {
+    animation: doctorFadeIn 0.8s ease-out;
+}
+
+.doctor-slide-up {
+    animation: doctorSlideUp 0.8s ease-out 0.2s both;
+}
+
+@keyframes doctorFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes doctorSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .doctor-dashboard-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .doctor-card-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .doctor-card-header h2 {
+        font-size: 1.8rem;
+    }
+    
+    .doctor-stat-card {
+        padding: 1.5rem;
+    }
+    
+    .doctor-stat-number {
+        font-size: 2rem;
+    }
+}
+
+/* Enhanced Status Indicators */
+.doctor-status-pending {
+    background: linear-gradient(135deg, #FFA726, #FFB74D);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.doctor-status-completed {
+    background: linear-gradient(135deg, #28A745, #34CE57);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.doctor-status-urgent {
+    background: linear-gradient(135deg, #DC3545, #E57373);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="doctor-card doctor-card-header doctor-fade-in">
+                <h2><i class="fas fa-stethoscope me-2"></i>{% trans "لوحة الطبيب" %}</h2>
+                <p class="text-muted">{% trans "مرحباً بك" %} د. {{ user.first_name }}، {% trans "إليك الحالات الطبية المطلوب مراجعتها" %}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="doctor-dashboard-grid doctor-slide-up">
+        <div class="doctor-stat-card">
+            <i class="fas fa-file-medical doctor-stat-icon"></i>
+            <div class="doctor-stat-number">{{ total_cases }}</div>
+            <div class="doctor-stat-label">{% trans "إجمالي الحالات" %}</div>
+        </div>
+        <div class="doctor-stat-card">
+            <i class="fas fa-clock doctor-stat-icon"></i>
+            <div class="doctor-stat-number">{{ pending_cases }}</div>
+            <div class="doctor-stat-label">{% trans "قيد المراجعة" %}</div>
+        </div>
+        <div class="doctor-stat-card">
+            <i class="fas fa-check-circle doctor-stat-icon"></i>
+            <div class="doctor-stat-number">{{ completed_cases }}</div>
+            <div class="doctor-stat-label">{% trans "تم الرد عليها" %}</div>
+        </div>
+        <div class="doctor-stat-card">
+            <i class="fas fa-star doctor-stat-icon"></i>
+            <div class="doctor-stat-number">{{ doctor.rating|floatformat:1 }}</div>
+            <div class="doctor-stat-label">{% trans "التقييم" %}</div>
+            <small class="text-muted">({{ doctor.total_reviews }} {% trans "تقييم" %})</small>
+        </div>
+        <div class="doctor-stat-card">
+            <i class="fas fa-bell doctor-stat-icon"></i>
+            <div class="doctor-stat-number">{{ unread_notifications }}</div>
+            <div class="doctor-stat-label">{% trans "إشعارات غير مقروءة" %}</div>
+            <a href="{% url 'doctors:notifications' %}" class="btn btn-sm btn-outline-primary mt-2">{% trans "عرض الإشعارات" %}</a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- New Cases -->
+        <div class="col-md-8">
+            <div class="dashboard-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-file-medical me-2"></i>{% trans "الحالات الجديدة" %}</h5>
+                    <span class="badge bg-primary">{{ new_cases|length }} {% trans "حالة" %}</span>
+                </div>
+                <hr>
+                
+                {% if new_cases %}
+                    {% for case in new_cases %}
+                    <div class="case-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <h6 class="mb-0 me-3">{{ case.title }}</h6>
+                                    {% if case.priority == 'urgent' %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            {% trans "مستعجلة" %}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <p class="text-muted mb-2">{{ case.description|truncatewords:20 }}</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>
+                                            {{ case.patient.user.first_name }} {{ case.patient.user.last_name }}
+                                        </small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            {{ case.created_at|date:"d/m/Y H:i" }}
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                {% if case.attachments.exists %}
+                                <div class="mt-2">
+                                    <small class="text-info">
+                                        <i class="fas fa-paperclip me-1"></i>
+                                        {{ case.attachments.count }} {% trans "مرفق" %}
+                                    </small>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="text-end">
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'doctors:case_detail' case.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>
+                                        {% trans "فتح الحالة" %}
+                                    </a>
+                                    <a href="{% url 'doctors:respond_case' case.id %}" class="btn btn-sm btn-success">
+                                        <i class="fas fa-reply me-1"></i>
+                                        {% trans "رد على الحالة" %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-file-medical fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">{% trans "لا توجد حالات جديدة" %}</h5>
+                        <p class="text-muted">{% trans "لا توجد حالات طبية تحتاج لمراجعتك حالياً" %}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Recent Ratings -->
+        {% if recent_ratings %}
+        <div class="col-md-8 mt-4">
+            <div class="dashboard-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5><i class="fas fa-star me-2"></i>{% trans "التقييمات الحديثة" %}</h5>
+                    <a href="{% url 'doctors:my_ratings' %}" class="btn btn-sm btn-outline-primary">
+                        {% trans "عرض الكل" %} ({{ total_ratings }})
+                    </a>
+                </div>
+                
+                {% for rating in recent_ratings %}
+                <div class="rating-item mb-3">
+                    <div class="d-flex align-items-start">
+                        <div class="rating-avatar me-3">
+                            {% if rating.patient.user.profile_picture %}
+                                <img src="{{ rating.patient.user.profile_picture.url }}" alt="{% trans 'صورة المريض' %}" class="rounded-circle" width="40" height="40">
+                            {% else %}
+                                <div class="avatar-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">{{ rating.patient.user.first_name }}</h6>
+                                <div class="rating-stars">
+                                    {% for i in "12345" %}
+                                        {% if rating.rating >= forloop.counter %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% elif rating.rating >= forloop.counter|add:"-0.5" %}
+                                            <i class="fas fa-star-half-alt text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-2 text-muted">{{ rating.rating|floatformat:1 }}</span>
+                                </div>
+                            </div>
+                            
+                            <p class="case-title mb-1">{{ rating.case.title }}</p>
+                            
+                            {% if rating.comment %}
+                                <p class="rating-comment">"{{ rating.comment|truncatewords:15 }}"</p>
+                            {% endif %}
+                            
+                            <div class="rating-details">
+                                <small class="text-muted">
+                                    {% trans "دقة التشخيص" %}: {{ rating.diagnosis_accuracy }}/5 • 
+                                    {% trans "وضوح العلاج" %}: {{ rating.treatment_clarity }}/5 • 
+                                    {% trans "سرعة الرد" %}: {{ rating.response_speed }}/5
+                                </small>
+                            </div>
+                            
+                            <small class="text-muted">{{ rating.created_at|timesince }} {% trans "مضت" %}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Doctor Profile & Quick Actions -->
+        <div class="col-md-4">
+            <!-- Profile Card -->
+            <div class="dashboard-card mb-4">
+                <h5><i class="fas fa-user-md me-2"></i>{% trans "ملف الطبيب" %}</h5>
+                <hr>
+                
+                <div class="text-center mb-3">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{% trans 'د.' %} {{ user.first_name }}" class="rounded-circle" width="80" height="80">
+                    {% else %}
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user-md fa-2x text-white"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="text-center">
+                    <h6>{% trans "د." %} {{ user.first_name }} {{ user.last_name }}</h6>
+                    <p class="text-muted small">{{ doctor.get_specialization_display }}</p>
+                    <p class="text-muted small">{{ doctor.country }}</p>
+                    
+                    <div class="rating-stars mb-2">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= doctor.rating %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="ms-2 small text-muted">({{ doctor.total_reviews }})</span>
+                    </div>
+                </div>
+                
+                <div class="d-grid">
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i>
+                        {% trans "تعديل الملف" %}
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="dashboard-card">
+                <h5><i class="fas fa-bolt me-2"></i>إجراءات سريعة</h5>
+                <hr>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'doctors:my_ratings' %}" class="btn btn-outline-warning">
+                        <i class="fas fa-star me-2"></i>
+                        تقييماتي
+                        {% if total_ratings > 0 %}
+                            <span class="badge bg-warning ms-1">{{ total_ratings }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'doctors:send_notification' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-paper-plane me-2"></i>
+                        إرسال إشعار
+                    </a>
+                    <a href="{% url 'doctors:notifications' %}" class="btn btn-outline-info">
+                        <i class="fas fa-bell me-2"></i>
+                        إشعاراتي
+                        {% if unread_notifications > 0 %}
+                            <span class="badge bg-danger ms-1">{{ unread_notifications }}</span>
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'doctors:my_responses' %}" class="btn btn-outline-success">
+                        <i class="fas fa-history me-2"></i>
+                        ردودي السابقة
+                    </a>
+                    <a href="{% url 'doctors:all_patient_cases' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-list me-2"></i>
+                        جميع حالات المرضى
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* تصميم التقييمات في Dashboard */
+.rating-item {
+    padding: 1rem;
+    border-radius: 10px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.rating-item:hover {
+    background: #e9ecef;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.rating-stars {
+    font-size: 0.9rem;
+}
+
+.rating-stars .fas.fa-star,
+.rating-stars .fas.fa-star-half-alt {
+    color: #ffc107;
+}
+
+.rating-stars .far.fa-star {
+    color: #dee2e6;
+}
+
+.case-title {
+    font-size: 0.9rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+.rating-comment {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-style: italic;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 6px;
+    border-left: 3px solid #007bff;
+}
+
+.rating-details {
+    font-size: 0.75rem;
+    margin: 0.5rem 0;
+}
+
+/* تحسينات عامة */
+.dashboard-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 0.5rem;
+}
+
+.btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.6em;
+    border-radius: 10px;
+}
+
+/* تحسينات للموبايل */
+@media (max-width: 768px) {
+    .rating-item {
+        padding: 0.75rem;
+    }
+    
+    .rating-item .d-flex {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .rating-avatar {
+        margin: 0 auto 1rem auto !important;
+    }
+    
+    .dashboard-card {
+        padding: 1rem;
+    }
+    
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+{% endblock %}

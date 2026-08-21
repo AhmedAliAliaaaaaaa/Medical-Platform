@@ -1,0 +1,6 @@
+من المسار التالي
+PS C:\Users\asus\Desktop\ge>نقوم بتشغيل السيرفر الذي بدورة يقوم بتشغيل الموقع
+ python manage.py runserver
+2.تشغيل التطبيق من المسار التالي
+PS C:\Users\asus\Desktop\ge\doctor_app>نقوم بكتابة التالية وتشغيل المشروع
+ flutter run   

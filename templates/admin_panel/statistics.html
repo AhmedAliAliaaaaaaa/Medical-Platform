@@ -1,0 +1,567 @@
+{% extends 'base.html' %} {% load i18n %} {% block title %}{% trans "الإحصائيات"
+%} - {% trans "لوحة الإدارة" %}{% endblock %} {% block content %}
+<div class="container-fluid py-4">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-cogs me-2"></i>
+            {% trans "لوحة الإدارة" %}
+          </h5>
+        </div>
+        <div class="list-group list-group-flush">
+          <a
+            href="{% url 'admin_panel:dashboard' %}"
+            class="list-group-item list-group-item-action"
+          >
+            <i class="fas fa-tachometer-alt me-2"></i>
+            {% trans "الرئيسية" %}
+          </a>
+          <a
+            href="{% url 'admin_panel:manage_doctors' %}"
+            class="list-group-item list-group-item-action"
+          >
+            <i class="fas fa-user-md me-2"></i>
+            {% trans "إدارة الأطباء" %}
+          </a>
+          <a
+            href="{% url 'admin_panel:manage_cases' %}"
+            class="list-group-item list-group-item-action"
+          >
+            <i class="fas fa-file-medical me-2"></i>
+            {% trans "إدارة الحالات" %}
+          </a>
+          <a
+            href="{% url 'admin_panel:manage_users' %}"
+            class="list-group-item list-group-item-action"
+          >
+            <i class="fas fa-users me-2"></i>
+            {% trans "إدارة المستخدمين" %}
+          </a>
+          <a
+            href="{% url 'admin_panel:statistics' %}"
+            class="list-group-item list-group-item-action active"
+          >
+            <i class="fas fa-chart-bar me-2"></i>
+            {% trans "الإحصائيات" %}
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9">
+      <div class="card">
+        <div class="card-header bg-warning text-dark">
+          <div class="d-flex justify-content-between align-items-center">
+            <button class="btn btn-outline-secondary" onclick="window.print()">
+              <i class="fas fa-print me-2"></i>
+              {% trans "طباعة" %}
+            </button>
+            <h4 class="mb-0">
+              <i class="fas fa-chart-bar me-2"></i>
+              {% trans "الإحصائيات والتقارير" %}
+            </h4>
+            <div class="dropdown">
+              <button
+                class="btn btn-success dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="fas fa-download me-2"></i>
+                {% trans "تصدير التقارير" %}
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <h6 class="dropdown-header">
+                    {% trans "تقرير المستخدمين" %}
+                  </h6>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=users&format=csv"
+                  >
+                    <i class="fas fa-file-csv me-2"></i>
+                    {% trans "CSV" %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=users&format=excel"
+                  >
+                    <i class="fas fa-file-excel me-2"></i>
+                    {% trans "Excel" %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=users&format=json"
+                  >
+                    <i class="fas fa-file-code me-2"></i>
+                    {% trans "JSON" %}
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <h6 class="dropdown-header">{% trans "تقرير الحالات" %}</h6>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=cases&format=csv"
+                  >
+                    <i class="fas fa-file-csv me-2"></i>
+                    {% trans "CSV" %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=cases&format=excel"
+                  >
+                    <i class="fas fa-file-excel me-2"></i>
+                    {% trans "Excel" %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=cases&format=json"
+                  >
+                    <i class="fas fa-file-code me-2"></i>
+                    {% trans "JSON" %}
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <h6 class="dropdown-header">{% trans "تقرير الأطباء" %}</h6>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=doctors&format=csv"
+                  >
+                    <i class="fas fa-file-csv me-2"></i>
+                    {% trans "CSV" %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=doctors&format=excel"
+                  >
+                    <i class="fas fa-file-excel me-2"></i>
+                    {% trans "Excel" %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=doctors&format=json"
+                  >
+                    <i class="fas fa-file-code me-2"></i>
+                    {% trans "JSON" %}
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <h6 class="dropdown-header">
+                    {% trans "الإحصائيات العامة" %}
+                  </h6>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=statistics&format=csv"
+                  >
+                    <i class="fas fa-file-csv me-2"></i>
+                    {% trans "CSV" %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=statistics&format=excel"
+                  >
+                    <i class="fas fa-file-excel me-2"></i>
+                    {% trans "Excel" %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'admin_panel:export_reports' %}?type=statistics&format=json"
+                  >
+                    <i class="fas fa-file-code me-2"></i>
+                    {% trans "JSON" %}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="#"
+                    onclick="window.print(); return false;"
+                  >
+                    <i class="fas fa-file-pdf me-2"></i>
+                    {% trans "PDF" %}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Monthly Statistics -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h5 class="mb-3">
+                <i class="fas fa-calendar-alt me-2"></i>
+                {% trans "إحصائيات الشهر الحالي" %}
+              </h5>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                  <i class="fas fa-users fa-2x mb-2"></i>
+                  <h4>{{ monthly_users|default:0 }}</h4>
+                  <small>{% trans "مستخدمون جدد" %}</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                  <i class="fas fa-user-md fa-2x mb-2"></i>
+                  <h4>{{ monthly_doctors|default:0 }}</h4>
+                  <small>{% trans "أطباء جدد" %}</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                  <i class="fas fa-file-medical fa-2x mb-2"></i>
+                  <h4>{{ monthly_cases|default:0 }}</h4>
+                  <small>{% trans "حالات جديدة" %}</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                  <i class="fas fa-reply fa-2x mb-2"></i>
+                  <h4>{{ monthly_responses|default:0 }}</h4>
+                  <small>{% trans "ردود الأطباء" %}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cases by Status Chart -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    {% trans "الحالات حسب الحالة" %}
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <canvas
+                    id="casesStatusChart"
+                    width="400"
+                    height="200"
+                  ></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    {% trans "إحصائيات سريعة" %}
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <div class="row text-center">
+                    <div class="col-6 mb-3">
+                      <div class="border rounded p-3">
+                        <h4 class="text-warning">
+                          {{ cases_by_status.pending|default:0 }}
+                        </h4>
+                        <small>{% trans "قيد الانتظار" %}</small>
+                      </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                      <div class="border rounded p-3">
+                        <h4 class="text-info">
+                          {{ cases_by_status.in_progress|default:0 }}
+                        </h4>
+                        <small>{% trans "قيد المراجعة" %}</small>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="border rounded p-3">
+                        <h4 class="text-success">
+                          {{ cases_by_status.completed|default:0 }}
+                        </h4>
+                        <small>{% trans "مكتملة" %}</small>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="border rounded p-3">
+                        <h4 class="text-primary">
+                          {{
+                          cases_by_status.pending|add:cases_by_status.in_progress|add:cases_by_status.completed
+                          }}
+                        </h4>
+                        <small>{% trans "المجموع" %}</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detailed Statistics Table -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">
+                    <i class="fas fa-table me-2"></i>
+                    {% trans "تفاصيل الإحصائيات" %}
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-striped">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>{% trans "المؤشر" %}</th>
+                          <th>{% trans "العدد" %}</th>
+                          <th>{% trans "النسبة" %}</th>
+                          <th>{% trans "الحالة" %}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <i class="fas fa-users text-primary me-2"></i>
+                            {% trans "إجمالي المستخدمين" %}
+                          </td>
+                          <td>
+                            <strong>{{ monthly_users|default:0 }}</strong>
+                          </td>
+                          <td>
+                            <div class="progress" style="height: 20px">
+                              <div
+                                class="progress-bar bg-primary"
+                                style="width: 100%"
+                              >
+                                100%
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span class="badge bg-success"
+                              >{% trans "نشط" %}</span
+                            >
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <i class="fas fa-user-md text-success me-2"></i>
+                            {% trans "الأطباء المعتمدون" %}
+                          </td>
+                          <td>
+                            <strong>{{ monthly_doctors|default:0 }}</strong>
+                          </td>
+                          <td>
+                            <div class="progress" style="height: 20px">
+                              <div
+                                class="progress-bar bg-success"
+                                style="width: 75%"
+                              >
+                                75%
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span class="badge bg-success"
+                              >{% trans "جيد" %}</span
+                            >
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <i class="fas fa-file-medical text-info me-2"></i>
+                            {% trans "الحالات المكتملة" %}
+                          </td>
+                          <td>
+                            <strong
+                              >{{ cases_by_status.completed|default:0 }}</strong
+                            >
+                          </td>
+                          <td>
+                            <div class="progress" style="height: 20px">
+                              <div
+                                class="progress-bar bg-info"
+                                style="width: 60%"
+                              >
+                                60%
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span class="badge bg-info"
+                              >{% trans "متوسط" %}</span
+                            >
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <i class="fas fa-clock text-warning me-2"></i>
+                            {% trans "الحالات المعلقة" %}
+                          </td>
+                          <td>
+                            <strong
+                              >{{ cases_by_status.pending|default:0 }}</strong
+                            >
+                          </td>
+                          <td>
+                            <div class="progress" style="height: 20px">
+                              <div
+                                class="progress-bar bg-warning"
+                                style="width: 40%"
+                              >
+                                40%
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span class="badge bg-warning"
+                              >{% trans "يحتاج متابعة" %}</span
+                            >
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Export Options -->
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">
+                    <i class="fas fa-download me-2"></i>
+                    {% trans "تصدير التقارير" %}
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-3">
+                      <a
+                        class="btn btn-success w-100"
+                        href="{% url 'admin_panel:export_reports' %}?type=statistics&format=excel"
+                      >
+                        <i class="fas fa-file-excel me-2"></i>
+                        {% trans "تصدير Excel" %}
+                      </a>
+                    </div>
+                    <div class="col-md-3">
+                      <a
+                        class="btn btn-danger w-100"
+                        href="#"
+                        onclick="window.print(); return false;"
+                      >
+                        <i class="fas fa-file-pdf me-2"></i>
+                        {% trans "تصدير PDF" %}
+                      </a>
+                    </div>
+                    <div class="col-md-3">
+                      <a
+                        class="btn btn-info w-100"
+                        href="{% url 'admin_panel:export_reports' %}?type=statistics&format=csv"
+                      >
+                        <i class="fas fa-file-csv me-2"></i>
+                        {% trans "تصدير CSV" %}
+                      </a>
+                    </div>
+                    <div class="col-md-3">
+                      <a
+                        class="btn btn-primary w-100"
+                        href="#"
+                        onclick="window.print(); return false;"
+                      >
+                        <i class="fas fa-print me-2"></i>
+                        {% trans "طباعة" %}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Cases Status Chart
+    const ctx = document.getElementById("casesStatusChart").getContext("2d");
+    const casesStatusChart = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: [
+          '{% trans "قيد الانتظار" %}',
+          '{% trans "قيد المراجعة" %}',
+          '{% trans "مكتملة" %}',
+        ],
+        datasets: [
+          {
+            data: [
+              parseInt('{{ cases_by_status.pending|default:"0" }}', 10),
+              parseInt('{{ cases_by_status.in_progress|default:"0" }}', 10),
+              parseInt('{{ cases_by_status.completed|default:"0" }}', 10),
+            ],
+            backgroundColor: ["#ffc107", "#17a2b8", "#28a745"],
+            borderWidth: 2,
+            borderColor: "#fff",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+            },
+          },
+        },
+      },
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,2103 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "لوحة تحكم المريض" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Patient Dashboard Styles */
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6);
+}
+
+.welcome-header {
+    background: var(--gradient-medical);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    color: white;
+    box-shadow: var(--shadow-xl);
+    margin-bottom: var(--space-8);
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    animation: float 20s linear infinite;
+}
+
+.welcome-title {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--font-bold);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.welcome-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+}
+
+.welcome-description {
+    font-size: 1rem;
+    opacity: 0.8;
+    line-height: 1.6;
+}
+
+.profile-image, .profile-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.3);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.profile-placeholder {
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+/* Enhanced Stat Cards */
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.stat-card-primary::before {
+    background: linear-gradient(90deg, #4A90E2, #7BB3F0);
+}
+
+.stat-card-warning::before {
+    background: linear-gradient(90deg, #FFA726, #FFB74D);
+}
+
+.stat-card-success::before {
+    background: linear-gradient(90deg, #50C878, #7ED89A);
+}
+
+.stat-card-info::before {
+    background: linear-gradient(90deg, #AB47BC, #BA68C8);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.stat-card-primary .stat-icon {
+    background: linear-gradient(135deg, #4A90E2, #7BB3F0);
+}
+
+.stat-card-warning .stat-icon {
+    background: linear-gradient(135deg, #FFA726, #FFB74D);
+}
+
+.stat-card-success .stat-icon {
+    background: linear-gradient(135deg, #50C878, #7ED89A);
+}
+
+.stat-card-info .stat-icon {
+    background: linear-gradient(135deg, #AB47BC, #BA68C8);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card-primary .stat-number {
+    color: #4A90E2;
+}
+
+.stat-card-warning .stat-number {
+    color: #FFA726;
+}
+
+.stat-card-success .stat-number {
+    color: #50C878;
+}
+
+.stat-card-info .stat-number {
+    color: #AB47BC;
+}
+
+.stat-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2C3E50;
+    margin-bottom: 0.5rem;
+}
+
+.stat-trend {
+    font-size: 0.85rem;
+    color: #7F8C8D;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Quick Actions Card */
+.quick-actions-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border: 1px solid rgba(74, 144, 226, 0.1);
+}
+
+.section-title {
+    color: #2C3E50;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.section-title i {
+    color: #4A90E2;
+}
+
+.action-btn {
+    display: block;
+    background: white;
+    border: 2px solid #E9ECEF;
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transition: all 0.3s ease;
+}
+
+.action-btn-primary::before {
+    background: linear-gradient(90deg, #4A90E2, #7BB3F0);
+}
+
+.action-btn-warning::before {
+    background: linear-gradient(90deg, #FFA726, #FFB74D);
+}
+
+.action-btn-success::before {
+    background: linear-gradient(90deg, #50C878, #7ED89A);
+}
+
+.action-btn-info::before {
+    background: linear-gradient(90deg, #AB47BC, #BA68C8);
+}
+
+.action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    text-decoration: none;
+}
+
+.action-btn-primary:hover {
+    border-color: #4A90E2;
+}
+
+.action-btn-warning:hover {
+    border-color: #FFA726;
+}
+
+.action-btn-success:hover {
+    border-color: #50C878;
+}
+
+.action-btn-info:hover {
+    border-color: #AB47BC;
+}
+
+.action-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.action-btn-primary .action-icon {
+    background: linear-gradient(135deg, #4A90E2, #7BB3F0);
+}
+
+.action-btn-warning .action-icon {
+    background: linear-gradient(135deg, #FFA726, #FFB74D);
+}
+
+.action-btn-success .action-icon {
+    background: linear-gradient(135deg, #50C878, #7ED89A);
+}
+
+.action-btn-info .action-icon {
+    background: linear-gradient(135deg, #AB47BC, #BA68C8);
+}
+
+.action-content h6 {
+    color: #2C3E50;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.action-content p {
+    color: #7F8C8D;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Enhanced Case Cards */
+.case-card {
+    background: #F8F9FA;
+    border: 1px solid #E9ECEF;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.case-card:hover {
+    background: white;
+    border-color: #4A90E2;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.1);
+    transform: translateX(5px);
+}
+
+.case-card h6 {
+    color: #2C3E50;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Enhanced Status Badges */
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background: linear-gradient(135deg, #FFA726, #FFB74D);
+    color: white;
+}
+
+.status-completed {
+    background: linear-gradient(135deg, #50C878, #7ED89A);
+    color: white;
+}
+
+.status-in-progress {
+    background: linear-gradient(135deg, #4A90E2, #7BB3F0);
+    color: white;
+}
+
+/* Notification Badge */
+.notification-badge, .action-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: linear-gradient(135deg, #EF5350, #E57373);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Enhanced Buttons */
+.btn-outline-primary {
+    border: 2px solid #4A90E2;
+    color: #4A90E2;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, #4A90E2, #7BB3F0);
+    border-color: #4A90E2;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4A90E2, #7BB3F0);
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .welcome-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .welcome-title {
+        font-size: 1.8rem;
+    }
+    
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .quick-actions-card {
+        padding: 1.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="welcome-header">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="welcome-content">
+                            <h1 class="welcome-title">
+                                <i class="fas fa-heart-pulse me-3"></i>
+                                {% trans "مرحباً بك" %}، {{ user.first_name }}
+                            </h1>
+                            <p class="welcome-subtitle">
+                                <i class="fas fa-calendar me-2"></i>
+                                {% trans "اليوم" %} {{ "now"|date:"l, d F Y" }}
+                            </p>
+                            <p class="welcome-description">
+                                {% trans "نحن هنا لمساعدتك في الحصول على أفضل رعاية طبية من أطباء متخصصين" %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="profile-section">
+                            {% if user.profile_picture %}
+                                <img src="{{ user.profile_picture.url }}" alt="{% trans 'الصورة الشخصية' %}" class="profile-image">
+                            {% else %}
+                                <div class="profile-placeholder">
+                                    <i class="fas fa-user fa-3x"></i>
+                                </div>
+                            {% endif %}
+                            <div class="profile-info mt-3">
+                                <h5>{{ user.first_name }} {{ user.last_name }}</h5>
+                                <span class="badge bg-success">{% trans "مريض مسجل" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card stat-card-primary">
+                <div class="stat-icon">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ total_cases }}</div>
+                    <div class="stat-label">{% trans "إجمالي الحالات" %}</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>{% trans "جميع حالاتك الطبية" %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card stat-card-warning">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ pending_cases }}</div>
+                    <div class="stat-label">{% trans "قيد الانتظار" %}</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-hourglass-half"></i>
+                        <span>{% trans "في انتظار الرد" %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card stat-card-success">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-number">{{ completed_cases }}</div>
+                    <div class="stat-label">{% trans "تم الرد عليها" %}</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-thumbs-up"></i>
+                        <span>{% trans "حالات مكتملة" %}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="stat-card stat-card-info">
+                <a href="{% url 'patients:notifications' %}" class="text-decoration-none">
+                    <div class="stat-icon">
+                        <i class="fas fa-bell"></i>
+                        {% if unread_notifications > 0 %}
+                            <span class="notification-badge">{{ unread_notifications }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ unread_notifications }}</div>
+                        <div class="stat-label">{% trans "إشعارات جديدة" %}</div>
+                        <div class="stat-trend">
+                            <i class="fas fa-envelope"></i>
+                            <span>{% trans "انقر للعرض" %}</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="quick-actions-card">
+                <h4 class="section-title">
+                    <i class="fas fa-bolt me-2"></i>
+                    {% trans "إجراءات سريعة" %}
+                </h4>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="{% url 'patients:new_case' %}" class="action-btn action-btn-primary">
+                            <div class="action-icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="action-content">
+                                <h6>{% trans "حالة جديدة" %}</h6>
+                                <p>{% trans "أرسل حالتك الطبية" %}</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="{% url 'patients:notifications' %}" class="action-btn action-btn-warning">
+                            <div class="action-icon">
+                                <i class="fas fa-bell"></i>
+                                {% if unread_notifications > 0 %}
+                                    <span class="action-badge">{{ unread_notifications }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="action-content">
+                                <h6>{% trans "الإشعارات" %}</h6>
+                                <p>{% trans "عرض الرسائل الجديدة" %}</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="{% url 'patients:my_responses' %}" class="action-btn action-btn-success">
+                            <div class="action-icon">
+                                <i class="fas fa-reply-all"></i>
+                            </div>
+                            <div class="action-content">
+                                <h6>{% trans "ردود الأطباء" %}</h6>
+                                <p>{% trans "عرض الردود الطبية" %}</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <a href="{% url 'accounts:profile' %}" class="action-btn action-btn-info">
+                            <div class="action-icon">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <div class="action-content">
+                                <h6>{% trans "الملف الشخصي" %}</h6>
+                                <p>{% trans "تحديث البيانات" %}</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Recent Cases -->
+        <div class="col-md-8">
+            <div class="dashboard-card">
+                <h5><i class="fas fa-file-medical me-2"></i>{% trans "حالاتي السابقة" %}</h5>
+                <hr>
+                
+                {% if recent_cases %}
+                    {% for case in recent_cases %}
+                    <div class="case-card">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6>{{ case.title }}</h6>
+                                <p class="text-muted mb-2">{{ case.description|truncatewords:15 }}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ case.created_at|date:"d/m/Y H:i" }}
+                                </small>
+                                {% if case.doctor %}
+                                    <small class="text-muted ms-3">
+                                        <i class="fas fa-user-md me-1"></i>
+                                        {% trans "د." %} {{ case.doctor.user.first_name }} {{ case.doctor.user.last_name }}
+                                    </small>
+                                {% endif %}
+                            </div>
+                            <div class="text-end">
+                                <span class="status-badge 
+                                    {% if case.status == 'pending' %}status-pending
+                                    {% elif case.status == 'completed' %}status-completed
+                                    {% elif case.status == 'in_progress' %}status-in-progress
+                                    {% endif %}">
+                                    {% if case.status == 'pending' %}{% trans "قيد الانتظار" %}
+                                    {% elif case.status == 'completed' %}{% trans "تم الرد" %}
+                                    {% elif case.status == 'in_progress' %}{% trans "قيد المراجعة" %}
+                                    {% endif %}
+                                </span>
+                                <div class="mt-2">
+                                    <a href="{% url 'patients:case_detail' case.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>
+                                        {% trans "عرض التفاصيل" %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if case.priority == 'urgent' %}
+                        <div class="mt-2">
+                            <span class="badge bg-danger">
+                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                {% trans "مستعجلة" %}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="text-center mt-3">
+                        <a href="#" class="btn btn-outline-primary" onclick="window.location.reload()">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            {% trans "تحديث الآن" %}
+                        </a>
+                        <a href="{% url 'patients:notifications' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-bell me-1"></i>
+                            {% trans "إشعاراتي" %}
+                        </a>
+                        <a href="{% url 'patients:all_cases' %}" class="btn btn-outline-primary" id="viewAllCasesBtn">
+                            {% trans "عرض جميع الحالات" %}
+                        </a>
+                        <script>
+                        // تحديث تلقائي كل 30 ثانية
+                        setInterval(function() { window.location.reload(); }, 30000);
+                        </script>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-file-medical fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">لا توجد حالات طبية</h5>
+                        <p class="text-muted">لم تقم بإرسال أي حالة طبية بعد</p>
+                        <a href="{% url 'patients:new_case' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>
+                            إرسال حالة جديدة
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Profile & Notifications -->
+        <div class="col-md-4">
+            <!-- Profile Card -->
+            <div class="dashboard-card mb-4">
+                <h5><i class="fas fa-user me-2"></i>البيانات الشخصية</h5>
+                <hr>
+                
+                <div class="text-center mb-3">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="الصورة الشخصية" class="rounded-circle" width="80" height="80">
+                    {% else %}
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user fa-2x text-white"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="text-center">
+                    <h6>{{ user.first_name }} {{ user.last_name }}</h6>
+                    <p class="text-muted small">{{ user.email }}</p>
+                    {% if user.phone_number %}
+                        <p class="text-muted small">{{ user.phone_number }}</p>
+                    {% endif %}
+                </div>
+                
+                <div class="d-grid">
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i>
+                        تعديل البيانات
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Recent Notifications -->
+            <div class="dashboard-card mb-4 notifications-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bell me-2"></i>
+                        الإشعارات الحديثة
+                    </h5>
+                    {% if unread_notifications > 0 %}
+                        <span class="badge bg-danger pulse-animation">{{ unread_notifications }} جديد</span>
+                    {% endif %}
+                </div>
+                
+                {% if recent_notifications %}
+                    <div class="notifications-list">
+                        {% for notification in recent_notifications %}
+                        <div class="notification-item {% if not notification.is_read %}unread-notification{% endif %}" 
+                             onclick="markAsRead('{{ notification.id }}')">
+                            <div class="notification-header">
+                                <div class="notification-type-icon">
+                                    {% if notification.notification_type == 'general' %}
+                                        <div class="icon-wrapper icon-general">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                        <span class="notification-type-label">إشعار عام</span>
+                                    {% elif notification.notification_type == 'case_update' %}
+                                        <div class="icon-wrapper icon-case">
+                                            <i class="fas fa-file-medical"></i>
+                                        </div>
+                                        <span class="notification-type-label">تحديث حالة</span>
+                                    {% elif notification.notification_type == 'doctor_response' %}
+                                        <div class="icon-wrapper icon-doctor">
+                                            <i class="fas fa-user-md"></i>
+                                        </div>
+                                        <span class="notification-type-label">رد طبيب</span>
+                                    {% elif notification.notification_type == 'doctor_message' %}
+                                        <div class="icon-wrapper icon-message">
+                                            <i class="fas fa-comment-medical"></i>
+                                        </div>
+                                        <span class="notification-type-label">رسالة من طبيب</span>
+                                    {% elif notification.notification_type == 'appointment' %}
+                                        <div class="icon-wrapper icon-appointment">
+                                            <i class="fas fa-calendar-check"></i>
+                                        </div>
+                                        <span class="notification-type-label">موعد</span>
+                                    {% elif notification.notification_type == 'payment' %}
+                                        <div class="icon-wrapper icon-payment">
+                                            <i class="fas fa-credit-card"></i>
+                                        </div>
+                                        <span class="notification-type-label">دفع</span>
+                                    {% elif notification.notification_type == 'system' %}
+                                        <div class="icon-wrapper icon-system">
+                                            <i class="fas fa-cog"></i>
+                                        </div>
+                                        <span class="notification-type-label">نظام</span>
+                                    {% elif notification.notification_type == 'admin' %}
+                                        <div class="icon-wrapper icon-admin">
+                                            <i class="fas fa-user-shield"></i>
+                                        </div>
+                                        <span class="notification-type-label">إدارة</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="notification-time">
+                                    <small class="text-muted">{{ notification.created_at|timesince }} مضت</small>
+                                    {% if not notification.is_read %}
+                                        <span class="new-indicator"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="notification-content">
+                                <h6 class="notification-title">
+                                    {{ notification.title }}
+                                </h6>
+                                <p class="notification-message">{{ notification.message|truncatewords:15 }}</p>
+                                
+                                {% if notification.sender_doctor %}
+                                    <div class="notification-sender">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user-md me-1"></i>
+                                            من د. {{ notification.sender_doctor.user.first_name }}
+                                        </small>
+                                    </div>
+                                {% elif notification.sender_admin %}
+                                    <div class="notification-sender">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user-shield me-1"></i>
+                                            من الإدارة
+                                        </small>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if notification.related_case %}
+                                    <div class="notification-action mt-2">
+                                        <a href="{% url 'patients:case_detail' notification.related_case.id %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i>
+                                            عرض الحالة
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="notifications-footer">
+                        <div class="row">
+                            <div class="col-6">
+                                <a href="{% url 'patients:notifications' %}" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-list me-1"></i>
+                                    عرض الكل
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                {% if unread_notifications > 0 %}
+                                    <button class="btn btn-outline-success btn-sm w-100" onclick="markAllAsRead()">
+                                        <i class="fas fa-check-double me-1"></i>
+                                        تحديد الكل كمقروء
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-outline-secondary btn-sm w-100" disabled>
+                                        <i class="fas fa-check me-1"></i>
+                                        لا توجد إشعارات جديدة
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-notifications">
+                        <div class="text-center py-4">
+                            <div class="empty-icon">
+                                <i class="fas fa-bell-slash fa-3x"></i>
+                            </div>
+                            <h6 class="mt-3 text-muted">لا توجد إشعارات</h6>
+                            <p class="text-muted small">لم تتلق أي إشعارات حتى الآن</p>
+                            <a href="{% url 'patients:new_case' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i>
+                                إرسال حالة جديدة
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="dashboard-card">
+                <h5><i class="fas fa-bolt me-2"></i>{% trans "إجراءات سريعة" %}</h5>
+                <hr>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'patients:new_case' %}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>
+                        حالة جديدة
+                    </a>
+                    <a href="{% url 'patients:my_responses' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-reply-all me-2"></i>
+                        ردود الأطباء
+                    </a>
+                    <a href="#" class="btn btn-outline-info">
+                        <i class="fas fa-history me-2"></i>
+                        تاريخ الحالات
+                    </a>
+                    <a href="#" class="btn btn-outline-secondary">
+                        <i class="fas fa-star me-2"></i>
+                        تقييماتي
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Welcome Header */
+.welcome-header {
+    background: linear-gradient(135deg, #a8e6cf 0%, #88d8c0 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    color: #2c3e50;
+    box-shadow: 0 10px 30px rgba(168, 230, 207, 0.4);
+    margin-bottom: 2rem;
+}
+
+.welcome-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(44, 62, 80, 0.1);
+    color: #2c3e50;
+}
+
+.welcome-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+    color: #34495e;
+}
+
+.welcome-description {
+    font-size: 1rem;
+    opacity: 0.7;
+    line-height: 1.6;
+    color: #34495e;
+}
+
+.profile-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.6);
+    box-shadow: 0 8px 20px rgba(136, 216, 192, 0.3);
+}
+
+.profile-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border: 4px solid rgba(255,255,255,0.6);
+    color: #2c3e50;
+}
+
+.profile-info h5 {
+    margin-top: 1rem;
+    font-weight: 600;
+}
+
+/* Statistics Cards */
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border: none;
+    transition: all 0.3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #a8e6cf, #88d8c0);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(168, 230, 207, 0.2);
+}
+
+.stat-card-primary::before { background: linear-gradient(90deg, #a8e6cf, #88d8c0); }
+.stat-card-warning::before { background: linear-gradient(90deg, #ffd3a5, #fd9853); }
+.stat-card-success::before { background: linear-gradient(90deg, #a8edea, #fed6e3); }
+.stat-card-info::before { background: linear-gradient(90deg, #d299c2, #fef9d7); }
+
+.stat-icon {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    opacity: 0.15;
+}
+
+.stat-card-primary .stat-icon { background: #a8e6cf; color: #2c3e50; }
+.stat-card-warning .stat-icon { background: #ffd3a5; color: #8b4513; }
+.stat-card-success .stat-icon { background: #a8edea; color: #2c5aa0; }
+.stat-card-info .stat-icon { background: #d299c2; color: #6b46c1; }
+
+.stat-content {
+    position: relative;
+    z-index: 2;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #34495e;
+    margin-bottom: 0.5rem;
+}
+
+.stat-trend {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #fd9853;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(253, 152, 83, 0.3);
+}
+
+/* Quick Actions */
+.quick-actions-card {
+    background: linear-gradient(135deg, #fdfefe 0%, #f8f9fa 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(168, 230, 207, 0.1);
+    border: 1px solid #e8f5e8;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.action-btn {
+    display: block;
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    transition: all 0.3s ease;
+}
+
+.action-btn-primary::before { background: linear-gradient(90deg, #a8e6cf, #88d8c0); }
+.action-btn-warning::before { background: linear-gradient(90deg, #ffd3a5, #fd9853); }
+.action-btn-success::before { background: linear-gradient(90deg, #a8edea, #fed6e3); }
+.action-btn-info::before { background: linear-gradient(90deg, #d299c2, #fef9d7); }
+
+.action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    text-decoration: none;
+    color: inherit;
+}
+
+.action-btn:hover::before {
+    height: 100%;
+    opacity: 0.05;
+}
+
+.action-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.action-btn-primary .action-icon { background: linear-gradient(135deg, #a8e6cf, #88d8c0); color: #2c3e50; }
+.action-btn-warning .action-icon { background: linear-gradient(135deg, #ffd3a5, #fd9853); color: #8b4513; }
+.action-btn-success .action-icon { background: linear-gradient(135deg, #a8edea, #fed6e3); color: #2c5aa0; }
+.action-btn-info .action-icon { background: linear-gradient(135deg, #d299c2, #fef9d7); color: #6b46c1; }
+
+.action-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #e53e3e;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border: 2px solid white;
+}
+
+.action-content h6 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.action-content p {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* تصميم الإشعارات المحسن */
+.notifications-card {
+    background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+    border: 1px solid #e3e8ff;
+    position: relative;
+    overflow: hidden;
+}
+
+.notifications-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #a8e6cf, #88d8c0);
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.notifications-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.notification-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.notification-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(168, 230, 207, 0.15);
+    border-color: #88d8c0;
+}
+
+.unread-notification {
+    border-left: 4px solid #88d8c0;
+    background: linear-gradient(135deg, rgba(168, 230, 207, 0.08) 0%, rgba(255,255,255,1) 100%);
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.notification-type-icon {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.icon-wrapper {
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: white;
+}
+
+.icon-general { background: linear-gradient(135deg, #a8e6cf, #88d8c0); }
+.icon-case { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+.icon-doctor { background: linear-gradient(135deg, #d299c2, #fef9d7); }
+.icon-message { background: linear-gradient(135deg, #ffd3a5, #fd9853); }
+.icon-appointment { background: linear-gradient(135deg, #ffeaa7, #fab1a0); }
+.icon-payment { background: linear-gradient(135deg, #c7ecee, #dcedc1); }
+.icon-system { background: linear-gradient(135deg, #b2bec3, #ddd6fe); }
+.icon-admin { background: linear-gradient(135deg, #fab1a0, #ffeaa7); }
+
+.notification-type-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #34495e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.notification-time {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.new-indicator {
+    width: 8px;
+    height: 8px;
+    background: #fd9853;
+    border-radius: 50%;
+    animation: blink 1.5s infinite;
+    box-shadow: 0 0 6px rgba(253, 152, 83, 0.5);
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+.notification-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.unread-notification .notification-title {
+    color: #27ae60;
+}
+
+.notification-message {
+    font-size: 0.9rem;
+    color: #34495e;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+}
+
+.notification-sender {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.notification-action {
+    margin-top: 0.75rem;
+}
+
+.notifications-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid #e2e8f0;
+}
+
+.empty-notifications {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.empty-icon {
+    color: #a0aec0;
+    opacity: 0.7;
+}
+
+/* تحسينات الحالات */
+.case-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.case-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(168, 230, 207, 0.2);
+    border-color: #88d8c0;
+}
+
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+    color: #8b4513;
+}
+
+.status-completed {
+    background: linear-gradient(135deg, #a8e6cf, #88d8c0);
+    color: #2c3e50;
+}
+
+.status-in-progress {
+    background: linear-gradient(135deg, #a8edea, #fed6e3);
+    color: #2c5aa0;
+}
+
+.dashboard-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 20px rgba(168, 230, 207, 0.08);
+    border: 1px solid #e8f5e8;
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+/* تحسينات عامة للخط والخلفية */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #2c3e50;
+    line-height: 1.6;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.container {
+    background: transparent;
+}
+
+.card, .dashboard-card, .stat-card, .action-btn, .notification-item {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* تحسينات النصوص */
+.text-muted {
+    color: #7f8c8d !important;
+}
+
+.text-primary {
+    color: #27ae60 !important;
+}
+
+.text-success {
+    color: #2ecc71 !important;
+}
+
+.text-warning {
+    color: #f39c12 !important;
+}
+
+.text-info {
+    color: #3498db !important;
+}
+
+.text-danger {
+    color: #e74c3c !important;
+}
+
+/* تحسينات العناوين */
+.section-title i {
+    color: #88d8c0;
+    margin-left: 0.5rem;
+}
+
+.welcome-title {
+    text-shadow: 0 2px 4px rgba(44, 62, 80, 0.1);
+}
+
+/* تحسينات الروابط */
+a {
+    color: #27ae60;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+a:hover {
+    color: #2ecc71;
+    text-decoration: none;
+}
+
+/* تحسينات الحدود والظلال */
+.border {
+    border-color: #e8f5e8 !important;
+}
+
+.border-primary {
+    border-color: #a8e6cf !important;
+}
+
+.border-success {
+    border-color: #a8edea !important;
+}
+
+.border-warning {
+    border-color: #ffd3a5 !important;
+}
+
+.border-info {
+    border-color: #d299c2 !important;
+}
+
+/* تحسينات الخلفيات الملونة */
+.bg-light {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, #a8e6cf, #88d8c0) !important;
+    color: #2c3e50 !important;
+}
+
+.bg-success {
+    background: linear-gradient(135deg, #a8edea, #fed6e3) !important;
+    color: #2c5aa0 !important;
+}
+
+.bg-warning {
+    background: linear-gradient(135deg, #ffd3a5, #fd9853) !important;
+    color: #8b4513 !important;
+}
+
+.bg-info {
+    background: linear-gradient(135deg, #d299c2, #fef9d7) !important;
+    color: #6b46c1 !important;
+}
+
+/* تحسينات الشارات */
+.badge {
+    font-weight: 500;
+    border-radius: 12px;
+    padding: 0.5em 0.8em;
+}
+
+.badge-primary {
+    background: linear-gradient(135deg, #a8e6cf, #88d8c0);
+    color: #2c3e50;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, #a8edea, #fed6e3);
+    color: #2c5aa0;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, #ffd3a5, #fd9853);
+    color: #8b4513;
+}
+
+.badge-info {
+    background: linear-gradient(135deg, #d299c2, #fef9d7);
+    color: #6b46c1;
+}
+
+.badge-danger {
+    background: linear-gradient(135deg, #fab1a0, #ffeaa7);
+    color: #8b4513;
+}
+
+/* تحسينات الجداول */
+.table {
+    color: #2c3e50;
+}
+
+.table th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #2c3e50;
+    font-weight: 500;
+    border-color: #e8f5e8;
+}
+
+.table td {
+    border-color: #e8f5e8;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background: linear-gradient(135deg, rgba(168, 230, 207, 0.02) 0%, rgba(255,255,255,0.5) 100%);
+}
+
+/* تحسينات القوائم */
+.list-group-item {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-color: #e8f5e8;
+    color: #2c3e50;
+}
+
+.list-group-item:hover {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.list-group-item.active {
+    background: linear-gradient(135deg, #a8e6cf, #88d8c0);
+    border-color: #88d8c0;
+    color: #2c3e50;
+}
+
+/* تحسينات النماذج */
+.form-control {
+    border-color: #e8f5e8;
+    color: #2c3e50;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.form-control:focus {
+    border-color: #88d8c0;
+    box-shadow: 0 0 0 0.2rem rgba(168, 230, 207, 0.25);
+    background: #ffffff;
+}
+
+.form-label {
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+/* تحسينات التنبيهات */
+.alert {
+    border-radius: 12px;
+    border: none;
+}
+
+.alert-primary {
+    background: linear-gradient(135deg, rgba(168, 230, 207, 0.1) 0%, rgba(255,255,255,0.8) 100%);
+    color: #2c3e50;
+    border-left: 4px solid #a8e6cf;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(168, 237, 234, 0.1) 0%, rgba(255,255,255,0.8) 100%);
+    color: #2c5aa0;
+    border-left: 4px solid #a8edea;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, rgba(255, 211, 165, 0.1) 0%, rgba(255,255,255,0.8) 100%);
+    color: #8b4513;
+    border-left: 4px solid #ffd3a5;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, rgba(210, 153, 194, 0.1) 0%, rgba(255,255,255,0.8) 100%);
+    color: #6b46c1;
+    border-left: 4px solid #d299c2;
+}
+
+/* تأثيرات بصرية إضافية */
+.shadow {
+    box-shadow: 0 5px 15px rgba(168, 230, 207, 0.1) !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 2px 8px rgba(168, 230, 207, 0.08) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 10px 30px rgba(168, 230, 207, 0.15) !important;
+}
+
+/* تحسينات الأيقونات */
+.fas, .far, .fab {
+    transition: all 0.3s ease;
+}
+
+.text-primary .fas,
+.text-primary .far {
+    color: #27ae60 !important;
+}
+
+.text-success .fas,
+.text-success .far {
+    color: #2ecc71 !important;
+}
+
+.text-warning .fas,
+.text-warning .far {
+    color: #f39c12 !important;
+}
+
+.text-info .fas,
+.text-info .far {
+    color: #3498db !important;
+}
+
+/* تحسينات التمرير */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #a8e6cf, #88d8c0);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #88d8c0, #7fb3d3);
+}
+
+/* تحسينات الحركة */
+@keyframes gentlePulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% { 
+        transform: scale(1.02);
+        opacity: 0.9;
+    }
+}
+
+.pulse-gentle {
+    animation: gentlePulse 3s infinite;
+}
+
+@keyframes softGlow {
+    0%, 100% { 
+        box-shadow: 0 0 10px rgba(168, 230, 207, 0.3);
+    }
+    50% { 
+        box-shadow: 0 0 20px rgba(168, 230, 207, 0.5);
+    }
+}
+
+.glow-soft {
+    animation: softGlow 2s infinite;
+}
+
+/* تحسينات الخلفية العامة */
+.page-wrapper {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
+
+/* تحسينات نهائية للتناسق */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #a8e6cf #f8f9fa;
+}
+
+::selection {
+    background: rgba(168, 230, 207, 0.3);
+    color: #2c3e50;
+}
+
+::-moz-selection {
+    background: rgba(168, 230, 207, 0.3);
+    color: #2c3e50;
+}
+
+/* تحسينات للموبايل */
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 1.8rem;
+    }
+    
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .notification-item {
+        padding: 0.75rem;
+    }
+    
+    .notification-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .notifications-footer .row {
+        gap: 0.5rem;
+    }
+    
+    .notifications-footer .col-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .case-card {
+        padding: 1rem;
+    }
+    
+    .case-card .d-flex {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .case-card .text-end {
+        text-align: center !important;
+    }
+}
+
+/* تأثيرات إضافية */
+.btn {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(168, 230, 207, 0.2);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #a8e6cf, #88d8c0);
+    border: none;
+    color: #2c3e50;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #88d8c0, #7fb3d3);
+    color: #2c3e50;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #a8edea, #fed6e3);
+    border: none;
+    color: #2c5aa0;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #fed6e3, #fbb6ce);
+    color: #2c5aa0;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #ffd3a5, #fd9853);
+    border: none;
+    color: #8b4513;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #fd9853, #fc7c08);
+    color: #8b4513;
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #d299c2, #fef9d7);
+    border: none;
+    color: #6b46c1;
+}
+
+.btn-info:hover {
+    background: linear-gradient(135deg, #fef9d7, #f3e8ff);
+    color: #6b46c1;
+}
+
+/* تحسين شريط التمرير */
+.notifications-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notifications-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.notifications-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #a8e6cf, #88d8c0);
+    border-radius: 10px;
+}
+
+.notifications-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #88d8c0, #7fb3d3);
+}
+
+.notification-item {
+    padding: 0.75rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.notification-item.unread {
+    background-color: rgba(0, 123, 255, 0.1);
+    border-left: 3px solid #007bff;
+}
+
+.notification-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.notification-icon {
+    font-size: 1.2rem;
+    width: 30px;
+    text-align: center;
+}
+
+.notification-item h6 {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.notification-item.unread h6 {
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* تحسينات عامة */
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.6em;
+    border-radius: 10px;
+}
+
+/* تحسينات للموبايل */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .dashboard-card {
+        padding: 1rem;
+    }
+    
+    .notification-item {
+        padding: 0.5rem;
+    }
+}
+</style>
+
+<script>
+// وظائف التفاعل مع الإشعارات
+function markAsRead(notificationId) {
+    // إرسال طلب AJAX لتحديد الإشعار كمقروء
+    fetch('{% url "patients:notifications" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: `notification_id=${notificationId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // إزالة كلاس unread من الإشعار
+            const notificationElement = document.querySelector(`[onclick="markAsRead('${notificationId}')"]`);
+            if (notificationElement) {
+                notificationElement.classList.remove('unread-notification');
+                
+                // إزالة المؤشر الجديد
+                const newIndicator = notificationElement.querySelector('.new-indicator');
+                if (newIndicator) {
+                    newIndicator.remove();
+                }
+                
+                // تحديث العداد
+                updateNotificationCounter();
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function markAllAsRead() {
+    // إرسال طلب AJAX لتحديد جميع الإشعارات كمقروءة
+    fetch('{% url "patients:notifications" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: 'mark_all_read=1'
+    })
+    .then(response => {
+        if (response.ok) {
+            // إعادة تحميل الصفحة لتحديث العدادات
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function updateNotificationCounter() {
+    // تحديث عداد الإشعارات
+    const unreadElements = document.querySelectorAll('.unread-notification');
+    const count = unreadElements.length;
+    
+    // تحديث الشارات
+    const badges = document.querySelectorAll('.pulse-animation');
+    badges.forEach(badge => {
+        if (count > 0) {
+            badge.textContent = count + ' جديد';
+        } else {
+            badge.style.display = 'none';
+        }
+    });
+    
+    // تحديث زر "تحديد الكل كمقروء"
+    const markAllBtn = document.querySelector('[onclick="markAllAsRead()"]');
+    if (markAllBtn && count === 0) {
+        markAllBtn.disabled = true;
+        markAllBtn.innerHTML = '<i class="fas fa-check me-1"></i>لا توجد إشعارات جديدة';
+        markAllBtn.classList.remove('btn-outline-success');
+        markAllBtn.classList.add('btn-outline-secondary');
+    }
+}
+
+// تأثيرات إضافية عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    // إضافة تأثيرات hover للكروت
+    const cards = document.querySelectorAll('.stat-card, .action-btn, .case-card, .notification-item');
+    
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-3px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // تأثير للإشعارات غير المقروءة
+    const unreadNotifications = document.querySelectorAll('.unread-notification');
+    unreadNotifications.forEach((notification, index) => {
+        setTimeout(() => {
+            notification.style.animation = 'slideInRight 0.5s ease-out';
+        }, index * 100);
+    });
+    
+    // تحديث الوقت كل دقيقة
+    setInterval(updateTimeStamps, 60000);
+});
+
+function updateTimeStamps() {
+    // تحديث طوابع الوقت (يمكن تطويرها لاحقاً)
+    console.log('تحديث طوابع الوقت...');
+}
+
+// إضافة أنيميشن للعناصر الجديدة
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .stat-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .action-btn {
+        animation: fadeInUp 0.8s ease-out;
+    }
+    
+    .case-card {
+        animation: fadeInUp 1s ease-out;
+    }
+`;
+document.head.appendChild(style);
+
+// إضافة CSRF token للطلبات
+const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+if (!csrfToken) {
+    // إنشاء CSRF token إذا لم يكن موجود
+    const token = document.createElement('input');
+    token.type = 'hidden';
+    token.name = 'csrfmiddlewaretoken';
+    token.value = '{{ csrf_token }}';
+    document.body.appendChild(token);
+}
+</script>
+{% endblock %}

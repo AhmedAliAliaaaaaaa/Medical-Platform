@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{% trans "تسجيل الدخول" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+        min-height: 100vh;
+        font-family: 'Tajawal', 'Poppins', sans-serif !important;
+        overflow-x: hidden;
+        width: 100%;
+        position: relative;
+        padding-top: 80px !important;
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+    
+    .login-card {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 25px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        overflow: hidden;
+        max-width: 450px;
+        width: 100%;
+        animation: cardFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes cardFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .login-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="sparkle" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.3)"/></pattern></defs><rect width="100" height="100" fill="url(%23sparkle)"/></svg>');
+        opacity: 0.5;
+        animation: sparkle 3s linear infinite;
+    }
+
+    @keyframes sparkle {
+        0% { transform: translateX(0) translateY(0); }
+        100% { transform: translateX(-20px) translateY(-20px); }
+    }
+
+    .login-header h2, .login-header p {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .login-body {
+        padding: 40px;
+    }
+    
+    .form-floating {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .form-floating input {
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        padding: 20px 15px 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+    }
+    
+    .form-floating input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        background: white;
+    }
+    
+    .form-floating label {
+        position: absolute;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
+        transition: all 0.3s ease;
+        color: #6c757d;
+        pointer-events: none;
+    }
+    
+    .form-floating input:focus + label,
+    .form-floating input:not(:placeholder-shown) + label {
+        top: 15px;
+        font-size: 12px;
+        color: #667eea;
+        transform: translateY(0);
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        border-radius: 20px;
+        padding: 18px;
+        font-weight: 700;
+        font-size: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+    }
+    
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-login:hover::before {
+        left: 100%;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.6);
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+    
+    .register-section {
+        background: #f8f9fa;
+        padding: 30px;
+        text-align: center;
+    }
+    
+    .btn-register {
+        border: 2px solid;
+        border-radius: 15px;
+        padding: 12px 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        margin: 5px;
+    }
+    
+    .btn-register.patient {
+        border-color: #10b981;
+        color: #10b981;
+        background: rgba(16, 185, 129, 0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .btn-register.patient:hover {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+    }
+    
+    .btn-register.doctor {
+        border-color: #06b6d4;
+        color: #06b6d4;
+        background: rgba(6, 182, 212, 0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .btn-register.doctor:hover {
+        background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        color: white;
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 10px 25px rgba(6, 182, 212, 0.4);
+    }
+    
+    .quick-register {
+        position: relative;
+        margin-top: 15px;
+    }
+    
+    .quick-register-btn {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 10px 14px;
+        color: white;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+        animation: pulse 2s infinite;
+    }
+    
+    .quick-register-btn:hover {
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
+        background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+    }
+
+    @keyframes pulse {
+        0%, 100% { box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); }
+        50% { box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6); }
+    }
+    
+    @media (max-width: 768px) {
+        .login-container {
+            padding: 10px;
+        }
+        
+        .login-header {
+            padding: 20px;
+        }
+        
+        .login-body {
+            padding: 25px;
+        }
+        
+        .register-section {
+            padding: 20px;
+        }
+        
+        .btn-register {
+            display: block;
+            margin: 10px 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h2><i class="fas fa-sign-in-alt me-2"></i>{% trans "تسجيل الدخول" %}</h2>
+            <p class="mb-0">{% trans "مرحباً بك مرة أخرى في المنصة الطبية" %}</p>
+        </div>
+        
+        <div class="login-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- عرض الأخطاء -->
+                {% if form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for field, errors in form.errors.items %}
+                            {% for error in errors %}
+                                <div><i class="fas fa-exclamation-triangle me-2"></i>{{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div class="form-floating quick-register">
+                    <input type="text" class="form-control" name="username" id="username" placeholder=" " required>
+                    <label for="username">{% trans "اسم المستخدم، البريد الإلكتروني، أو الاسم الكامل (للأطباء)" %}</label>
+                    <button type="button" class="quick-register-btn" onclick="showDoctorRegister()" title="تسجيل كطبيب جديد">
+                        <i class="fas fa-user-md"></i>
+                    </button>
+                </div>
+                
+                <div class="form-text text-center mb-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        {% trans "الأطباء المعتمدون يمكنهم تسجيل الدخول باسمهم الكامل" %}
+                    </small>
+                    <br>
+                    <small class="text-muted">
+                        {% trans "مثال: أحمد محمد العلي أو ahmed.ali أو doctor@email.com" %}
+                    </small>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-control" name="password" id="password" placeholder=" " required>
+                    <label for="password">{% trans "كلمة المرور" %}</label>
+                </div>
+                
+                <button type="submit" class="btn btn-login w-100 text-white mb-3">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    {% trans "تسجيل الدخول" %}
+                </button>
+                
+                <div class="text-center">
+                    <a href="#" class="text-muted small">{% trans "نسيت كلمة المرور؟" %}</a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="register-section">
+            <p class="mb-3">{% trans "لا تملك حساباً؟" %}</p>
+            <div class="d-flex flex-wrap justify-content-center">
+                <a href="{% url 'accounts:register' %}" class="btn-register patient">
+                    <i class="fas fa-user-plus me-2"></i>
+                    {% trans "إنشاء حساب كمريض" %}
+                </a>
+                <a href="{% url 'accounts:doctor_register' %}" class="btn-register doctor">
+                    <i class="fas fa-stethoscope me-2"></i>
+                    {% trans "انضم كطبيب" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal تسجيل الطبيب السريع -->
+<div class="modal fade" id="doctorRegisterModal" tabindex="-1" aria-labelledby="doctorRegisterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius: 20px; border: none;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%); color: white; border-radius: 20px 20px 0 0;">
+                <h5 class="modal-title" id="doctorRegisterModalLabel">
+                    <i class="fas fa-user-md me-2"></i>
+                    تسجيل طبيب جديد
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="text-center mb-4">
+                    <i class="fas fa-stethoscope fa-3x text-info mb-3"></i>
+                    <h4>مرحباً بك في المنصة الطبية</h4>
+                    <p class="text-muted">انضم إلى شبكة الأطباء المعتمدين واحصل على فرصة لمساعدة المرضى من جميع أنحاء العالم</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card p-3 text-center" style="background: #f8f9fa; border-radius: 15px;">
+                            <i class="fas fa-globe fa-2x text-primary mb-2"></i>
+                            <h6>وصول عالمي</h6>
+                            <small class="text-muted">تواصل مع مرضى من جميع أنحاء العالم</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card p-3 text-center" style="background: #f8f9fa; border-radius: 15px;">
+                            <i class="fas fa-money-bill-wave fa-2x text-success mb-2"></i>
+                            <h6>دخل إضافي</h6>
+                            <small class="text-muted">احصل على دخل إضافي من خبرتك الطبية</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card p-3 text-center" style="background: #f8f9fa; border-radius: 15px;">
+                            <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                            <h6>مرونة في الوقت</h6>
+                            <small class="text-muted">اعمل في الأوقات التي تناسبك</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="feature-card p-3 text-center" style="background: #f8f9fa; border-radius: 15px;">
+                            <i class="fas fa-certificate fa-2x text-info mb-2"></i>
+                            <h6>منصة معتمدة</h6>
+                            <small class="text-muted">منصة طبية موثوقة ومعتمدة</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>متطلبات التسجيل:</strong>
+                    <ul class="mb-0 mt-2">
+                        <li>شهادة طبية معتمدة</li>
+                        <li>رخصة مزاولة المهنة</li>
+                        <li>خبرة لا تقل عن سنتين</li>
+                        <li>إثبات الهوية</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer" style="border: none; padding: 20px;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 15px;">
+                    <i class="fas fa-times me-2"></i>إلغاء
+                </button>
+                <a href="{% url 'accounts:enhanced_doctor_register' %}" class="btn text-white" style="background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%); border-radius: 15px;">
+                    <i class="fas fa-arrow-right me-2"></i>ابدأ التسجيل الآن
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showDoctorRegister() {
+    var modal = new bootstrap.Modal(document.getElementById('doctorRegisterModal'));
+    modal.show();
+}
+</script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

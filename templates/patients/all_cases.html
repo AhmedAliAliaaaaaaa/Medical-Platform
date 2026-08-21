@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "جميع حالاتي" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-list me-2"></i>{% trans "جميع حالاتي" %}</h2>
+        <div class="d-flex gap-2">
+            <a href="{% url 'patients:dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                {% trans "العودة" %}
+            </a>
+            <button class="btn btn-outline-primary" onclick="window.location.reload()">
+                <i class="fas fa-sync-alt me-1"></i>
+                {% trans "تحديث" %}
+            </button>
+        </div>
+    </div>
+
+    {% if cases %}
+        <div class="list-group">
+            {% for case in cases %}
+            <div class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">{{ case.title }}</h5>
+                    <small class="text-muted">{{ case.created_at|date:"d/m/Y H:i" }}</small>
+                </div>
+                <p class="mb-1 text-muted">{{ case.description|truncatewords:25 }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        {% if case.status == 'pending' %}
+                            <span class="badge bg-warning">{% trans "قيد الانتظار" %}</span>
+                        {% elif case.status == 'in_progress' %}
+                            <span class="badge bg-info">{% trans "قيد المراجعة" %}</span>
+                        {% elif case.status == 'completed' %}
+                            <span class="badge bg-success">{% trans "تم الرد" %}</span>
+                        {% elif case.status == 'cancelled' %}
+                            <span class="badge bg-secondary">{% trans "ملغية" %}</span>
+                        {% endif %}
+                        {% if case.priority == 'urgent' %}
+                            <span class="badge bg-danger ms-1"><i class="fas fa-exclamation-triangle me-1"></i>{% trans "مستعجلة" %}</span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'patients:case_detail' case.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye me-1"></i>{% trans "عرض التفاصيل" %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-file-medical fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">{% trans "لا توجد حالات" %}</h4>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// تحديث تلقائي كل 30 ثانية
+setInterval(function() { window.location.reload(); }, 30000);
+</script>
+{% endblock %}

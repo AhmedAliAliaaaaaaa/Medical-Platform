@@ -1,0 +1,651 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}تسجيل طبيب جديد{% endblock %}
+
+{% block extra_css %}
+<style>
+.registration-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.registration-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.registration-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.step.active .step-number {
+    background: #007bff;
+    color: white;
+}
+
+.step.completed .step-number {
+    background: #28a745;
+    color: white;
+}
+
+.form-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.fee-info {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px 0;
+    border-left: 4px solid #2196f3;
+}
+
+.fee-info h6 {
+    color: #1976d2;
+    margin-bottom: 10px;
+}
+
+.fee-info ul {
+    color: #424242;
+    margin-bottom: 0;
+}
+
+.license-upload {
+    border: 2px dashed #ddd;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.license-upload:hover {
+    border-color: #007bff;
+    background: #f8f9fa;
+}
+
+.license-upload.dragover {
+    border-color: #28a745;
+    background: #e8f5e8;
+}
+
+.preview-image {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 10px;
+    margin-top: 15px;
+}
+
+.terms-section {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.submit-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Google OAuth Styles */
+.divider {
+    position: relative;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #dee2e6;
+}
+
+.divider-text {
+    background: white;
+    padding: 0 15px;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #db4437 0%, #c23321 100%);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c23321 0%, #a52714 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(219, 68, 55, 0.3);
+}
+
+.fab.fa-google {
+    font-size: 1.1rem;
+}
+
+.google-registration-section {
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .step-indicator {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .step {
+        margin: 5px 0;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="registration-container">
+    <!-- Header -->
+    <div class="registration-header">
+        <h1><i class="fas fa-user-md"></i> تسجيل طبيب جديد</h1>
+        <p class="lead">انضم إلى منصتنا الطبية وابدأ في تقديم الاستشارات الطبية</p>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+        <div class="step completed">
+            <div class="step-number">1</div>
+            <span>إنشاء الحساب</span>
+        </div>
+        <div class="step active">
+            <div class="step-number">2</div>
+            <span>المعلومات المهنية</span>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <span>المراجعة والموافقة</span>
+        </div>
+    </div>
+
+    <!-- Registration Form -->
+    <div class="registration-card">
+        <form method="post" enctype="multipart/form-data" id="doctor-registration-form">
+            {% csrf_token %}
+            
+            <!-- Personal Information -->
+            <div class="form-section">
+                <h4 class="section-title">
+                    <i class="fas fa-user"></i> المعلومات الشخصية
+                </h4>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">الاسم الكامل</label>
+                            <input type="text" class="form-control" value="{{ user.first_name }} {{ user.last_name }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">البريد الإلكتروني</label>
+                            <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Professional Information -->
+            <div class="form-section">
+                <h4 class="section-title">
+                    <i class="fas fa-stethoscope"></i> المعلومات المهنية
+                </h4>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.specialization|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.country|as_crispy_field }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.experience_years|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.consultation_fee|as_crispy_field }}
+                        <div class="fee-info">
+                            <h6><i class="fas fa-info-circle"></i> معلومات عن الأسعار</h6>
+                            <ul>
+                                <li>الحد الأدنى: 50 ريال سعودي</li>
+                                <li>الحد الأقصى: 1000 ريال سعودي</li>
+                                <li>عمولة المنصة: 15%</li>
+                                <li>يمكنك تعديل السعر لاحقاً</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                {{ form.bio|as_crispy_field }}
+            </div>
+
+            <!-- License Information -->
+            <div class="form-section">
+                <h4 class="section-title">
+                    <i class="fas fa-certificate"></i> معلومات الترخيص
+                </h4>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        {{ form.license_number|as_crispy_field }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">صورة الترخيص الطبي *</label>
+                        <div class="license-upload" onclick="document.getElementById('id_license_image').click()">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                            <h5>اضغط لرفع صورة الترخيص</h5>
+                            <p class="text-muted">JPG, PNG - حد أقصى 5 ميجا</p>
+                            {{ form.license_image }}
+                        </div>
+                        <div id="license-preview"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terms and Conditions -->
+            <div class="terms-section">
+                <h5><i class="fas fa-file-contract"></i> الشروط والأحكام</h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="terms" required>
+                    <label class="form-check-label" for="terms">
+                        أوافق على <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">الشروط والأحكام</a> 
+                        و <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">سياسة الخصوصية</a>
+                    </label>
+                </div>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="medical-ethics" required>
+                    <label class="form-check-label" for="medical-ethics">
+                        أتعهد بالالتزام بأخلاقيات المهنة الطبية وتقديم أفضل رعاية طبية للمرضى
+                    </label>
+                </div>
+            </div>
+
+            <!-- Google Registration Option -->
+            <div class="google-registration-section mb-4">
+                <div class="divider mb-3">
+                    <span class="divider-text">أو استخدم حساب Google الخاص بك</span>
+                </div>
+                <button type="button" class="btn btn-danger btn-lg w-100 mb-3" onclick="registerWithGoogle()">
+                    <i class="fab fa-google me-2"></i>
+                    التسجيل بحساب Google (سيتطلب إكمال البيانات الطبية لاحقاً)
+                </button>
+                <small class="text-muted d-block text-center">
+                    <i class="fas fa-info-circle me-1"></i>
+                    سيتم إنشاء حساب أساسي، ويمكنك إكمال البيانات الطبية لاحقاً
+                </small>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn" id="submit-btn">
+                <i class="fas fa-paper-plane"></i>
+                إرسال طلب التسجيل الكامل
+            </button>
+        </form>
+    </div>
+
+    <!-- Information Card -->
+    <div class="registration-card">
+        <h5><i class="fas fa-info-circle"></i> ماذا يحدث بعد التسجيل؟</h5>
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <i class="fas fa-search fa-2x text-primary mb-3"></i>
+                <h6>مراجعة الطلب</h6>
+                <p class="text-muted">سيتم مراجعة طلبك والتحقق من المعلومات خلال 24-48 ساعة</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-check-circle fa-2x text-success mb-3"></i>
+                <h6>الموافقة</h6>
+                <p class="text-muted">ستتلقى إشعار بالموافقة على طلبك عبر البريد الإلكتروني</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-rocket fa-2x text-warning mb-3"></i>
+                <h6>البدء</h6>
+                <p class="text-muted">يمكنك البدء في استقبال الحالات الطبية فوراً</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">الشروط والأحكام</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. التزامات الطبيب</h6>
+                <ul>
+                    <li>تقديم استشارات طبية دقيقة ومهنية</li>
+                    <li>الرد على الحالات في الوقت المحدد</li>
+                    <li>احترام خصوصية المرضى</li>
+                    <li>الالتزام بأخلاقيات المهنة الطبية</li>
+                </ul>
+                
+                <h6>2. الرسوم والعمولات</h6>
+                <ul>
+                    <li>عمولة المنصة: 15% من كل استشارة</li>
+                    <li>يتم تحويل الأرباح كل أسبوع</li>
+                    <li>الحد الأدنى للسحب: 100 ريال</li>
+                </ul>
+                
+                <h6>3. إنهاء الخدمة</h6>
+                <ul>
+                    <li>يمكن إنهاء الخدمة من أي طرف بإشعار مسبق</li>
+                    <li>يجب إكمال الحالات المعلقة قبل الإنهاء</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">موافق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Privacy Modal -->
+<div class="modal fade" id="privacyModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">سياسة الخصوصية</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>حماية البيانات</h6>
+                <p>نحن ملتزمون بحماية خصوصية جميع المستخدمين وضمان أمان البيانات الطبية.</p>
+                
+                <h6>استخدام المعلومات</h6>
+                <ul>
+                    <li>المعلومات الطبية تستخدم فقط لتقديم الخدمة</li>
+                    <li>لا نشارك البيانات مع أطراف ثالثة</li>
+                    <li>جميع البيانات مشفرة ومحمية</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">موافق</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('doctor-registration-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const licenseInput = document.getElementById('id_license_image');
+    const licensePreview = document.getElementById('license-preview');
+    
+    // License image preview
+    licenseInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                licensePreview.innerHTML = `
+                    <div class="mt-3">
+                        <img src="${e.target.result}" class="preview-image" alt="معاينة الترخيص">
+                        <p class="text-success mt-2">
+                            <i class="fas fa-check"></i> تم رفع الصورة بنجاح
+                        </p>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Check required fields
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim() && field.type !== 'checkbox') {
+                isValid = false;
+                field.classList.add('is-invalid');
+            } else if (field.type === 'checkbox' && !field.checked) {
+                isValid = false;
+                field.classList.add('is-invalid');
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            alert('يرجى ملء جميع الحقول المطلوبة');
+            return;
+        }
+        
+        // Disable submit button
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+        
+        // Submit form
+        const formData = new FormData(form);
+        
+        fetch(form.action || window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            }
+            throw new Error('Network response was not ok');
+        })
+        .then(data => {
+            // Check if response contains success message or redirect
+            if (data.includes('success') || response.redirected) {
+                alert('تم إرسال طلب التسجيل بنجاح! سيتم مراجعته خلال 24-48 ساعة.');
+                window.location.href = '/accounts/login/';
+            } else {
+                // If there are form errors, reload the page to show them
+                document.body.innerHTML = data;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ في إرسال الطلب. يرجى المحاولة مرة أخرى.');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال طلب التسجيل';
+        });
+    });
+    
+    // Drag and drop for license upload
+    const uploadArea = document.querySelector('.license-upload');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight(e) {
+        uploadArea.classList.add('dragover');
+    }
+    
+    function unhighlight(e) {
+        uploadArea.classList.remove('dragover');
+    }
+    
+    uploadArea.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            licenseInput.files = files;
+            licenseInput.dispatchEvent(new Event('change'));
+        }
+    }
+    
+    // Google OAuth Functions
+    window.onload = function () {
+        google.accounts.id.initialize({
+            client_id: "{{ GOOGLE_OAUTH_CLIENT_ID }}", // من إعدادات Django
+            callback: handleDoctorCredentialResponse,
+            auto_select: false,
+            cancel_on_tap_outside: true
+        });
+    };
+});
+
+// Google Registration for Doctors
+function registerWithGoogle() {
+    google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+            // Fallback to popup if prompt is not displayed
+            google.accounts.id.renderButton(
+                document.getElementById("google-doctor-signup-button"),
+                { theme: "outline", size: "large", width: "100%" }
+            );
+        }
+    });
+}
+
+function handleDoctorCredentialResponse(response) {
+    // Send the credential to your backend
+    fetch('{% url "accounts:google_login" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: JSON.stringify({
+            'credential': response.credential,
+            'user_type': 'doctor'  // Indicate this is for doctor registration
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            alert(data.message + '\n\nسيتم توجيهك لإكمال البيانات الطبية.');
+            // Redirect to doctor registration completion page
+            window.location.href = '{% url "accounts:doctor_register" %}?google_user=true';
+        } else {
+            alert('فشل في إنشاء الحساب: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('حدث خطأ في إنشاء الحساب');
+    });
+}
+
+// Alternative button container (hidden by default)
+document.addEventListener('DOMContentLoaded', function() {
+    const buttonContainer = document.createElement('div');
+    buttonContainer.id = 'google-doctor-signup-button';
+    buttonContainer.style.display = 'none';
+    document.body.appendChild(buttonContainer);
+});
+</script>
+
+<!-- Google Sign-In API -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+{% endblock %}

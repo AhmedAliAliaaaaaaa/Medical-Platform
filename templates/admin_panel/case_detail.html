@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "تفاصيل الحالة" %} - {% trans "لوحة الإدارة" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-file-medical me-2"></i>
+                    {% trans "تفاصيل الحالة" %} #{{ case.id }}
+                </h2>
+                <div>
+                    <a href="{% url 'admin_panel:update_case' case.id %}" class="btn btn-warning me-2">
+                        <i class="fas fa-edit me-1"></i>
+                        {% trans "تعديل الحالة" %}
+                    </a>
+                    <a href="{% url 'admin_panel:manage_cases' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        {% trans "العودة للحالات" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Case Information -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {% trans "معلومات الحالة" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">{% trans "العنوان" %}:</h6>
+                            <p>{{ case.title }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">{% trans "الحالة" %}:</h6>
+                            <p>
+                                {% if case.status == 'pending' %}
+                                    <span class="badge bg-warning">{% trans "قيد الانتظار" %}</span>
+                                {% elif case.status == 'in_progress' %}
+                                    <span class="badge bg-info">{% trans "قيد المراجعة" %}</span>
+                                {% elif case.status == 'completed' %}
+                                    <span class="badge bg-success">{% trans "مكتملة" %}</span>
+                                {% elif case.status == 'cancelled' %}
+                                    <span class="badge bg-danger">{% trans "ملغية" %}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">{% trans "الأولوية" %}:</h6>
+                            <p>
+                                {% if case.priority == 'urgent' %}
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        {% trans "مستعجلة" %}
+                                    </span>
+                                {% elif case.priority == 'normal' %}
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-minus me-1"></i>
+                                        {% trans "عادية" %}
+                                    </span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">{% trans "تاريخ الإنشاء" %}:</h6>
+                            <p>{{ case.created_at|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="text-primary">{% trans "وصف الحالة" %}:</h6>
+                            <div class="bg-light p-3 rounded">
+                                <p class="mb-0">{{ case.description|linebreaks }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attachments -->
+            {% if case.attachments.all %}
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-paperclip me-2"></i>
+                        {% trans "المرفقات" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for attachment in case.attachments.all %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    {% if attachment.file_type == 'image' %}
+                                        <img src="{{ attachment.file.url }}" class="img-fluid rounded mb-2" style="max-height: 150px;">
+                                        <br>
+                                        <a href="{{ attachment.file.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye me-1"></i>
+                                            {% trans "عرض الصورة" %}
+                                        </a>
+                                    {% elif attachment.file_type == 'pdf' %}
+                                        <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
+                                        <br>
+                                        <a href="{{ attachment.file.url }}" target="_blank" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-download me-1"></i>
+                                            {% trans "تحميل PDF" %}
+                                        </a>
+                                    {% else %}
+                                        <i class="fas fa-file fa-3x text-secondary mb-2"></i>
+                                        <br>
+                                        <a href="{{ attachment.file.url }}" target="_blank" class="btn btn-sm btn-secondary">
+                                            <i class="fas fa-download me-1"></i>
+                                            {% trans "تحميل الملف" %}
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Doctor Response -->
+            {% if case.responses.all %}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-md me-2"></i>
+                        {% trans "ردود الطبيب" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for response in case.responses.all %}
+                    <div class="border rounded p-3 mb-3">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-primary">
+                                    <i class="fas fa-diagnoses me-2"></i>
+                                    {% trans "التشخيص" %}:
+                                </h6>
+                                <div class="bg-light p-3 rounded">
+                                    <p class="mb-0">{{ response.diagnosis|linebreaks }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-primary">
+                                    <i class="fas fa-pills me-2"></i>
+                                    {% trans "العلاج المقترح" %}:
+                                </h6>
+                                <div class="bg-light p-3 rounded">
+                                    <p class="mb-0">{{ response.treatment_plan|linebreaks }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if response.notes %}
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <h6 class="text-primary">
+                                    <i class="fas fa-sticky-note me-2"></i>
+                                    {% trans "ملاحظات إضافية" %}:
+                                </h6>
+                                <div class="bg-light p-3 rounded">
+                                    <p class="mb-0">{{ response.notes|linebreaks }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Response Files -->
+                        <div class="row">
+                            {% if response.response_file %}
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-primary">
+                                    <i class="fas fa-file me-2"></i>
+                                    {% trans "ملف الرد" %}:
+                                </h6>
+                                <a href="{{ response.response_file.url }}" target="_blank" class="btn btn-outline-primary">
+                                    <i class="fas fa-download me-1"></i>
+                                    {% trans "تحميل الملف" %}
+                                </a>
+                            </div>
+                            {% endif %}
+
+                            {% if response.response_video %}
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-primary">
+                                    <i class="fas fa-video me-2"></i>
+                                    {% trans "فيديو الرد" %}:
+                                </h6>
+                                <video controls class="w-100" style="max-height: 300px;">
+                                    <source src="{{ response.response_video.url }}" type="video/mp4">
+                                    {% trans "متصفحك لا يدعم تشغيل الفيديو" %}
+                                </video>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="text-muted">
+                            <small>
+                                <i class="fas fa-clock me-1"></i>
+                                {% trans "تاريخ الرد" %}: {{ response.created_at|date:"d/m/Y H:i" }}
+                            </small>
+                        </div>
+                    </div>
+                    {% empty %}
+                        <div class="text-muted">{% trans "لا توجد ردود بعد" %}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Patient & Doctor Info -->
+        <div class="col-md-4">
+            <!-- Patient Info -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user me-2"></i>
+                        {% trans "معلومات المريض" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        {% if case.patient.user.profile_picture %}
+                            <img src="{{ case.patient.user.profile_picture.url }}" 
+                                 class="rounded-circle" width="80" height="80"
+                                 alt="{{ case.patient.user.first_name }}">
+                        {% else %}
+                            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                 style="width: 80px; height: 80px;">
+                                <i class="fas fa-user text-white fa-2x"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h6 class="text-center">{{ case.patient.user.first_name }} {{ case.patient.user.last_name }}</h6>
+                    <p class="text-center text-muted">{{ case.patient.user.email }}</p>
+                    
+                    {% if case.patient.date_of_birth %}
+                    <p><strong>{% trans "تاريخ الميلاد" %}:</strong> {{ case.patient.date_of_birth|date:"d/m/Y" }}</p>
+                    {% endif %}
+                    
+                    {% if case.patient.gender %}
+                    <p><strong>{% trans "الجنس" %}:</strong> {{ case.patient.get_gender_display }}</p>
+                    {% endif %}
+                    
+                    {% if case.patient.blood_type %}
+                    <p><strong>{% trans "فصيلة الدم" %}:</strong> {{ case.patient.blood_type }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Doctor Info -->
+            {% if case.doctor %}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-md me-2"></i>
+                        {% trans "معلومات الطبيب" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        {% if case.doctor.user.profile_picture %}
+                            <img src="{{ case.doctor.user.profile_picture.url }}" 
+                                 class="rounded-circle" width="80" height="80"
+                                 alt="Dr. {{ case.doctor.user.first_name }}">
+                        {% else %}
+                            <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                 style="width: 80px; height: 80px;">
+                                <i class="fas fa-user-md text-white fa-2x"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h6 class="text-center">د. {{ case.doctor.user.first_name }} {{ case.doctor.user.last_name }}</h6>
+                    <p class="text-center text-muted">{{ case.doctor.get_specialization_display }}</p>
+                    <p class="text-center text-muted">{{ case.doctor.user.email }}</p>
+                    
+                    <p><strong>{% trans "سنوات الخبرة" %}:</strong> {{ case.doctor.experience_years }} {% trans "سنة" %}</p>
+                    <p><strong>{% trans "رقم الترخيص" %}:</strong> {{ case.doctor.license_number }}</p>
+                    <p><strong>{% trans "البلد" %}:</strong> {{ case.doctor.country }}</p>
+                    
+                    <div class="text-center">
+                        <a href="{% url 'admin_panel:doctor_detail' case.doctor.id %}" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-eye me-1"></i>
+                            {% trans "عرض ملف الطبيب" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- Assign Doctor -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-md me-2"></i>
+                        {% trans "تعيين طبيب" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">{% trans "لم يتم تعيين طبيب لهذه الحالة بعد" %}</p>
+                    <form method="post" action="{% url 'admin_panel:assign_doctor' case.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">{% trans "اختر الطبيب" %}</label>
+                            <select name="doctor_id" class="form-select" required>
+                                <option value="">{% trans "اختر طبيب..." %}</option>
+                                {% for doctor in available_doctors %}
+                                    <option value="{{ doctor.id }}">
+                                        د. {{ doctor.user.get_full_name }} - {{ doctor.get_specialization_display }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="fas fa-user-md me-1"></i>
+                            {% trans "تعيين الطبيب" %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

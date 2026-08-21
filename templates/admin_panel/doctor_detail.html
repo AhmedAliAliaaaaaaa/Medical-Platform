@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "تفاصيل الطبيب" %} - {% trans "لوحة الإدارة" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-user-md me-2"></i>
+                    {% trans "ملف الطبيب" %}: د. {{ doctor.user.get_full_name }}
+                </h2>
+                <div>
+                    <a href="{% url 'admin_panel:update_doctor' doctor.id %}" class="btn btn-warning me-2">
+                        <i class="fas fa-edit me-1"></i>
+                        {% trans "تعديل البيانات" %}
+                    </a>
+                    <a href="{% url 'admin_panel:manage_doctors' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        {% trans "العودة للأطباء" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Doctor Information -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-md me-2"></i>
+                        {% trans "المعلومات الشخصية" %}
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if doctor.user.profile_picture %}
+                        <img src="{{ doctor.user.profile_picture.url }}" 
+                             class="rounded-circle mb-3" 
+                             width="120" height="120"
+                             alt="د. {{ doctor.user.get_full_name }}">
+                    {% else %}
+                        <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 120px; height: 120px;">
+                            <i class="fas fa-user-md text-white fa-3x"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <h4>د. {{ doctor.user.get_full_name }}</h4>
+                    <p class="text-muted">{{ doctor.get_specialization_display }}</p>
+                    
+                    <div class="text-start mt-4">
+                        <p><strong>{% trans "البريد الإلكتروني" %}:</strong><br>{{ doctor.user.email }}</p>
+                        <p><strong>{% trans "رقم الهاتف" %}:</strong><br>{{ doctor.user.phone_number|default:"غير محدد" }}</p>
+                        <p><strong>{% trans "البلد" %}:</strong><br>{{ doctor.country }}</p>
+                        <p><strong>{% trans "سنوات الخبرة" %}:</strong><br>{{ doctor.experience_years }} {% trans "سنة" %}</p>
+                        <p><strong>{% trans "رقم الترخيص" %}:</strong><br>{{ doctor.license_number }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-money-bill-wave me-2"></i>
+                        الأسعار والرسوم
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="pricing-details">
+                        <div class="price-item mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">
+                                    <i class="fas fa-stethoscope me-2 text-success"></i>
+                                    استشارة عادية:
+                                </span>
+                                <span class="badge bg-success fs-6">
+                                    {{ doctor.consultation_fee|default:"غير محدد" }} {{ doctor.currency|default:"SAR" }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        {% if doctor.emergency_fee and doctor.emergency_fee > 0 %}
+                        <div class="price-item mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">
+                                    <i class="fas fa-exclamation-triangle me-2 text-danger"></i>
+                                    استشارة طوارئ:
+                                </span>
+                                <span class="badge bg-danger fs-6">
+                                    {{ doctor.emergency_fee }} {{ doctor.currency|default:"SAR" }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if doctor.follow_up_fee and doctor.follow_up_fee > 0 %}
+                        <div class="price-item mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">
+                                    <i class="fas fa-redo me-2 text-info"></i>
+                                    استشارة متابعة:
+                                </span>
+                                <span class="badge bg-info fs-6">
+                                    {{ doctor.follow_up_fee }} {{ doctor.currency|default:"SAR" }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <hr>
+                        <div class="text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-coins me-1"></i>
+                                العملة: {{ doctor.get_currency_display|default:"ريال سعودي" }}
+                            </small>
+                        </div>
+                        
+                        {% if doctor.accepts_insurance %}
+                        <div class="text-center mt-2">
+                            <span class="badge bg-primary">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                يقبل التأمين الطبي
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {% trans "حالة الطبيب" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>{% trans "حالة التفعيل" %}:</strong><br>
+                        {% if doctor.status == 'approved' %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check me-1"></i>
+                                {% trans "معتمد" %}
+                            </span>
+                        {% elif doctor.status == 'pending' %}
+                            <span class="badge bg-warning">
+                                <i class="fas fa-clock me-1"></i>
+                                {% trans "قيد المراجعة" %}
+                            </span>
+                        {% elif doctor.status == 'rejected' %}
+                            <span class="badge bg-danger">
+                                <i class="fas fa-times me-1"></i>
+                                {% trans "مرفوض" %}
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>{% trans "متاح للاستشارات" %}:</strong><br>
+                        {% if doctor.is_available %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check me-1"></i>
+                                {% trans "متاح" %}
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                <i class="fas fa-times me-1"></i>
+                                {% trans "غير متاح" %}
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>{% trans "التقييم" %}:</strong><br>
+                        <div class="text-warning">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= doctor.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="text-muted ms-2">{{ doctor.rating }}/5 ({{ doctor.total_reviews }} {% trans "تقييم" %})</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <strong>{% trans "تاريخ التسجيل" %}:</strong><br>
+                        <small class="text-muted">{{ doctor.created_at|date:"d/m/Y H:i" }}</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons for Pending Doctors -->
+            {% if doctor.status == 'pending' %}
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        إجراءات المراجعة
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        هذا الطبيب في انتظار المراجعة والموافقة. يرجى مراجعة جميع البيانات والمستندات قبل اتخاذ القرار.
+                    </p>
+                    
+                    <div class="d-grid gap-2">
+                        <form method="post" action="{% url 'admin_panel:approve_doctor' doctor.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-lg w-100" onclick="return confirm('هل أنت متأكد من الموافقة على هذا الطبيب؟')">
+                                <i class="fas fa-check me-2"></i>
+                                الموافقة على الطبيب
+                            </button>
+                        </form>
+                        
+                        <form method="post" action="{% url 'admin_panel:reject_doctor' doctor.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-lg w-100" onclick="return confirm('هل أنت متأكد من رفض هذا الطبيب؟ هذا الإجراء لا يمكن التراجع عنه.')">
+                                <i class="fas fa-times me-2"></i>
+                                رفض الطبيب
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-8">
+            <!-- Bio -->
+            {% if doctor.bio %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-circle me-2"></i>
+                        {% trans "نبذة عن الطبيب" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ doctor.bio|linebreaks }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- License -->
+            {% if doctor.license_image %}
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-certificate me-2"></i>
+                        {% trans "صورة الترخيص" %}
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <img src="{{ doctor.license_image.url }}" 
+                         class="img-fluid rounded border" 
+                         style="max-height: 400px;"
+                         alt="{% trans 'ترخيص الطبيب' %}">
+                    <br><br>
+                    <a href="{{ doctor.license_image.url }}" 
+                       target="_blank" 
+                       class="btn btn-warning">
+                        <i class="fas fa-external-link-alt me-1"></i>
+                        {% trans "فتح في نافذة جديدة" %}
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Recent Cases -->
+            {% if doctor_cases %}
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-medical me-2"></i>
+                        {% trans "الحالات الأخيرة" %} ({{ doctor_cases.count }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{% trans "رقم الحالة" %}</th>
+                                    <th>{% trans "المريض" %}</th>
+                                    <th>{% trans "العنوان" %}</th>
+                                    <th>{% trans "الحالة" %}</th>
+                                    <th>{% trans "التاريخ" %}</th>
+                                    <th>{% trans "الإجراءات" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for case in doctor_cases %}
+                                <tr>
+                                    <td>#{{ case.id }}</td>
+                                    <td>{{ case.patient.user.get_full_name }}</td>
+                                    <td>{{ case.title|truncatechars:30 }}</td>
+                                    <td>
+                                        {% if case.status == 'pending' %}
+                                            <span class="badge bg-warning">{% trans "قيد الانتظار" %}</span>
+                                        {% elif case.status == 'in_progress' %}
+                                            <span class="badge bg-info">{% trans "قيد المراجعة" %}</span>
+                                        {% elif case.status == 'completed' %}
+                                            <span class="badge bg-success">{% trans "مكتملة" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ case.created_at|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'admin_panel:case_detail' case.id %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Recent Responses -->
+            {% if doctor_responses %}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-reply-all me-2"></i>
+                        {% trans "الردود الأخيرة" %} ({{ doctor_responses.count }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for response in doctor_responses %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6>{{ response.medical_case.title }}</h6>
+                                <p class="text-muted mb-1">
+                                    {% trans "المريض" %}: {{ response.medical_case.patient.user.get_full_name }}
+                                </p>
+                                <p class="mb-0">
+                                    <strong>{% trans "التشخيص" %}:</strong> {{ response.diagnosis|truncatechars:100 }}
+                                </p>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted">{{ response.created_at|date:"d/m/Y" }}</small>
+                                <br>
+                                <a href="{% url 'admin_panel:response_detail' response.id %}" 
+                                   class="btn btn-sm btn-outline-success mt-1">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,597 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "إشعاراتي" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-bell me-2"></i>
+                    {% trans "إشعاراتي" %}
+                    {% if unread_count > 0 %}
+                        <span class="badge bg-danger ms-2 pulse-animation">{{ unread_count }}</span>
+                    {% endif %}
+                </h2>
+                <div class="d-flex gap-2">
+                    {% if unread_count > 0 %}
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="mark_all_read" value="1">
+                            <button type="submit" class="btn btn-outline-success">
+                                <i class="fas fa-check-double me-1"></i>
+                                {% trans "تحديد الكل كمقروء" %}
+                            </button>
+                        </form>
+                    {% endif %}
+                    <a href="{% url 'patients:dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        {% trans "العودة" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if notifications %}
+        <!-- إحصائيات الإشعارات -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card stat-primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ notifications.count }}</h3>
+                        <p>{% trans "إجمالي الإشعارات" %}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card stat-warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ unread_count }}</h3>
+                        <p>غير مقروءة</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card stat-success">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ notifications.count|add:"-"|add:unread_count }}</h3>
+                        <p>مقروءة</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card stat-info">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ notifications.first.created_at|timesince|truncatewords:1 }}</h3>
+                        <p>آخر إشعار</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% if notifications %}
+                <div class="notifications-container">
+                    {% for notification in notifications %}
+                    <div class="card notification-card mb-3 {% if not notification.is_read %}unread{% endif %}">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    <div class="notification-icon">
+                                        {% if notification.notification_type == 'general' %}
+                                            <i class="fas fa-info-circle text-primary"></i>
+                                        {% elif notification.notification_type == 'case_update' %}
+                                            <i class="fas fa-file-medical text-info"></i>
+                                        {% elif notification.notification_type == 'doctor_response' %}
+                                            <i class="fas fa-user-md text-success"></i>
+                                        {% elif notification.notification_type == 'appointment' %}
+                                            <i class="fas fa-calendar text-warning"></i>
+                                        {% elif notification.notification_type == 'system' %}
+                                            <i class="fas fa-cog text-secondary"></i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="notification-content">
+                                        <h6 class="notification-title mb-1">
+                                            {{ notification.title }}
+                                            {% if not notification.is_read %}
+                                                <span class="badge bg-danger ms-2">{% trans "جديد" %}</span>
+                                            {% endif %}
+                                        </h6>
+                                        <p class="notification-message mb-2">{{ notification.message }}</p>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>
+                                            {{ notification.created_at|date:"d/m/Y H:i" }}
+                                            ({% trans "منذ" %} {{ notification.created_at|timesince }})
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-end">
+                                    <div class="notification-actions">
+                                        {% if not notification.is_read %}
+                                            <button class="btn btn-sm btn-outline-primary mark-read-btn" 
+                                                    data-notification-id="{{ notification.id }}">
+                                                <i class="fas fa-check me-1"></i>
+                                                {% trans "تحديد كمقروء" %}
+                                            </button>
+                                        {% endif %}
+                                        
+                                        {% if notification.related_case %}
+                                            <a href="{% url 'patients:case_detail' notification.related_case.id %}" 
+                                               class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-eye me-1"></i>
+                                                {% trans "عرض الحالة" %}
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination if needed -->
+                {% if notifications.count > 20 %}
+                <nav aria-label="{% trans 'تصفح الإشعارات' %}">
+                    <ul class="pagination justify-content-center">
+                        <!-- Add pagination logic here if needed -->
+                    </ul>
+                </nav>
+                {% endif %}
+                
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <div class="empty-state">
+                            <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
+                            <h4 class="text-muted">{% trans "لا توجد إشعارات" %}</h4>
+                            <p class="text-muted">{% trans "لم تتلق أي إشعارات بعد" %}</p>
+                            <a href="{% url 'patients:dashboard' %}" class="btn btn-primary">
+                                <i class="fas fa-home me-2"></i>
+                                {% trans "العودة للرئيسية" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* تصميم صفحة الإشعارات المحسن */
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* إحصائيات الإشعارات */
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border: none;
+    transition: all 0.3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.stat-primary::before { background: linear-gradient(90deg, #667eea, #764ba2); }
+.stat-warning::before { background: linear-gradient(90deg, #f093fb, #f5576c); }
+.stat-success::before { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+.stat-info::before { background: linear-gradient(90deg, #43e97b, #38f9d7); }
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 1rem;
+    color: white;
+}
+
+.stat-primary .stat-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+.stat-warning .stat-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.stat-success .stat-icon { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.stat-info .stat-icon { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+
+.stat-content h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-content p {
+    color: #4a5568;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* تصميم الإشعارات المحسن */
+.notification-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.notification-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+}
+
+.notification-card.unread {
+    border-left: 4px solid #667eea;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.02) 0%, rgba(255,255,255,1) 100%);
+}
+
+.notification-card .card-body {
+    padding: 1.5rem;
+}
+
+.notification-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin: 0 auto;
+    color: white;
+}
+
+.notification-icon.text-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white !important; }
+.notification-icon.text-info { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white !important; }
+.notification-icon.text-success { background: linear-gradient(135deg, #43e97b, #38f9d7); color: white !important; }
+.notification-icon.text-warning { background: linear-gradient(135deg, #f093fb, #f5576c); color: white !important; }
+.notification-icon.text-secondary { background: linear-gradient(135deg, #636e72, #2d3436); color: white !important; }
+
+.notification-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.75rem;
+}
+
+.notification-card.unread .notification-title {
+    color: #667eea;
+    font-weight: 700;
+}
+
+.notification-message {
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.notification-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.notification-actions .btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+/* شارات محسنة */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.8em;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.badge.bg-danger {
+    background: linear-gradient(135deg, #f093fb, #f5576c) !important;
+    animation: glow 2s infinite;
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 5px rgba(240, 147, 251, 0.5); }
+    50% { box-shadow: 0 0 15px rgba(240, 147, 251, 0.8); }
+}
+
+/* حالة فارغة محسنة */
+.empty-state {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e2e8f0;
+    padding: 3rem;
+    text-align: center;
+}
+
+.empty-state i {
+    opacity: 0.5;
+    color: #a0aec0;
+}
+
+/* تأثيرات الأزرار المحسنة */
+.btn {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.btn-outline-primary {
+    border: 2px solid #667eea;
+    color: #667eea;
+}
+
+.btn-outline-primary:hover {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+
+.btn-outline-success {
+    border: 2px solid #43e97b;
+    color: #43e97b;
+}
+
+.btn-outline-success:hover {
+    background: #43e97b;
+    border-color: #43e97b;
+    color: white;
+}
+
+.btn-outline-secondary {
+    border: 2px solid #e2e8f0;
+    color: #718096;
+}
+
+.btn-outline-secondary:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+    color: #4a5568;
+}
+
+/* تحسينات للموبايل */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .notification-card .row {
+        text-align: center;
+    }
+    
+    .notification-card .col-md-1,
+    .notification-card .col-md-9,
+    .notification-card .col-md-2 {
+        margin-bottom: 1rem;
+    }
+    
+    .notification-actions {
+        align-items: center;
+    }
+    
+    .d-flex.justify-content-between.align-items-center.mb-4 {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .d-flex.gap-2 {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+
+/* تأثيرات إضافية */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-1px);
+}
+
+/* تحسين شريط التمرير */
+.notifications-container {
+    max-height: 800px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.notifications-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notifications-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.notifications-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 10px;
+}
+
+.notifications-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a67d8, #6b46c1);
+}
+
+/* أنيميشن للإشعارات الجديدة */
+.notification-card.unread {
+    animation: slideInRight 0.5s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* تحسينات إضافية للتفاعل */
+.mark-read-btn {
+    transition: all 0.3s ease;
+}
+
+.mark-read-btn:hover {
+    transform: scale(1.05);
+}
+
+.notification-card .card-body:hover {
+    background: rgba(102, 126, 234, 0.01);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // تحديد الإشعار كمقروء
+    document.querySelectorAll('.mark-read-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const notificationId = this.dataset.notificationId;
+            const card = this.closest('.notification-card');
+            
+            fetch('{% url "patients:notifications" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: 'notification_id=' + notificationId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // إزالة كلاس unread
+                    card.classList.remove('unread');
+                    
+                    // إخفاء الزر
+                    this.style.display = 'none';
+                    
+                    // إزالة شارة "جديد"
+                    const newBadge = card.querySelector('.badge.bg-danger');
+                    if (newBadge) {
+                        newBadge.remove();
+                    }
+                    
+                    // تحديث العداد
+                    const countBadge = document.querySelector('h2 .badge');
+                    if (countBadge) {
+                        let count = parseInt(countBadge.textContent) - 1;
+                        if (count > 0) {
+                            countBadge.textContent = count;
+                        } else {
+                            countBadge.remove();
+                            // إخفاء زر "تحديد الكل كمقروء"
+                            const markAllBtn = document.querySelector('button[name="mark_all_read"]');
+                            if (markAllBtn) {
+                                markAllBtn.closest('form').style.display = 'none';
+                            }
+                        }
+                    }
+                    
+                    // إظهار رسالة نجاح
+                    showNotification('تم تحديد الإشعار كمقروء', 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('حدث خطأ أثناء تحديث الإشعار', 'error');
+            });
+        });
+    });
+    
+    // تأثيرات بصرية
+    document.querySelectorAll('.notification-card').forEach(function(card) {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+</script>
+{% endif %}
+
+{% endblock %}

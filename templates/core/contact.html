@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "اتصل بنا" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background: var(--surface-50, #f8f9fa);">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="brand-icon mb-3" style="font-size: 2.25rem; color: var(--primary-500, #667eea);">
+        <i class="fas fa-headset"></i>
+      </div>
+      <h1 class="mb-3">{% trans "اتصل بنا" %}</h1>
+      <p class="lead text-muted">{% trans "يسعدنا تواصلك معنا على مدار الساعة. أرسل رسالتك وسيقوم فريقنا بالرد عليك في أقرب وقت." %}</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="p-4 rounded-4" style="background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">{% trans "الاسم الكامل" %}</label>
+                <input type="text" name="name" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">{% trans "البريد الإلكتروني" %}</label>
+                <input type="email" name="email" class="form-control" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">{% trans "الموضوع" %}</label>
+                <input type="text" name="subject" class="form-control" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">{% trans "الرسالة" %}</label>
+                <textarea name="message" class="form-control" rows="6" required></textarea>
+              </div>
+              <div class="col-12 d-grid">
+                <button class="btn btn-primary btn-lg" type="submit">
+                  <i class="fas fa-paper-plane me-2 ms-2"></i>
+                  {% trans "إرسال الرسالة" %}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="p-4 rounded-4 h-100" style="background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
+          <h4 class="mb-3"><i class="fas fa-info-circle text-primary me-2 ms-2"></i> {% trans "معلومات التواصل" %}</h4>
+          <ul class="list-unstyled text-muted mb-4">
+            <li class="mb-2"><i class="fas fa-phone text-success me-2 ms-2"></i> +966 50 123 4567</li>
+            <li class="mb-2"><i class="fas fa-envelope text-danger me-2 ms-2"></i> info@medical-platform.com</li>
+            <li class="mb-2"><i class="fas fa-map-marker-alt text-warning me-2 ms-2"></i> {% trans "الرياض، المملكة العربية السعودية" %}</li>
+            <li class="mb-2"><i class="fas fa-clock text-info me-2 ms-2"></i> {% trans "متاح 24/7" %}</li>
+          </ul>
+
+          <h4 class="mb-3"><i class="fas fa-shield-alt text-success me-2 ms-2"></i> {% trans "الخصوصية" %}</h4>
+          <p class="text-muted mb-0">{% trans "نلتزم بحماية خصوصية معلوماتك. يتم استخدام بياناتك فقط لغرض التواصل والرد على استفسارك." %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

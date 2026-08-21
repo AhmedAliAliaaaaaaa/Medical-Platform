@@ -1,0 +1,391 @@
+/* Enhanced Color System for Medical Platform */
+
+:root {
+    /* Primary Colors - Medical Theme */
+    --primary-blue: #2563eb;
+    --primary-blue-light: #3b82f6;
+    --primary-blue-dark: #1d4ed8;
+    --primary-blue-50: rgba(37, 99, 235, 0.05);
+    --primary-blue-100: rgba(37, 99, 235, 0.1);
+    --primary-blue-200: rgba(37, 99, 235, 0.2);
+    --primary-blue-300: rgba(37, 99, 235, 0.3);
+    
+    /* Secondary Colors - Healing Green */
+    --secondary-green: #10b981;
+    --secondary-green-light: #34d399;
+    --secondary-green-dark: #059669;
+    --secondary-green-50: rgba(16, 185, 129, 0.05);
+    --secondary-green-100: rgba(16, 185, 129, 0.1);
+    --secondary-green-200: rgba(16, 185, 129, 0.2);
+    
+    /* Accent Colors */
+    --accent-purple: #8b5cf6;
+    --accent-purple-light: #a78bfa;
+    --accent-purple-dark: #7c3aed;
+    
+    --accent-pink: #ec4899;
+    --accent-pink-light: #f472b6;
+    --accent-pink-dark: #db2777;
+    
+    /* Status Colors */
+    --success-color: #10b981;
+    --success-light: #d1fae5;
+    --success-dark: #047857;
+    
+    --warning-color: #f59e0b;
+    --warning-light: #fef3c7;
+    --warning-dark: #d97706;
+    
+    --error-color: #ef4444;
+    --error-light: #fee2e2;
+    --error-dark: #dc2626;
+    
+    --info-color: #3b82f6;
+    --info-light: #dbeafe;
+    --info-dark: #1d4ed8;
+    
+    /* Priority Colors */
+    --priority-high: #ef4444;
+    --priority-medium: #f59e0b;
+    --priority-normal: #10b981;
+    --priority-low: #6b7280;
+    
+    /* Neutral Colors */
+    --white: #ffffff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    /* Text Colors */
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    --text-light: #9ca3af;
+    --text-white: #ffffff;
+    
+    /* Background Colors */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --bg-dark: #1f2937;
+    --bg-overlay: rgba(0, 0, 0, 0.5);
+    
+    /* Border Colors */
+    --border-light: #e5e7eb;
+    --border-medium: #d1d5db;
+    --border-dark: #9ca3af;
+    
+    /* Shadow Colors */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    
+    /* Gradient Colors */
+    --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-green) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-pink) 100%);
+    --gradient-success: linear-gradient(135deg, var(--success-color) 0%, var(--secondary-green-light) 100%);
+    --gradient-warning: linear-gradient(135deg, var(--warning-color) 0%, #fbbf24 100%);
+    --gradient-error: linear-gradient(135deg, var(--error-color) 0%, #f87171 100%);
+    
+    /* Medical Specialty Colors */
+    --cardiology-color: #ef4444;
+    --neurology-color: #8b5cf6;
+    --pediatrics-color: #10b981;
+    --orthopedics-color: #f59e0b;
+    --dermatology-color: #ec4899;
+    --psychiatry-color: #6366f1;
+    --surgery-color: #dc2626;
+    --internal-medicine-color: #2563eb;
+}
+
+/* Enhanced Button Colors */
+.btn-primary-enhanced {
+    background: var(--gradient-primary);
+    border: none;
+    color: var(--text-white);
+    transition: all 0.3s ease;
+}
+
+.btn-primary-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    filter: brightness(1.1);
+}
+
+.btn-secondary-enhanced {
+    background: var(--gradient-secondary);
+    border: none;
+    color: var(--text-white);
+    transition: all 0.3s ease;
+}
+
+.btn-secondary-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    filter: brightness(1.1);
+}
+
+.btn-success-enhanced {
+    background: var(--gradient-success);
+    border: none;
+    color: var(--text-white);
+    transition: all 0.3s ease;
+}
+
+.btn-success-enhanced:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    filter: brightness(1.1);
+}
+
+/* Enhanced Card Colors */
+.card-enhanced {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.card-enhanced:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-blue-200);
+}
+
+.card-primary {
+    border-left: 4px solid var(--primary-blue);
+}
+
+.card-success {
+    border-left: 4px solid var(--success-color);
+}
+
+.card-warning {
+    border-left: 4px solid var(--warning-color);
+}
+
+.card-error {
+    border-left: 4px solid var(--error-color);
+}
+
+/* Priority Indicators */
+.priority-high {
+    color: var(--priority-high);
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.priority-medium {
+    color: var(--priority-medium);
+    background-color: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.priority-normal {
+    color: var(--priority-normal);
+    background-color: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.priority-low {
+    color: var(--priority-low);
+    background-color: rgba(107, 114, 128, 0.1);
+    border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+/* Status Badges */
+.status-pending {
+    background: var(--warning-light);
+    color: var(--warning-dark);
+    border: 1px solid var(--warning-color);
+}
+
+.status-approved {
+    background: var(--success-light);
+    color: var(--success-dark);
+    border: 1px solid var(--success-color);
+}
+
+.status-rejected {
+    background: var(--error-light);
+    color: var(--error-dark);
+    border: 1px solid var(--error-color);
+}
+
+.status-in-progress {
+    background: var(--info-light);
+    color: var(--info-dark);
+    border: 1px solid var(--info-color);
+}
+
+.status-completed {
+    background: var(--success-light);
+    color: var(--success-dark);
+    border: 1px solid var(--success-color);
+}
+
+/* Medical Specialty Colors */
+.specialty-cardiology {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--cardiology-color);
+    border-left: 4px solid var(--cardiology-color);
+}
+
+.specialty-neurology {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--neurology-color);
+    border-left: 4px solid var(--neurology-color);
+}
+
+.specialty-pediatrics {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--pediatrics-color);
+    border-left: 4px solid var(--pediatrics-color);
+}
+
+.specialty-orthopedics {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--orthopedics-color);
+    border-left: 4px solid var(--orthopedics-color);
+}
+
+.specialty-dermatology {
+    background: rgba(236, 72, 153, 0.1);
+    color: var(--dermatology-color);
+    border-left: 4px solid var(--dermatology-color);
+}
+
+/* Enhanced Form Colors */
+.form-control-enhanced {
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: var(--bg-primary);
+}
+
+.form-control-enhanced:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px var(--primary-blue-100);
+    background: var(--white);
+}
+
+.form-control-enhanced.is-valid {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px var(--success-light);
+}
+
+.form-control-enhanced.is-invalid {
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 3px var(--error-light);
+}
+
+/* Enhanced Alert Colors */
+.alert-enhanced {
+    border-radius: 12px;
+    border: none;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+}
+
+.alert-primary-enhanced {
+    background: var(--primary-blue-50);
+    color: var(--primary-blue-dark);
+    border-left: 4px solid var(--primary-blue);
+}
+
+.alert-success-enhanced {
+    background: var(--success-light);
+    color: var(--success-dark);
+    border-left: 4px solid var(--success-color);
+}
+
+.alert-warning-enhanced {
+    background: var(--warning-light);
+    color: var(--warning-dark);
+    border-left: 4px solid var(--warning-color);
+}
+
+.alert-error-enhanced {
+    background: var(--error-light);
+    color: var(--error-dark);
+    border-left: 4px solid var(--error-color);
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-primary: #1f2937;
+        --bg-secondary: #111827;
+        --bg-tertiary: #374151;
+        --text-primary: #f9fafb;
+        --text-secondary: #d1d5db;
+        --text-muted: #9ca3af;
+        --border-light: #374151;
+        --border-medium: #4b5563;
+    }
+    
+    .card-enhanced {
+        background: var(--bg-primary);
+        border-color: var(--border-light);
+    }
+    
+    .form-control-enhanced {
+        background: var(--bg-secondary);
+        border-color: var(--border-light);
+        color: var(--text-primary);
+    }
+}
+
+/* Animation Classes */
+.fade-in-enhanced {
+    animation: fadeInEnhanced 0.6s ease-out;
+}
+
+.slide-up-enhanced {
+    animation: slideUpEnhanced 0.6s ease-out;
+}
+
+.scale-in-enhanced {
+    animation: scaleInEnhanced 0.4s ease-out;
+}
+
+@keyframes fadeInEnhanced {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUpEnhanced {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleInEnhanced {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

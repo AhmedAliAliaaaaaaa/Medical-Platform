@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "جلساتي" %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="fas fa-user-clock me-2"></i>{% trans "إدارة الجلسات" %}</h2>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="kill" value="all">
+      <button type="submit" class="btn btn-outline-danger">
+        <i class="fas fa-sign-out-alt me-1"></i>{% trans "إنهاء جميع الجلسات" %}
+      </button>
+    </form>
+  </div>
+
+  {% if sessions %}
+    <div class="list-group">
+      {% for s in sessions %}
+      <div class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <div class="fw-bold">{% trans "جلسة" %} {{ forloop.counter }}</div>
+          <small class="text-muted">{% trans "تنتهي" %}: {{ s.expire_date|date:"d/m/Y H:i" }}</small>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="kill" value="{{ s.session_key }}">
+          <button type="submit" class="btn btn-sm btn-outline-warning">
+            {% trans "إنهاء" %}
+          </button>
+        </form>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-5">
+      <i class="fas fa-user-clock fa-3x text-muted mb-2"></i>
+      <p class="text-muted">{% trans "لا توجد جلسات نشطة" %}</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

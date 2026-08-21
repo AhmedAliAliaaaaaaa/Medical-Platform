@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>اختبار بسيط</title>
+  </head>
+  <body>
+    <h1>اختبار بسيط للترجمة</h1>
+
+    <textarea id="originalText">أعاني من صداع</textarea>
+    <textarea id="translatedText" readonly></textarea>
+
+    <select id="sourceLanguage">
+      <option value="ar" selected>العربية</option>
+      <option value="en">English</option>
+    </select>
+
+    <select id="targetLanguage">
+      <option value="en" selected>English</option>
+      <option value="ar">العربية</option>
+    </select>
+
+    <button id="translateBtn">ترجم</button>
+    <button id="useTranslationBtn" disabled>استخدام</button>
+    <button id="clearTranslationBtn">مسح</button>
+    <button id="swapLanguagesBtn">تبديل</button>
+
+    <div id="translationStatus"></div>
+
+    <textarea name="description" style="display: none"></textarea>
+    <input type="hidden" name="csrfmiddlewaretoken" value="test" />
+
+    <div
+      id="log"
+      style="
+        background: #000;
+        color: #0f0;
+        padding: 10px;
+        margin-top: 20px;
+        height: 200px;
+        overflow-y: auto;
+      "
+    ></div>
+
+    <script>
+      const log = document.getElementById("log");
+      const originalConsoleLog = console.log;
+      const originalConsoleError = console.error;
+
+      console.log = function (...args) {
+        originalConsoleLog.apply(console, args);
+        log.innerHTML += '<div style="color:#0f0">' + args.join(" ") + "</div>";
+        log.scrollTop = log.scrollHeight;
+      };
+
+      console.error = function (...args) {
+        originalConsoleError.apply(console, args);
+        log.innerHTML += '<div style="color:#f00">' + args.join(" ") + "</div>";
+        log.scrollTop = log.scrollHeight;
+      };
+
+      console.log("🔄 بدء تحميل الاختبار البسيط...");
+    </script>
+
+    <script src="/static/js/instant-translator.js"></script>
+
+    <script>
+      setTimeout(() => {
+        console.log("🔍 اختبار نهائي...");
+        const btn = document.getElementById("translateBtn");
+        if (btn) {
+          console.log("✅ الزر موجود، محاولة الضغط...");
+          btn.click();
+        } else {
+          console.error("❌ الزر غير موجود");
+        }
+      }, 2000);
+    </script>
+  </body>
+</html>

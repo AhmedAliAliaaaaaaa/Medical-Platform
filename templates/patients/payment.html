@@ -1,0 +1,527 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}الدفع - {{ service_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.payment-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.payment-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    padding: 30px;
+    margin-bottom: 20px;
+}
+
+.payment-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.payment-header h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.payment-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.payment-summary h4 {
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 5px 0;
+}
+
+.summary-row.total {
+    border-top: 1px solid rgba(255,255,255,0.3);
+    padding-top: 15px;
+    margin-top: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.payment-methods {
+    margin-bottom: 30px;
+}
+
+.payment-method-card {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-method-card:hover {
+    border-color: #007bff;
+    background-color: #f8f9fa;
+}
+
+.payment-method-card.selected {
+    border-color: #28a745;
+    background-color: #d4edda;
+}
+
+.payment-method-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    font-size: 1.5em;
+}
+
+.visa-icon { background: linear-gradient(135deg, #1a1f71 0%, #0f4c75 100%); color: white; }
+.mastercard-icon { background: linear-gradient(135deg, #eb001b 0%, #f79e1b 100%); color: white; }
+.paypal-icon { background: linear-gradient(135deg, #003087 0%, #009cde 100%); color: white; }
+.apple-pay-icon { background: linear-gradient(135deg, #000000 0%, #434343 100%); color: white; }
+.stc-pay-icon { background: linear-gradient(135deg, #662d91 0%, #9c27b0 100%); color: white; }
+
+.new-payment-method {
+    border: 2px dashed #007bff;
+    background-color: #f8f9fa;
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.new-payment-method:hover {
+    background-color: #e9ecef;
+}
+
+.payment-form {
+    display: none;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.card-input-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+}
+
+.security-info {
+    background: #e8f5e8;
+    border: 1px solid #c3e6c3;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.security-info i {
+    color: #28a745;
+    margin-right: 10px;
+}
+
+.payment-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn-payment {
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+.btn-primary-payment {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.btn-primary-payment:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40,167,69,0.4);
+}
+
+.btn-secondary-payment {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary-payment:hover {
+    background: #5a6268;
+}
+
+.loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-spinner {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+    .payment-container {
+        padding: 10px;
+    }
+    
+    .payment-card {
+        padding: 20px;
+    }
+    
+    .card-input-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .payment-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+    <div class="payment-card">
+        <div class="payment-header">
+            <h2><i class="fas fa-credit-card me-2"></i>الدفع الآمن</h2>
+            <p class="text-muted">أكمل عملية الدفع للحصول على الاستشارة الطبية</p>
+        </div>
+
+        <!-- ملخص الدفع -->
+        <div class="payment-summary">
+            <h4><i class="fas fa-receipt me-2"></i>ملخص الطلب</h4>
+            <div class="summary-row">
+                <span>الخدمة:</span>
+                <span>{{ service_name }}</span>
+            </div>
+            <div class="summary-row">
+                <span>الطبيب:</span>
+                <span>د. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</span>
+            </div>
+            <div class="summary-row">
+                <span>التخصص:</span>
+                <span>{{ doctor.get_specialization_display }}</span>
+            </div>
+            <div class="summary-row">
+                <span>المبلغ:</span>
+                <span>{{ amount }} {{ currency }}</span>
+            </div>
+            <div class="summary-row total">
+                <span>المجموع:</span>
+                <span>{{ amount }} {{ currency }}</span>
+            </div>
+        </div>
+
+        <form method="post" id="paymentForm">
+            {% csrf_token %}
+            <input type="hidden" name="consultation_type" value="{{ consultation_type }}">
+            
+            <!-- طرق الدفع المحفوظة -->
+            {% if payment_methods %}
+            <div class="payment-methods">
+                <h5><i class="fas fa-wallet me-2"></i>طرق الدفع المحفوظة</h5>
+                {% for method in payment_methods %}
+                <div class="payment-method-card" onclick="selectPaymentMethod({{ method.id }})">
+                    <input type="radio" name="payment_method" value="{{ method.id }}" id="method_{{ method.id }}" style="display: none;">
+                    <div class="d-flex align-items-center">
+                        <div class="payment-method-icon {{ method.payment_type }}-icon">
+                            {% if method.payment_type == 'visa' %}
+                                <i class="fab fa-cc-visa"></i>
+                            {% elif method.payment_type == 'mastercard' %}
+                                <i class="fab fa-cc-mastercard"></i>
+                            {% elif method.payment_type == 'paypal' %}
+                                <i class="fab fa-paypal"></i>
+                            {% elif method.payment_type == 'apple_pay' %}
+                                <i class="fab fa-apple-pay"></i>
+                            {% else %}
+                                <i class="fas fa-credit-card"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div class="fw-bold">{{ method.get_payment_type_display }}</div>
+                            {% if method.card_number %}
+                                <small class="text-muted">{{ method.card_number }}</small>
+                            {% endif %}
+                            {% if method.paypal_email %}
+                                <small class="text-muted">{{ method.paypal_email }}</small>
+                            {% endif %}
+                        </div>
+                        {% if method.is_default %}
+                            <span class="badge bg-primary ms-auto">افتراضي</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- إضافة طريقة دفع جديدة -->
+            <div class="new-payment-method" onclick="toggleNewPaymentForm()">
+                <i class="fas fa-plus-circle fa-2x text-primary mb-2"></i>
+                <div class="fw-bold">إضافة طريقة دفع جديدة</div>
+                <small class="text-muted">بطاقة ائتمان، PayPal، أو طريقة أخرى</small>
+            </div>
+
+            <!-- نموذج طريقة الدفع الجديدة -->
+            <div class="payment-form" id="newPaymentForm">
+                <h6><i class="fas fa-credit-card me-2"></i>معلومات الدفع</h6>
+                
+                <div class="form-group">
+                    <label>نوع الدفع</label>
+                    <select class="form-control" name="new_payment_type" onchange="togglePaymentFields(this.value)">
+                        <option value="">اختر نوع الدفع</option>
+                        <option value="visa">Visa</option>
+                        <option value="mastercard">Mastercard</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="apple_pay">Apple Pay</option>
+                        <option value="stc_pay">STC Pay</option>
+                    </select>
+                </div>
+
+                <!-- حقول البطاقة الائتمانية -->
+                <div id="cardFields" style="display: none;">
+                    <div class="form-group">
+                        <label>رقم البطاقة</label>
+                        <input type="text" class="form-control" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>اسم حامل البطاقة</label>
+                        <input type="text" class="form-control" name="card_holder_name" placeholder="الاسم كما يظهر على البطاقة">
+                    </div>
+                    
+                    <div class="card-input-group">
+                        <div class="form-group">
+                            <label>الشهر</label>
+                            <select class="form-control" name="expiry_month">
+                                <option value="">الشهر</option>
+                                {% for i in "123456789012"|make_list %}
+                                    <option value="{{ forloop.counter }}">{{ forloop.counter|stringformat:"02d" }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>السنة</label>
+                            <select class="form-control" name="expiry_year">
+                                <option value="">السنة</option>
+                                {% for year in "2024 2025 2026 2027 2028 2029 2030 2031 2032 2033 2034"|make_list %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <input type="password" class="form-control" name="cvv" placeholder="123" maxlength="4">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- حقول PayPal -->
+                <div id="paypalFields" style="display: none;">
+                    <div class="form-group">
+                        <label>بريد PayPal الإلكتروني</label>
+                        <input type="email" class="form-control" name="paypal_email" placeholder="your-email@paypal.com">
+                    </div>
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="save_payment_method" id="savePaymentMethod">
+                    <label class="form-check-label" for="savePaymentMethod">
+                        حفظ طريقة الدفع للاستخدام المستقبلي
+                    </label>
+                </div>
+            </div>
+
+            <!-- معلومات الأمان -->
+            <div class="security-info">
+                <i class="fas fa-shield-alt"></i>
+                <strong>دفع آمن ومشفر</strong>
+                <p class="mb-0">جميع معلومات الدفع محمية بتشفير SSL 256-bit ولا يتم حفظ معلومات البطاقة على خوادمنا.</p>
+            </div>
+
+            <!-- أزرار الدفع -->
+            <div class="payment-buttons">
+                <button type="submit" class="btn-payment btn-primary-payment">
+                    <i class="fas fa-lock me-2"></i>
+                    دفع {{ amount }} {{ currency }}
+                </button>
+                <a href="{% url 'patients:select_doctor' case.id %}" class="btn-payment btn-secondary-payment">
+                    <i class="fas fa-arrow-right me-2"></i>
+                    رجوع
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>جاري معالجة الدفع...</p>
+        <small class="text-muted">يرجى عدم إغلاق الصفحة</small>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function selectPaymentMethod(methodId) {
+    // إلغاء تحديد جميع البطاقات
+    document.querySelectorAll('.payment-method-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // تحديد البطاقة المختارة
+    event.currentTarget.classList.add('selected');
+    document.getElementById('method_' + methodId).checked = true;
+    
+    // إخفاء نموذج الدفع الجديد
+    document.getElementById('newPaymentForm').style.display = 'none';
+}
+
+function toggleNewPaymentForm() {
+    const form = document.getElementById('newPaymentForm');
+    const isVisible = form.style.display === 'block';
+    
+    if (isVisible) {
+        form.style.display = 'none';
+    } else {
+        form.style.display = 'block';
+        // إلغاء تحديد طرق الدفع المحفوظة
+        document.querySelectorAll('.payment-method-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        document.querySelectorAll('input[name="payment_method"]').forEach(input => {
+            input.checked = false;
+        });
+    }
+}
+
+function togglePaymentFields(paymentType) {
+    const cardFields = document.getElementById('cardFields');
+    const paypalFields = document.getElementById('paypalFields');
+    
+    // إخفاء جميع الحقول
+    cardFields.style.display = 'none';
+    paypalFields.style.display = 'none';
+    
+    // إظهار الحقول المناسبة
+    if (['visa', 'mastercard', 'american_express'].includes(paymentType)) {
+        cardFields.style.display = 'block';
+    } else if (paymentType === 'paypal') {
+        paypalFields.style.display = 'block';
+    }
+}
+
+// معالجة إرسال النموذج
+document.getElementById('paymentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // التحقق من اختيار طريقة دفع
+    const selectedMethod = document.querySelector('input[name="payment_method"]:checked');
+    const newPaymentType = document.querySelector('select[name="new_payment_type"]').value;
+    
+    if (!selectedMethod && !newPaymentType) {
+        alert('يرجى اختيار طريقة دفع');
+        return;
+    }
+    
+    // إظهار شاشة التحميل
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    
+    // محاكاة معالجة الدفع
+    setTimeout(() => {
+        this.submit();
+    }, 2000);
+});
+
+// تنسيق رقم البطاقة
+document.querySelector('input[name="card_number"]')?.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s/g, '');
+    let formattedValue = value.replace(/(.{4})/g, '$1 ').trim();
+    e.target.value = formattedValue;
+});
+</script>
+{% endblock %}

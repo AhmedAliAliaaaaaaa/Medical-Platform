@@ -1,0 +1,351 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "إرسال إشعار" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card notification-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            {% trans "إرسال إشعار للمرضى" %}
+                        </h4>
+                        <a href="{% url 'doctors:dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            {% trans "العودة" %}
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <form method="post" class="notification-form">
+                        {% csrf_token %}
+                        
+                        <!-- اختيار المريض -->
+                        <div class="mb-4">
+                            <label for="patient_id" class="form-label">
+                                <i class="fas fa-user me-2"></i>
+                                {% trans "المريض المستهدف" %}
+                            </label>
+                            <select name="patient_id" id="patient_id" class="form-select" required>
+                                <option value="">{% trans "اختر المريض" %}</option>
+                                <option value="all">{% trans "جميع مرضاي" %}</option>
+                                {% for patient in my_patients %}
+                                    <option value="{{ patient.patient__id }}">
+                                        {{ patient.patient__user__first_name }} {{ patient.patient__user__last_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                {% trans "يمكنك إرسال الإشعار لمريض محدد أو لجميع مرضاك" %}
+                            </div>
+                        </div>
+                        
+                        <!-- نوع الإشعار -->
+                        <div class="mb-4">
+                            <label for="notification_type" class="form-label">
+                                <i class="fas fa-tag me-2"></i>
+                                {% trans "نوع الإشعار" %}
+                            </label>
+                            <select name="notification_type" id="notification_type" class="form-select">
+                                <option value="doctor_message">{% trans "رسالة من الطبيب" %}</option>
+                                <option value="appointment">{% trans "موعد" %}</option>
+                                <option value="case_update">{% trans "تحديث حالة" %}</option>
+                                <option value="general">{% trans "عام" %}</option>
+                            </select>
+                        </div>
+                        
+                        <!-- عنوان الإشعار -->
+                        <div class="mb-4">
+                            <label for="title" class="form-label">
+                                <i class="fas fa-heading me-2"></i>
+                                {% trans "عنوان الإشعار" %}
+                            </label>
+                            <input type="text" name="title" id="title" class="form-control" 
+                                   placeholder="{% trans 'اكتب عنوان الإشعار...' %}" required maxlength="200">
+                            <div class="form-text">
+                                <span id="title-counter">0</span>/200 {% trans "حرف" %}
+                            </div>
+                        </div>
+                        
+                        <!-- محتوى الإشعار -->
+                        <div class="mb-4">
+                            <label for="message" class="form-label">
+                                <i class="fas fa-comment me-2"></i>
+                                {% trans "محتوى الإشعار" %}
+                            </label>
+                            <textarea name="message" id="message" class="form-control" rows="6" 
+                                      placeholder="{% trans 'اكتب محتوى الإشعار...' %}" required></textarea>
+                            <div class="form-text">
+                                <span id="message-counter">0</span> {% trans "حرف" %}
+                            </div>
+                        </div>
+                        
+                        <!-- أزرار الإجراءات -->
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary" onclick="clearForm()">
+                                <i class="fas fa-eraser me-2"></i>
+                                {% trans "مسح الحقول" %}
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                {% trans "إرسال الإشعار" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- نصائح للاستخدام -->
+            <div class="card mt-4 tips-card">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        {% trans "نصائح لكتابة إشعار فعال" %}
+                    </h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            {% trans "استخدم عنوان واضح ومختصر" %}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            {% trans "اكتب المحتوى بلغة بسيطة ومفهومة" %}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            {% trans "حدد الإجراء المطلوب من المريض إن وجد" %}
+                        </li>
+                        <li>
+                            <i class="fas fa-check text-success me-2"></i>
+                            {% trans "تأكد من صحة المعلومات قبل الإرسال" %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* تصميم صفحة إرسال الإشعارات */
+.notification-card {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.notification-card .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1.5rem;
+}
+
+.notification-form {
+    padding: 1rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.75rem;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-text {
+    color: #718096;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.btn {
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-outline-secondary {
+    border: 2px solid #e2e8f0;
+    color: #718096;
+}
+
+.btn-outline-secondary:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+    color: #4a5568;
+    transform: translateY(-1px);
+}
+
+.tips-card {
+    border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border-radius: 15px;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+}
+
+.tips-card .card-title {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.tips-card li {
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+/* عدادات الأحرف */
+#title-counter, #message-counter {
+    font-weight: 600;
+    color: #667eea;
+}
+
+/* تحسينات للموبايل */
+@media (max-width: 768px) {
+    .notification-card .card-header {
+        padding: 1rem;
+    }
+    
+    .notification-form {
+        padding: 0.5rem;
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
+
+/* تأثيرات إضافية */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* أنيميشن للنماذج */
+.form-control, .form-select {
+    position: relative;
+}
+
+.form-control:focus::placeholder {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+/* تحسين المظهر العام */
+.container {
+    max-width: 1000px;
+}
+
+.notification-card .card-body {
+    padding: 2rem;
+}
+
+/* تأثيرات التفاعل */
+.form-control:hover, .form-select:hover {
+    border-color: #cbd5e0;
+}
+
+.tips-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+</style>
+
+<script>
+// عداد الأحرف للعنوان
+document.getElementById('title').addEventListener('input', function() {
+    const counter = document.getElementById('title-counter');
+    counter.textContent = this.value.length;
+    
+    if (this.value.length > 180) {
+        counter.style.color = '#e53e3e';
+    } else if (this.value.length > 150) {
+        counter.style.color = '#f6ad55';
+    } else {
+        counter.style.color = '#667eea';
+    }
+});
+
+// عداد الأحرف للرسالة
+document.getElementById('message').addEventListener('input', function() {
+    const counter = document.getElementById('message-counter');
+    counter.textContent = this.value.length;
+    
+    if (this.value.length > 450) {
+        counter.style.color = '#e53e3e';
+    } else if (this.value.length > 350) {
+        counter.style.color = '#f6ad55';
+    } else {
+        counter.style.color = '#667eea';
+    }
+});
+
+// مسح النموذج
+function clearForm() {
+    if (confirm('هل أنت متأكد من مسح جميع الحقول؟')) {
+        document.getElementById('title').value = '';
+        document.getElementById('message').value = '';
+        document.getElementById('patient_id').value = '';
+        document.getElementById('notification_type').value = 'doctor_message';
+        document.getElementById('title-counter').textContent = '0';
+        document.getElementById('message-counter').textContent = '0';
+    }
+}
+
+// تحسين تجربة المستخدم
+document.addEventListener('DOMContentLoaded', function() {
+    // إضافة تأثيرات للحقول
+    const inputs = document.querySelectorAll('.form-control, .form-select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+        });
+    });
+    
+    // تحديث العدادات عند التحميل
+    document.getElementById('title').dispatchEvent(new Event('input'));
+    document.getElementById('message').dispatchEvent(new Event('input'));
+});
+</script>
+{% endblock %}

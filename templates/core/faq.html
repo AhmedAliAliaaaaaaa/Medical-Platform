@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "الأسئلة الشائعة" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block content %}
+<section class="py-5" style="background: var(--surface-50, #f8f9fa);">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div class="brand-icon mb-3" style="font-size: 2.25rem; color: var(--primary-500, #667eea);">
+        <i class="fas fa-question-circle"></i>
+      </div>
+      <h1 class="mb-3">{% trans "الأسئلة الشائعة" %}</h1>
+      <p class="lead text-muted">{% trans "إجابات لأكثر الأسئلة شيوعًا حول منصتنا وخدماتنا" %}</p>
+    </div>
+
+    <div class="accordion" id="faqAccordion">
+      {% if faqs %}
+        {% for item in faqs %}
+        <div class="accordion-item rounded-3 overflow-hidden mb-3" style="box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
+          <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+              {{ item.question }}
+            </button>
+          </h2>
+          <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#faqAccordion">
+            <div class="accordion-body text-muted">
+              {{ item.answer|linebreaks }}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="alert alert-info">
+          {% trans "لا توجد أسئلة شائعة حالياً." %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

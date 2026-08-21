@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "المنصة الطبية - منصتك للتواصل مع أطباء عالميين" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Slides Home Page Styles */
+body {
+    font-family: 'Cairo', 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+}
+
+/* Hero Slider Section */
+.hero-slider {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
+
+.slide.active {
+    opacity: 1;
+}
+
+.slide-1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.slide-2 {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.slide-3 {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.slide-content {
+    max-width: 800px;
+    padding: 0 20px;
+    z-index: 2;
+    position: relative;
+}
+
+.slide-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    animation: slideInUp 1s ease-out;
+}
+
+.slide-subtitle {
+    font-size: 1.4rem;
+    margin-bottom: 2rem;
+    opacity: 0.95;
+    animation: slideInUp 1s ease-out 0.3s both;
+}
+
+.slide-button {
+    display: inline-block;
+    padding: 15px 30px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    border: 2px solid rgba(255,255,255,0.4);
+    transition: all 0.3s ease;
+    animation: slideInUp 1s ease-out 0.6s both;
+}
+
+.slide-button:hover {
+    background: rgba(255,255,255,0.3);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+/* Slider Navigation */
+.slider-nav {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 3;
+}
+
+.nav-dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-dot.active {
+    background: white;
+    transform: scale(1.2);
+}
+
+/* Slider Arrows */
+.slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    z-index: 3;
+}
+
+.slider-arrow:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.arrow-prev {
+    left: 30px;
+}
+
+.arrow-next {
+    right: 30px;
+}
+
+/* Animations */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Features Section */
+.features-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.feature-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+
+.feature-icon {
+    font-size: 3.5rem;
+    color: #667eea;
+    margin-bottom: 20px;
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: #2c3e50;
+}
+
+.feature-description {
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .slide-title {
+        font-size: 2.5rem;
+    }
+    
+    .slide-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .slider-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .arrow-prev {
+        left: 15px;
+    }
+    
+    .arrow-next {
+        right: 15px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Slider -->
+<section class="hero-slider">
+    <!-- Slide 1 -->
+    <div class="slide slide-1 active">
+        <div class="slide-content">
+            <h1 class="slide-title">{% trans "مرحباً بك في المنصة الطبية" %}</h1>
+            <p class="slide-subtitle">{% trans "تواصل مع أطباء متخصصين من جميع أنحاء العالم واحصل على استشارة طبية موثوقة" %}</p>
+            <a href="{% url 'accounts:register' %}" class="slide-button">{% trans "ابدأ الآن" %}</a>
+        </div>
+    </div>
+    
+    <!-- Slide 2 -->
+    <div class="slide slide-2">
+        <div class="slide-content">
+            <h1 class="slide-title">{% trans "استشارات طبية متخصصة" %}</h1>
+            <p class="slide-subtitle">{% trans "احصل على تشخيص دقيق وخطة علاج مناسبة من أطباء معتمدين ومتخصصين" %}</p>
+            <a href="{% url 'patients:new_case' %}" class="slide-button">{% trans "أرسل حالتك" %}</a>
+        </div>
+    </div>
+    
+    <!-- Slide 3 -->
+    <div class="slide slide-3">
+        <div class="slide-content">
+            <h1 class="slide-title">{% trans "انضم كطبيب" %}</h1>
+            <p class="slide-subtitle">{% trans "شارك خبرتك الطبية وساعد المرضى من جميع أنحاء العالم" %}</p>
+            <a href="{% url 'doctors:register' %}" class="slide-button">{% trans "سجل كطبيب" %}</a>
+        </div>
+    </div>
+    
+    <!-- Navigation Arrows -->
+    <button class="slider-arrow arrow-prev" onclick="changeSlide(-1)">‹</button>
+    <button class="slider-arrow arrow-next" onclick="changeSlide(1)">›</button>
+    
+    <!-- Navigation Dots -->
+    <div class="slider-nav">
+        <div class="nav-dot active" onclick="currentSlide(1)"></div>
+        <div class="nav-dot" onclick="currentSlide(2)"></div>
+        <div class="nav-dot" onclick="currentSlide(3)"></div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-4 font-weight-bold text-primary mb-4">{% trans "لماذا تختار منصتنا؟" %}</h2>
+                <p class="lead text-muted">{% trans "نقدم لك أفضل الخدمات الطبية بأحدث التقنيات" %}</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h3 class="feature-title">{% trans "أطباء معتمدون" %}</h3>
+                    <p class="feature-description">{% trans "جميع أطبائنا معتمدون ومتخصصون في مجالاتهم" %}</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="feature-title">{% trans "استجابة سريعة" %}</h3>
+                    <p class="feature-description">{% trans "احصل على رد سريع على استفساراتك الطبية" %}</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title">{% trans "خصوصية وأمان" %}</h3>
+                    <p class="feature-description">{% trans "نحافظ على سرية معلوماتك الطبية بأعلى معايير الأمان" %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+let currentSlideIndex = 0;
+const slides = document.querySelectorAll('.slide');
+const dots = document.querySelectorAll('.nav-dot');
+
+function showSlide(index) {
+    // Hide all slides
+    slides.forEach(slide => slide.classList.remove('active'));
+    dots.forEach(dot => dot.classList.remove('active'));
+    
+    // Show current slide
+    slides[index].classList.add('active');
+    dots[index].classList.add('active');
+}
+
+function changeSlide(direction) {
+    currentSlideIndex += direction;
+    
+    if (currentSlideIndex >= slides.length) {
+        currentSlideIndex = 0;
+    } else if (currentSlideIndex < 0) {
+        currentSlideIndex = slides.length - 1;
+    }
+    
+    showSlide(currentSlideIndex);
+}
+
+function currentSlide(index) {
+    currentSlideIndex = index - 1;
+    showSlide(currentSlideIndex);
+}
+
+// Auto slide every 5 seconds
+setInterval(() => {
+    changeSlide(1);
+}, 5000);
+</script>
+{% endblock %}

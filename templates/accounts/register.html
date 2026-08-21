@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{% trans "إنشاء حساب جديد" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <div class="text-center">
+            <h1><i class="fas fa-user-plus me-3"></i>{% trans "إنشاء حساب جديد" %}</h1>
+            <p>{% trans "انضم إلى المنصة الطبية واحصل على استشارات طبية موثوقة من أطباء معتمدين" %}</p>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body p-5">
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            {{ form.username|as_crispy_field }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.phone_number|as_crispy_field }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.password1|as_crispy_field }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.password2|as_crispy_field }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success btn-lg w-100 mb-3">
+                            <i class="fas fa-user-plus me-2"></i>
+                            {% trans "إنشاء الحساب" %}
+                        </button>
+                    </form>
+                    
+                    <div class="text-center">
+                        <p class="mb-2">{% trans "هل لديك حساب بالفعل؟" %}</p>
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            {% trans "تسجيل الدخول" %}
+                        </a>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <p class="mb-2">{% trans "هل أنت طبيب؟" %}</p>
+                        <a href="{% url 'accounts:enhanced_doctor_register' %}" class="btn btn-outline-info">
+                            <i class="fas fa-stethoscope me-2"></i>
+                            {% trans "انضم كطبيب" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

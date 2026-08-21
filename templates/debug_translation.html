@@ -1,0 +1,265 @@
+{% extends 'base.html' %} {% load static %} {% block title %}تشخيص الترجمة{%
+endblock %} {% block content %}
+<div class="container mt-4">
+  <h2><i class="fas fa-bug me-2"></i>تشخيص مشكلة الترجمة</h2>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>اختبار العناصر</h5>
+    </div>
+    <div class="card-body">
+      <div id="elementsCheck"></div>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5>اختبار الترجمة</h5>
+    </div>
+    <div class="card-body">
+      <!-- نفس العناصر الموجودة في الصفحة الأصلية -->
+      <div class="row">
+        <div class="col-md-6">
+          <label>النص الأصلي:</label>
+          <textarea
+            id="originalText"
+            class="form-control"
+            rows="3"
+            placeholder="اكتب النص هنا..."
+          >
+أعاني من صداع شديد</textarea
+          >
+        </div>
+        <div class="col-md-6">
+          <label>النص المترجم:</label>
+          <textarea
+            id="translatedText"
+            class="form-control"
+            rows="3"
+            readonly
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-md-6">
+          <label>من:</label>
+          <select id="sourceLanguage" class="form-select">
+            <option value="auto">اكتشف تلقائياً</option>
+            <option value="ar" selected>العربية</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label>إلى:</label>
+          <select id="targetLanguage" class="form-select">
+            <option value="en" selected>English</option>
+            <option value="ar">العربية</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <button type="button" id="translateBtn" class="btn btn-primary">
+          <i class="fas fa-language me-2"></i>ترجم
+        </button>
+        <button
+          type="button"
+          id="useTranslationBtn"
+          class="btn btn-success"
+          disabled
+        >
+          استخدام الترجمة
+        </button>
+        <button
+          type="button"
+          id="clearTranslationBtn"
+          class="btn btn-outline-secondary"
+        >
+          مسح
+        </button>
+        <button
+          type="button"
+          id="swapLanguagesBtn"
+          class="btn btn-outline-info"
+        >
+          تبديل
+        </button>
+      </div>
+
+      <div id="translationStatus" class="mt-3"></div>
+
+      <!-- حقل الوصف المخفي -->
+      <textarea name="description" style="display: none"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h5>سجل الأحداث</h5>
+    </div>
+    <div class="card-body">
+      <div
+        id="logOutput"
+        style="
+          background: #000;
+          color: #0f0;
+          padding: 10px;
+          border-radius: 4px;
+          font-family: monospace;
+          font-size: 12px;
+          max-height: 300px;
+          overflow-y: auto;
+        "
+      ></div>
+      <button id="clearLog" class="btn btn-sm btn-secondary mt-2">
+        مسح السجل
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Override console.log to capture logs
+  const originalLog = console.log;
+  const originalError = console.error;
+  const logOutput = document.getElementById("logOutput");
+
+  function addLog(message, type = "log") {
+    const timestamp = new Date().toLocaleTimeString();
+    const color = type === "error" ? "#f00" : "#0f0";
+    logOutput.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+    logOutput.scrollTop = logOutput.scrollHeight;
+  }
+
+  console.log = function (...args) {
+    originalLog.apply(console, args);
+    addLog(args.join(" "), "log");
+  };
+
+  console.error = function (...args) {
+    originalError.apply(console, args);
+    addLog(args.join(" "), "error");
+  };
+
+  // Clear log button
+  document.getElementById("clearLog").addEventListener("click", function () {
+    logOutput.innerHTML = "";
+  });
+
+  // Check elements
+  function checkElements() {
+    const elements = [
+      "originalText",
+      "translatedText",
+      "translateBtn",
+      "sourceLanguage",
+      "targetLanguage",
+      "translationStatus",
+      "useTranslationBtn",
+      "clearTranslationBtn",
+      "swapLanguagesBtn",
+    ];
+
+    const elementsCheck = document.getElementById("elementsCheck");
+    let html = '<ul class="list-group">';
+
+    elements.forEach((id) => {
+      const element = document.getElementById(id);
+      const status = element ? "✅" : "❌";
+      const statusClass = element
+        ? "list-group-item-success"
+        : "list-group-item-danger";
+      html += `<li class="list-group-item ${statusClass}">${id}: ${status}</li>`;
+    });
+
+    html += "</ul>";
+    elementsCheck.innerHTML = html;
+  }
+
+  // Test translation function
+  async function testTranslation() {
+    const text = document.getElementById("originalText").value;
+    const statusField = document.getElementById("translationStatus");
+
+    console.log("🔄 بدء اختبار الترجمة مباشرة...");
+    statusField.innerHTML =
+      '<div class="spinner-border spinner-border-sm me-2"></div>جاري الاختبار...';
+
+    try {
+      const response = await fetch("/patients/api/translate/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]")
+            .value,
+        },
+        body: JSON.stringify({
+          text: text,
+          source_language: "ar",
+          target_language: "en",
+        }),
+      });
+
+      console.log("📊 كود الاستجابة:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("📥 البيانات المستلمة:", data);
+
+      if (data.success) {
+        document.getElementById("translatedText").value = data.translated_text;
+        statusField.innerHTML =
+          '<span class="text-success">✅ نجح الاختبار!</span>';
+      } else {
+        throw new Error(data.error || "فشل الاختبار");
+      }
+    } catch (error) {
+      console.error("❌ خطأ في الاختبار:", error);
+      statusField.innerHTML = `<span class="text-danger">❌ فشل: ${error.message}</span>`;
+    }
+  }
+
+  // Initialize
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("🔄 تحميل صفحة التشخيص...");
+    checkElements();
+
+    // Add test button
+    const testBtn = document.createElement("button");
+    testBtn.className = "btn btn-warning me-2";
+    testBtn.innerHTML = '<i class="fas fa-flask me-2"></i>اختبار مباشر';
+    testBtn.onclick = testTranslation;
+    document.getElementById("translateBtn").parentNode.appendChild(testBtn);
+
+    console.log("✅ تم إعداد صفحة التشخيص");
+  });
+</script>
+
+<!-- تحميل ملف JavaScript الأصلي -->
+<script src="{% static 'js/instant-translator.js' %}"></script>
+
+<script>
+  // اختبار إضافي بعد تحميل الملف
+  setTimeout(() => {
+    console.log("🔍 فحص الدوال العامة:");
+    console.log("window.translateText:", typeof window.translateText);
+    console.log("window.useTranslation:", typeof window.useTranslation);
+
+    // اختبار الزر مباشرة
+    const btn = document.getElementById("translateBtn");
+    if (btn) {
+      console.log("✅ زر الترجمة موجود");
+      // إضافة مستمع إضافي للاختبار
+      btn.addEventListener("click", function () {
+        console.log("🖱️ تم الضغط على الزر (اختبار إضافي)");
+      });
+    } else {
+      console.error("❌ زر الترجمة غير موجود");
+    }
+  }, 1000);
+</script>
+{% endblock %}

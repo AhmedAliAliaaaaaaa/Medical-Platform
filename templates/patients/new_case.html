@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "إرسال حالة جديدة" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'css/translation-enhanced.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="dashboard-card">
+                <div class="text-center mb-4">
+                    <h2><i class="fas fa-file-medical me-2"></i>{% trans "إرسال حالة طبية جديدة" %}</h2>
+                    <p class="text-muted">{% trans "اكتب وصفاً مفصلاً لحالتك الطبية ليتمكن الطبيب من تقديم أفضل استشارة" %}</p>
+                </div>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        {{ form.title|as_crispy_field }}
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form.description|as_crispy_field }}
+                        
+                        <!-- Translation Panel -->
+                        <div class="translation-panel mt-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label text-primary">
+                                    <i class="fas fa-language me-2"></i>
+                                    {% trans "الترجمة الفورية لوصف الحالة" %}
+                                </label>
+                                <div class="language-selector d-flex align-items-center">
+                                    <span class="me-2 small text-muted">من:</span>
+                                    <select id="sourceLanguage" class="form-select form-select-sm me-2" style="width: auto;">
+                                        <option value="auto">اكتشف تلقائياً</option>
+                                        <option value="ar" selected>العربية</option>
+                                        <option value="en">English</option>
+                                    </select>
+                                    <span class="me-2 small text-muted">إلى:</span>
+                                    <select id="targetLanguage" class="form-select form-select-sm" style="width: auto;">
+                                        <option value="en" selected>English</option>
+                                        <option value="ar">العربية</option>
+                                        <option value="fr">Français</option>
+                                        <option value="es">Español</option>
+                                        <option value="de">Deutsch</option>
+                                        <option value="it">Italiano</option>
+                                        <option value="tr">Türkçe</option>
+                                        <option value="ru">Русский</option>
+                                        <option value="zh">中文</option>
+                                        <option value="ja">日本語</option>
+                                        <option value="ko">한국어</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="translation-container">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="translation-box">
+                                            <div class="translation-header">
+                                                <i class="fas fa-edit me-2"></i>
+                                                <span id="sourceLangLabel">{% trans "النص الأصلي (العربية)" %}</span>
+                                            </div>
+                                            <textarea id="originalText" class="form-control translation-textarea" 
+                                                    placeholder="{% trans 'اكتب وصف حالتك هنا...' %}" 
+                                                    rows="6"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="translation-box">
+                                            <div class="translation-header">
+                                                <i class="fas fa-globe me-2"></i>
+                                                {% trans "النص المترجم" %}
+                                                <span id="targetLangName" class="badge bg-primary ms-2">English</span>
+                                            </div>
+                                            <textarea id="translatedText" class="form-control translation-textarea" 
+                                                    placeholder="{% trans 'الترجمة ستظهر هنا...' %}" 
+                                                    rows="6" readonly></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="translation-actions mt-3">
+                                    <button type="button" id="swapLanguagesBtn" class="btn btn-outline-info" title="تبديل اللغات">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </button>
+                                    <button type="button" id="translateBtn" class="btn btn-primary">
+                                        <i class="fas fa-language me-2"></i>
+                                        ترجم
+                                    </button>
+                                    <button type="button" id="useTranslationBtn" class="btn btn-success" disabled>
+                                        <i class="fas fa-check me-2"></i>
+                                        استخدام الترجمة
+                                    </button>
+                                    <button type="button" id="clearTranslationBtn" class="btn btn-outline-secondary">
+                                        <i class="fas fa-eraser me-2"></i>
+                                        مسح
+                                    </button>
+                                </div>
+                                
+                                <div id="translationStatus" class="mt-2"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-text mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            يرجى تقديم وصف مفصل يشمل: الأعراض، مدة الإصابة، الأدوية المتناولة، التاريخ المرضي
+                            <br>
+                            <i class="fas fa-lightbulb me-1 text-warning"></i>
+                            <strong>نصيحة:</strong> يمكنك استخدام الترجمة الفورية لكتابة الوصف بالعربية ثم ترجمته للغة الطبيب المختار
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form.priority|as_crispy_field }}
+                        <div class="form-text">
+                            <strong>عادية:</strong> رد خلال 48 ساعة | 
+                            <strong>مستعجلة:</strong> رد خلال 24 ساعة
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">رفع التقارير والصور</label>
+                        <div class="file-upload-area" onclick="document.getElementById('id_attachments').click()">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                            <h5>اضغط لرفع الملفات</h5>
+                            <p class="text-muted">يمكنك رفع تقارير طبية (PDF) أو صور (JPG, PNG)</p>
+                            <input type="file" id="id_attachments" name="attachments" multiple accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                        </div>
+                        <div id="file-list" class="mt-2"></div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        <strong>خصوصية البيانات:</strong> جميع المعلومات الطبية محمية ومشفرة ولن يتم مشاركتها مع أي طرف ثالث.
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'patients:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-right me-2"></i>
+                            العودة للوحة التحكم
+                        </a>
+                        <div>
+                          <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            التالي - اختيار الطبيب
+                        </button>
+                          
+                        </div>
+                    </div>
+                    
+                    <!-- Hidden fields to track doctor selection and payment status -->
+                    <input type="hidden" id="doctorSelected" name="doctorSelected" value="false">
+                    <input type="hidden" id="paymentCompleted" name="paymentCompleted" value="false">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('id_attachments').addEventListener('change', function(e) {
+    const fileList = document.getElementById('file-list');
+    fileList.innerHTML = '';
+    
+    for (let i = 0; i < e.target.files.length; i++) {
+        const file = e.target.files[i];
+        const fileItem = document.createElement('div');
+        fileItem.className = 'alert alert-success alert-dismissible fade show';
+        fileItem.innerHTML = `
+            <i class="fas fa-file me-2"></i>
+            ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        fileList.appendChild(fileItem);
+    }
+});
+</script>
+
+<!-- Instant Translation Script -->
+<script src="{% static 'js/instant-translator.js' %}"></script>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Additional enhancements for the new case form
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth animations
+    const cards = document.querySelectorAll('.dashboard-card, .translation-panel');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            card.style.transition = 'all 0.6s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 200);
+    });
+    
+    // Enhanced form validation
+    const form = document.querySelector('form');
+    const titleField = document.querySelector('input[name="title"]');
+    const descriptionField = document.querySelector('textarea[name="description"]');
+    
+    if (form && titleField && descriptionField) {
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            let error = '';
+            
+            // Validate title
+            if (titleField.value.trim().length < 5) {
+                isValid = false;
+                error += 'يجب أن يكون عنوان الحالة 5 أحرف على الأقل\n';
+            }
+            
+            // Validate description
+            if (descriptionField.value.trim().length < 20) {
+                isValid = false;
+                error += 'يجب أن يكون وصف الحالة 20 حرف على الأقل\n';
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert(error);
+                return false;
+            }
+            
+            // Show loading state
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الإرسال...';
+                submitBtn.disabled = true;
+            }
+        });
+    }
+    
+    // Character counter for description
+    if (descriptionField) {
+        const counterDiv = document.createElement('div');
+        counterDiv.className = 'character-counter text-muted mt-2';
+        counterDiv.style.fontSize = '0.85rem';
+        descriptionField.parentNode.appendChild(counterDiv);
+        
+        function updateCounter() {
+            const length = descriptionField.value.length;
+            const minLength = 20;
+            const maxLength = 2000;
+            
+            counterDiv.innerHTML = `
+                <i class="fas fa-keyboard me-1"></i>
+                عدد الأحرف: ${length} 
+                ${length < minLength ? `(يحتاج ${minLength - length} حرف إضافي)` : ''}
+                ${length > maxLength ? `(تجاوز الحد الأقصى بـ ${length - maxLength} حرف)` : ''}
+            `;
+            
+            if (length < minLength) {
+                counterDiv.className = 'character-counter text-warning mt-2';
+            } else if (length > maxLength) {
+                counterDiv.className = 'character-counter text-danger mt-2';
+            } else {
+                counterDiv.className = 'character-counter text-success mt-2';
+            }
+        }
+        
+        descriptionField.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+    
+    // Auto-save draft functionality
+    const draftKey = 'medical_case_draft';
+    
+    function saveDraft() {
+        if (titleField && descriptionField) {
+            const draft = {
+                title: titleField.value,
+                description: descriptionField.value,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem(draftKey, JSON.stringify(draft));
+        }
+    }
+    
+    function loadDraft() {
+        const draft = localStorage.getItem(draftKey);
+        if (draft) {
+            try {
+                const draftData = JSON.parse(draft);
+                const draftAge = new Date() - new Date(draftData.timestamp);
+                const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+                
+                if (draftAge < maxAge && (draftData.title || draftData.description)) {
+                    // Auto-restore draft without confirmation
+                    if (true) {
+                        if (titleField && draftData.title) titleField.value = draftData.title;
+                        if (descriptionField && draftData.description) descriptionField.value = draftData.description;
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading draft:', e);
+            }
+        }
+    }
+    
+    // Load draft on page load
+    loadDraft();
+    
+    // Save draft periodically
+    if (titleField && descriptionField) {
+        titleField.addEventListener('input', saveDraft);
+        descriptionField.addEventListener('input', saveDraft);
+        setInterval(saveDraft, 30000); // Save every 30 seconds
+    }
+    
+    // Clear draft on successful submission
+    form.addEventListener('submit', function() {
+        localStorage.removeItem(draftKey);
+    });
+});
+</script>
+{% endblock %}

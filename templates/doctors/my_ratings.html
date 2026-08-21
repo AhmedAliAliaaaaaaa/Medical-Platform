@@ -1,0 +1,499 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "تقييماتي" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-star me-2"></i>
+                    {% trans "تقييماتي من المرضى" %}
+                    <span class="badge bg-primary ms-2">{{ total_ratings }}</span>
+                </h2>
+                <a href="{% url 'doctors:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    {% trans "العودة" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if ratings %}
+        <!-- {% trans "إحصائيات التقييم" %} -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card rating-stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            {% trans "إحصائيات التقييم" %}
+                        </h5>
+                        
+                        <div class="row">
+                            <!-- {% trans "التقييم العام" %} -->
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="rating-stat-item">
+                                    <div class="rating-stat-icon">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="rating-stat-content">
+                                        <h3>{{ overall_average|floatformat:1 }}</h3>
+                                        <p>{% trans "التقييم العام" %}</p>
+                                        <div class="stars">
+                                            {% for i in "12345" %}
+                                                {% if overall_average >= forloop.counter %}
+                                                    <i class="fas fa-star text-warning"></i>
+                                                {% elif overall_average >= forloop.counter|add:"-0.5" %}
+                                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                                {% else %}
+                                                    <i class="far fa-star text-muted"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- {% trans "عدد التقييمات" %} -->
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="rating-stat-item">
+                                    <div class="rating-stat-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="rating-stat-content">
+                                        <h3>{{ total_ratings }}</h3>
+                                        <p>{% trans "إجمالي التقييمات" %}</p>
+                                        <small class="text-muted">{% trans "من المرضى" %}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- {% trans "أعلى تقييم" %} -->
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="rating-stat-item">
+                                    <div class="rating-stat-icon">
+                                        <i class="fas fa-trophy"></i>
+                                    </div>
+                                    <div class="rating-stat-content">
+                                        <h3>{{ avg_overall_satisfaction|floatformat:1 }}</h3>
+                                        <p>{% trans "الرضا العام" %}</p>
+                                        <small class="text-muted">{% trans "متوسط الرضا" %}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- {% trans "التقييم الأحدث" %} -->
+                            <div class="col-lg-3 col-md-6 mb-3">
+                                <div class="rating-stat-item">
+                                    <div class="rating-stat-icon">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="rating-stat-content">
+                                        <h3>{{ ratings.first.rating|floatformat:1 }}</h3>
+                                        <p>{% trans "آخر تقييم" %}</p>
+                                        <small class="text-muted">{{ ratings.first.created_at|timesince }} {% trans "مضت" %}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- {% trans "التقييمات التفصيلية" %} -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card detailed-ratings-card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-chart-line me-2"></i>
+                            {% trans "التقييمات التفصيلية" %}
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="detailed-rating-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>{% trans "دقة التشخيص" %}</span>
+                                        <span class="rating-value">{{ avg_diagnosis_accuracy|floatformat:1 }}/5</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-primary" style="width: {% widthratio avg_diagnosis_accuracy 5 100 %}%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="detailed-rating-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>{% trans "وضوح العلاج" %}</span>
+                                        <span class="rating-value">{{ avg_treatment_clarity|floatformat:1 }}/5</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" style="width: {% widthratio avg_treatment_clarity 5 100 %}%;"> </div>
+
+                                </div>
+                                
+                                <div class="detailed-rating-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>{% trans "سرعة الرد" %}</span>
+                                        <span class="rating-value">{{ avg_response_speed|floatformat:1 }}/5</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-info" style="width: {% widthratio avg_response_speed 5 100 %}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="detailed-rating-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>{% trans "الاحترافية" %}</span>
+                                        <span class="rating-value">{{ avg_professionalism|floatformat:1 }}/5</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-warning" style="width: {% widthratio avg_professionalism 5 100 %}%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="detailed-rating-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>{% trans "التواصل" %}</span>
+                                        <span class="rating-value">{{ avg_communication|floatformat:1 }}/5</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-danger" style="width: {% widthratio avg_communication 5 100 %}%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="detailed-rating-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>{% trans "الرضا العام" %}</span>
+                                        <span class="rating-value">{{ avg_overall_satisfaction|floatformat:1 }}/5</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-secondary" style="width: {% widthratio avg_overall_satisfaction 5 100 %}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- {% trans "قائمة التقييمات" %} -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card ratings-list-card">
+                    <div class="card-body">
+                        <h5 class="card-title mb-4">
+                            <i class="fas fa-list me-2"></i>
+                            {% trans "جميع التقييمات" %}
+                        </h5>
+                        
+                        {% for rating in ratings %}
+                        <div class="rating-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-2 text-center">
+                                    <div class="patient-info">
+                                        {% if rating.patient.user.profile_picture %}
+                                            <img src="{{ rating.patient.user.profile_picture.url }}" alt="{% trans 'صورة المريض' %}" class="patient-avatar">
+                                        {% else %}
+                                            <div class="patient-avatar-placeholder">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        {% endif %}
+                                        <h6 class="mt-2">{{ rating.patient.user.first_name }}</h6>
+                                        <small class="text-muted">{{ rating.created_at|date:"d/m/Y" }}</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-8">
+                                    <div class="rating-content">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="case-title">{{ rating.case.title }}</h6>
+                                            <div class="overall-rating">
+                                                <span class="rating-number">{{ rating.rating|floatformat:1 }}</span>
+                                                <div class="stars">
+                                                    {% for i in "12345" %}
+                                                        {% if rating.rating >= forloop.counter %}
+                                                            <i class="fas fa-star text-warning"></i>
+                                                        {% elif rating.rating >= forloop.counter|add:"-0.5" %}
+                                                            <i class="fas fa-star-half-alt text-warning"></i>
+                                                        {% else %}
+                                                            <i class="far fa-star text-muted"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {% if rating.comment %}
+                                            <div class="rating-comment">
+                                                <p>"{{ rating.comment }}"</p>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <div class="detailed-scores">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <small class="text-muted">{% trans "دقة التشخيص" %}: {{ rating.diagnosis_accuracy }}/5</small>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted">{% trans "وضوح العلاج" %}: {{ rating.treatment_clarity }}/5</small>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted">{% trans "سرعة الرد" %}: {{ rating.response_speed }}/5</small>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-1">
+                                                <div class="col-md-4">
+                                                    <small class="text-muted">{% trans "الاحترافية" %}: {{ rating.professionalism }}/5</small>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted">{% trans "التواصل" %}: {{ rating.communication }}/5</small>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <small class="text-muted">{% trans "الرضا العام" %}: {{ rating.overall_satisfaction }}/5</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2 text-center">
+                                    <a href="{% url 'doctors:case_detail' rating.case.id %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye me-1"></i>
+                                        {% trans "عرض الحالة" %}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    {% else %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <div class="empty-state">
+                            <i class="fas fa-star fa-4x text-muted mb-3"></i>
+                            <h4 class="text-muted">{% trans "لا توجد تقييمات بعد" %}</h4>
+                            <p class="text-muted">{% trans "لم يقم أي مريض بتقييمك حتى الآن" %}</p>
+                            <a href="{% url 'doctors:dashboard' %}" class="btn btn-primary">
+                                <i class="fas fa-home me-2"></i>
+                                {% trans "العودة للرئيسية" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+/* {% trans "تصميم صفحة التقييمات" %} */
+.rating-stats-card {
+    border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border-radius: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.rating-stat-item {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.rating-stat-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+}
+
+.rating-stat-content h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.rating-stat-content p {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+}
+
+.stars {
+    font-size: 1.2rem;
+}
+
+.detailed-ratings-card {
+    border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border-radius: 15px;
+}
+
+.detailed-rating-item {
+    margin-bottom: 1.5rem;
+}
+
+.rating-value {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.progress {
+    height: 8px;
+    border-radius: 10px;
+    background-color: #e2e8f0;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+
+.ratings-list-card {
+    border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    border-radius: 15px;
+}
+
+.rating-item {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.rating-item:last-child {
+    border-bottom: none;
+}
+
+.rating-item:hover {
+    background-color: #f7fafc;
+    border-radius: 10px;
+}
+
+.patient-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #e2e8f0;
+}
+
+.patient-avatar-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #a0aec0;
+    margin: 0 auto;
+}
+
+.case-title {
+    color: #2d3748;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.overall-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rating-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f6ad55;
+}
+
+.rating-comment {
+    background: #f7fafc;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    border-left: 4px solid #667eea;
+}
+
+.rating-comment p {
+    margin: 0;
+    font-style: italic;
+    color: #4a5568;
+}
+
+.detailed-scores {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.empty-state {
+    padding: 3rem;
+}
+
+.empty-state i {
+    opacity: 0.5;
+}
+
+/* {% trans "تحسينات للموبايل" %} */
+@media (max-width: 768px) {
+    .rating-stat-item {
+        margin-bottom: 1rem;
+    }
+    
+    .rating-item {
+        padding: 1rem;
+    }
+    
+    .rating-item .row {
+        text-align: center;
+    }
+    
+    .rating-item .col-md-2,
+    .rating-item .col-md-8,
+    .rating-item .col-md-2 {
+        margin-bottom: 1rem;
+    }
+    
+    .detailed-scores .row {
+        text-align: left;
+    }
+}
+
+/* {% trans "تأثيرات إضافية" %} */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+</style>
+{% endblock %}

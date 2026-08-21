@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}تأكيد إرسال الحالة - المنصة الطبية{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="dashboard-card">
+                <div class="text-center mb-4">
+                    <h2><i class="fas fa-check-circle me-2 text-success"></i>تأكيد إرسال الحالة</h2>
+                    <p class="text-muted">يرجى مراجعة تفاصيل حالتك والطبيب المختار قبل التأكيد</p>
+                </div>
+                
+                <div class="row">
+                    <!-- Case Details -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-file-medical me-2"></i>تفاصيل الحالة</h5>
+                            </div>
+                            <div class="card-body">
+                                <h6>{{ case.title }}</h6>
+                                <p class="text-muted">{{ case.description|truncatewords:30 }}</p>
+                                
+                                <div class="mb-2">
+                                    <strong>الأولوية:</strong>
+                                    <span class="badge {% if case.priority == 'urgent' %}bg-danger{% else %}bg-primary{% endif %}">
+                                        {% if case.priority == 'urgent' %}
+                                            <i class="fas fa-exclamation-triangle me-1"></i>مستعجلة
+                                        {% else %}
+                                            <i class="fas fa-clock me-1"></i>عادية
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <strong>وقت الاستلام المتوقع:</strong>
+                                    <span class="text-info">
+                                        {% if case.priority == 'urgent' %}
+                                            خلال 24 ساعة
+                                        {% else %}
+                                            خلال 48 ساعة
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                
+                                {% if case.attachments.exists %}
+                                <div class="mb-2">
+                                    <strong>المرفقات:</strong>
+                                    <span class="text-success">{{ case.attachments.count }} ملف</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Doctor Details -->
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>الطبيب المختار</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                {% if doctor.user.profile_picture %}
+                                    <img src="{{ doctor.user.profile_picture.url }}" alt="د. {{ doctor.user.first_name }}" class="rounded-circle mb-3" width="80" height="80">
+                                {% else %}
+                                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                        <i class="fas fa-user-md fa-2x text-white"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <h5>د. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</h5>
+                                <p class="text-primary fw-bold">{{ doctor.get_specialization_display }}</p>
+                                
+                                <div class="mb-2">
+                                    <i class="fas fa-map-marker-alt text-muted me-1"></i>
+                                    <span class="text-muted">{{ doctor.country }}</span>
+                                </div>
+                                
+                                <div class="rating-stars mb-2">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= doctor.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-2 text-muted">({{ doctor.total_reviews }} تقييم)</span>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-graduation-cap me-1"></i>
+                                        {{ doctor.experience_years }} سنة خبرة
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    {% if doctor.consultation_fee > 0 %}
+                                        <span class="h5 text-success">${{ doctor.consultation_fee }}</span>
+                                    {% else %}
+                                        <span class="h5 text-success">مجاني</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Summary -->
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle me-2"></i>ملخص الطلب</h5>
+                    <ul class="mb-0">
+                        <li>سيتم إرسال حالتك إلى د. {{ doctor.user.first_name }} {{ doctor.user.last_name }}</li>
+                        <li>ستحصل على الرد الطبي خلال 
+                            {% if case.priority == 'urgent' %}24 ساعة{% else %}48 ساعة{% endif %}
+                        </li>
+                        <li>سيتم إشعارك عبر البريد الإلكتروني عند وصول الرد</li>
+                        <li>يمكنك مراجعة الرد من لوحة التحكم الخاصة بك</li>
+                    </ul>
+                </div>
+                
+                <!-- Privacy Notice -->
+                <div class="alert alert-warning">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    <strong>خصوصية البيانات:</strong> جميع المعلومات الطبية محمية ومشفرة وسرية تماماً.
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'patients:select_doctor' case.id %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-right me-2"></i>
+                        العودة لاختيار طبيب آخر
+                    </a>
+                    
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            تأكيد إرسال الحالة
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

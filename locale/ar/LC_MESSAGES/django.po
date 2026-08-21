@@ -1,0 +1,169 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-09 18:14+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+msgid "تفاصيل الحالة"
+msgstr "تفاصيل الحالة"
+
+msgid "المنصة الطبية"
+msgstr "المنصة الطبية"
+
+msgid "تفاصيل الحالة الطبية"
+msgstr "تفاصيل الحالة الطبية"
+
+msgid "العودة للوحة التحكم"
+msgstr "العودة للوحة التحكم"
+
+msgid "مراحل الحالة"
+msgstr "مراحل الحالة"
+
+msgid "إنشاء الحالة"
+msgstr "إنشاء الحالة"
+
+msgid "تعيين طبيب"
+msgstr "تعيين طبيب"
+
+msgid "لم يتم التعيين بعد"
+msgstr "لم يتم التعيين بعد"
+
+msgid "قيد المراجعة"
+msgstr "قيد المراجعة"
+
+msgid "جاري المراجعة"
+msgstr "جاري المراجعة"
+
+msgid "في الانتظار"
+msgstr "في الانتظار"
+
+msgid "مكتملة"
+msgstr "مكتملة"
+
+msgid "تم الانتهاء"
+msgstr "تم الانتهاء"
+
+msgid "لم تكتمل بعد"
+msgstr "لم تكتمل بعد"
+
+msgid "معلومات الحالة"
+msgstr "معلومات الحالة"
+
+msgid "عنوان الحالة"
+msgstr "عنوان الحالة"
+
+msgid "تاريخ الإرسال"
+msgstr "تاريخ الإرسال"
+
+msgid "الأولوية"
+msgstr "الأولوية"
+
+msgid "عاجل"
+msgstr "عاجل"
+
+msgid "عادي"
+msgstr "عادي"
+
+msgid "غير عاجل"
+msgstr "غير عاجل"
+
+msgid "التخصص المطلوب"
+msgstr "التخصص المطلوب"
+
+msgid "وصف الحالة"
+msgstr "وصف الحالة"
+
+msgid "الأعراض"
+msgstr "الأعراض"
+
+msgid "رد الطبيب"
+msgstr "رد الطبيب"
+
+msgid "التشخيص"
+msgstr "التشخيص"
+
+msgid "العلاج المقترح"
+msgstr "العلاج المقترح"
+
+msgid "الطبيب المعالج"
+msgstr "الطبيب المعالج"
+
+msgid "إجراءات سريعة"
+msgstr "إجراءات سريعة"
+
+msgid "تقييم الطبيب"
+msgstr "تقييم الطبيب"
+
+msgid "جميع الحالات"
+msgstr "جميع الحالات"
+
+msgid "حالة جديدة"
+msgstr "حالة جديدة"
+
+msgid "متاح"
+msgstr "متاح"
+
+msgid "غير متاح"
+msgstr "غير متاح"
+
+msgid "إظهار/إخفاء كلمة المرور"
+msgstr "إظهار/إخفاء كلمة المرور"
+
+msgid "إعادة تعيين كلمة المرور"
+msgstr "إعادة تعيين كلمة المرور"
+
+msgid "حدث خطأ أثناء جلب كلمة المرور"
+msgstr "حدث خطأ أثناء جلب كلمة المرور"
+
+msgid "أدخل كلمة المرور الجديدة:"
+msgstr "أدخل كلمة المرور الجديدة:"
+
+msgid "هل أنت متأكد من تغيير كلمة المرور؟"
+msgstr "هل أنت متأكد من تغيير كلمة المرور؟"
+
+msgid "تم تغيير كلمة المرور بنجاح"
+msgstr "تم تغيير كلمة المرور بنجاح"
+
+msgid "حدث خطأ أثناء تغيير كلمة المرور"
+msgstr "حدث خطأ أثناء تغيير كلمة المرور"
+
+msgid "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
+msgstr "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
+
+msgid "تم تحديث حالة الإتاحة بنجاح"
+msgstr "تم تحديث حالة الإتاحة بنجاح"
+
+msgid "حدث خطأ أثناء تحديث حالة الإتاحة"
+msgstr "حدث خطأ أثناء تحديث حالة الإتاحة"
+
+msgid "سنة"
+msgstr "سنة"
+
+msgid "معلق"
+msgstr "معلق"
+
+msgid "موافقة"
+msgstr "موافقة"
+
+msgid "رفض"
+msgstr "رفض"
+
+msgid "تعديل"
+msgstr "تعديل"
+
+msgid "حذف"
+msgstr "حذف"

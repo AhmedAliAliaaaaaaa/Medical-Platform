@@ -1,0 +1,614 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "تقييم الطبيب" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3><i class="fas fa-star me-2"></i>{% trans "تقييم الطبيب" %}</h3>
+                    <p class="text-muted mb-0">{% trans "شاركنا رأيك في الخدمة الطبية المقدمة" %}</p>
+                </div>
+                <div class="card-body">
+                    <!-- معلومات الحالة -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h6 class="mb-1">
+                                            <i class="fas fa-file-medical me-2"></i>
+                                            {% trans "الحالة" %}: {{ case.title }}
+                                        </h6>
+                                        <small class="text-muted">
+                                            {% trans "تاريخ الإرسال" %}: {{ case.created_at|date:"d/m/Y" }}
+                                        </small>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>
+                                            {% trans "مكتملة" %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- معلومات الطبيب -->
+                    {% if case.doctor %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-2 text-center">
+                                            {% if case.doctor.user.profile_picture %}
+                                                <img src="{{ case.doctor.user.profile_picture.url }}" 
+                                                     class="rounded-circle" 
+                                                     width="60" height="60"
+                                                     alt="{{ case.doctor.user.get_full_name }}">
+                                            {% else %}
+                                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto" 
+                                                     style="width: 60px; height: 60px;">
+                                                    <i class="fas fa-user-md fa-lg text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-10">
+                                            <h5 class="mb-1">د. {{ case.doctor.user.get_full_name }}</h5>
+                                            <p class="text-muted mb-1">{{ case.doctor.get_specialization_display }}</p>
+                                            <div class="d-flex align-items-center">
+                                                <div class="text-warning me-2">
+                                                    {% for i in "12345" %}
+                                                        {% if forloop.counter <= case.doctor.rating %}
+                                                            <i class="fas fa-star"></i>
+                                                        {% else %}
+                                                            <i class="far fa-star"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                                <small class="text-muted">
+                                                    ({{ case.doctor.total_reviews }} {% trans "تقييم" %}) - 
+                                                    {{ case.doctor.experience_years }} {% trans "سنة خبرة" %}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- نموذج التقييم -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-star me-2"></i>
+                                    {% trans "التقييم" %} <span class="text-danger">*</span>
+                                </label>
+                                <div class="rating-input">
+                                    {% for i in "12345" %}
+                                        <input type="radio" name="rating" value="{{ forloop.counter }}" id="star{{ forloop.counter }}" required>
+                                        <label for="star{{ forloop.counter }}" class="star-label">
+                                            <i class="fas fa-star"></i>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                                <small class="text-muted">{% trans "اختر من 1 إلى 5 نجوم" %}</small>
+                                {% if form.rating.errors %}
+                                    <div class="text-danger small">{{ form.rating.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-thumbs-up me-2"></i>
+                                    {% trans "هل توصي بهذا الطبيب؟" %}
+                                </label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="would_recommend" id="recommend_yes" value="True">
+                                    <label class="form-check-label text-success" for="recommend_yes">
+                                        <i class="fas fa-thumbs-up me-1"></i>
+                                        {% trans "نعم، أوصي به" %}
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="would_recommend" id="recommend_no" value="False">
+                                    <label class="form-check-label text-danger" for="recommend_no">
+                                        <i class="fas fa-thumbs-down me-1"></i>
+                                        {% trans "لا، لا أوصي به" %}
+                                    </label>
+                                </div>
+                                {% if form.would_recommend.errors %}
+                                    <div class="text-danger small">{{ form.would_recommend.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-comment me-2"></i>
+                                    {% trans "تعليقك على الخدمة" %}
+                                </label>
+                                {{ form.comment }}
+                                <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const commentField = document.querySelector('#id_comment');
+                                    if (commentField) {
+                                        commentField.className = 'form-control';
+                                        commentField.placeholder = 'شاركنا رأيك وتجربتك مع الطبيب...';
+                                    }
+                                });
+                                </script>
+                                <small class="text-muted">{% trans "شاركنا تجربتك مع الطبيب (اختياري)" %}</small>
+                                {% if form.comment.errors %}
+                                    <div class="text-danger small">{{ form.comment.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- معايير التقييم التفصيلية -->
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <h6 class="text-primary">
+                                    <i class="fas fa-clipboard-check me-2"></i>
+                                    {% trans "تقييم تفصيلي للخدمة" %}:
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small">
+                                            <i class="fas fa-stethoscope me-1"></i>
+                                            {% trans "دقة التشخيص" %}
+                                        </label>
+                                        <div class="detailed-rating" data-field="diagnosis_accuracy">
+                                            {% for i in "12345" %}
+                                                <input type="radio" name="diagnosis_accuracy" value="{{ forloop.counter }}" id="diag{{ forloop.counter }}">
+                                                <label for="diag{{ forloop.counter }}" class="star-label-small">
+                                                    <i class="fas fa-star"></i>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small">
+                                            <i class="fas fa-pills me-1"></i>
+                                            {% trans "وضوح العلاج" %}
+                                        </label>
+                                        <div class="detailed-rating" data-field="treatment_clarity">
+                                            {% for i in "12345" %}
+                                                <input type="radio" name="treatment_clarity" value="{{ forloop.counter }}" id="treat{{ forloop.counter }}">
+                                                <label for="treat{{ forloop.counter }}" class="star-label-small">
+                                                    <i class="fas fa-star"></i>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small">
+                                            <i class="fas fa-clock me-1"></i>
+                                            {% trans "سرعة الرد" %}
+                                        </label>
+                                        <div class="detailed-rating" data-field="response_time">
+                                            {% for i in "12345" %}
+                                                <input type="radio" name="response_time" value="{{ forloop.counter }}" id="time{{ forloop.counter }}">
+                                                <label for="time{{ forloop.counter }}" class="star-label-small">
+                                                    <i class="fas fa-star"></i>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small">
+                                            <i class="fas fa-user-tie me-1"></i>
+                                            {% trans "الاحترافية" %}
+                                        </label>
+                                        <div class="detailed-rating" data-field="professionalism">
+                                            {% for i in "12345" %}
+                                                <input type="radio" name="professionalism" value="{{ forloop.counter }}" id="prof{{ forloop.counter }}">
+                                                <label for="prof{{ forloop.counter }}" class="star-label-small">
+                                                    <i class="fas fa-star"></i>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small">
+                                            <i class="fas fa-comments me-1"></i>
+                                            {% trans "التواصل" %}
+                                        </label>
+                                        <div class="detailed-rating" data-field="communication">
+                                            {% for i in "12345" %}
+                                                <input type="radio" name="communication" value="{{ forloop.counter }}" id="comm{{ forloop.counter }}">
+                                                <label for="comm{{ forloop.counter }}" class="star-label-small">
+                                                    <i class="fas fa-star"></i>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label small">
+                                            <i class="fas fa-heart me-1"></i>
+                                            {% trans "الرضا العام" %}
+                                        </label>
+                                        <div class="detailed-rating" data-field="overall_satisfaction">
+                                            {% for i in "12345" %}
+                                                <input type="radio" name="overall_satisfaction" value="{{ forloop.counter }}" id="satis{{ forloop.counter }}">
+                                                <label for="satis{{ forloop.counter }}" class="star-label-small">
+                                                    <i class="fas fa-star"></i>
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- متوسط التقييم التلقائي -->
+                                <div class="alert alert-light mt-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <small class="text-muted">
+                                                <i class="fas fa-calculator me-2"></i>
+                                                {% trans "سيتم حساب التقييم العام تلقائياً بناءً على التقييمات التفصيلية" %}
+                                            </small>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <div id="auto-rating-display" class="text-warning">
+                                                <span id="rating-stars"></span>
+                                                <small class="text-muted ms-2">(<span id="rating-value">0</span>/5)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- أزرار الإجراءات -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'patients:case_detail' case.id %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        {% trans "العودة للحالة" %}
+                                    </a>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-paper-plane me-2"></i>
+                                        {% trans "إرسال التقييم" %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- نصائح للتقييم -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        {% trans "نصائح للتقييم" %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-success">
+                                <i class="fas fa-thumbs-up me-2"></i>
+                                {% trans "تقييم إيجابي عندما" %}:
+                            </h6>
+                            <ul class="small text-muted">
+                                <li>{% trans "التشخيص دقيق ومفصل" %}</li>
+                                <li>{% trans "العلاج واضح وفعال" %}</li>
+                                <li>{% trans "الرد سريع ومهني" %}</li>
+                                <li>{% trans "التواصل واضح ومفهوم" %}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                {% trans "كن صادقاً في تقييمك" %}:
+                            </h6>
+                            <ul class="small text-muted">
+                                <li>{% trans "التقييم يساعد الأطباء على التحسن" %}</li>
+                                <li>{% trans "يساعد المرضى الآخرين في الاختيار" %}</li>
+                                <li>{% trans "يحسن جودة الخدمة الطبية" %}</li>
+                                <li>{% trans "تقييمك مهم لتطوير المنصة" %}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 15px 15px 0 0 !important;
+}
+
+.rating-input {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.rating-input input[type="radio"] {
+    display: none;
+}
+
+.star-label {
+    font-size: 1.5rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.star-label:hover,
+.star-label:hover ~ .star-label {
+    color: #ffc107;
+    transform: scale(1.1);
+}
+
+.rating-input input[type="radio"]:checked ~ .star-label {
+    color: #ffc107;
+}
+
+/* التقييم التفصيلي */
+.detailed-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    gap: 3px;
+    margin-bottom: 10px;
+}
+
+.detailed-rating input[type="radio"] {
+    display: none;
+}
+
+.star-label-small {
+    font-size: 1rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.star-label-small:hover,
+.star-label-small:hover ~ .star-label-small {
+    color: #ffc107;
+    transform: scale(1.05);
+}
+
+.detailed-rating input[type="radio"]:checked ~ .star-label-small {
+    color: #ffc107;
+}
+
+/* تأثيرات بصرية محسنة */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+.btn {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+/* تحسينات للتقييم التلقائي */
+#auto-rating-display {
+    padding: 10px;
+    background: rgba(255,193,7,0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255,193,7,0.3);
+}
+
+#rating-stars {
+    font-size: 1.2rem;
+}
+
+/* تحسينات للموبايل */
+@media (max-width: 768px) {
+    .rating-input {
+        justify-content: center;
+    }
+    
+    .detailed-rating {
+        justify-content: center;
+    }
+    
+    .star-label {
+        font-size: 1.3rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // تحديث التقييم العام تلقائياً
+    function updateOverallRating() {
+        const detailedRatings = document.querySelectorAll('.detailed-rating input[type="radio"]:checked');
+        let total = 0;
+        let count = 0;
+        
+        detailedRatings.forEach(function(rating) {
+            total += parseInt(rating.value);
+            count++;
+        });
+        
+        if (count > 0) {
+            const average = Math.round(total / count);
+            const ratingStars = document.getElementById('rating-stars');
+            const ratingValue = document.getElementById('rating-value');
+            
+            // تحديث النجوم
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= average) {
+                    starsHtml += '<i class="fas fa-star"></i>';
+                } else {
+                    starsHtml += '<i class="far fa-star"></i>';
+                }
+            }
+            ratingStars.innerHTML = starsHtml;
+            ratingValue.textContent = average;
+            
+            // تحديث التقييم الرئيسي
+            const mainRatingInput = document.querySelector(`input[name="rating"][value="${average}"]`);
+            if (mainRatingInput) {
+                mainRatingInput.checked = true;
+                updateMainStars(average);
+            }
+        }
+    }
+    
+    // تحديث النجوم الرئيسية
+    function updateMainStars(rating) {
+        const stars = document.querySelectorAll('.rating-input .star-label');
+        stars.forEach((star, index) => {
+            if (5 - index <= rating) {
+                star.style.color = '#ffc107';
+            } else {
+                star.style.color = '#ddd';
+            }
+        });
+    }
+    
+    // تحديث النجوم التفصيلية
+    function updateDetailedStars(container, rating) {
+        const stars = container.querySelectorAll('.star-label-small');
+        stars.forEach((star, index) => {
+            if (5 - index <= rating) {
+                star.style.color = '#ffc107';
+            } else {
+                star.style.color = '#ddd';
+            }
+        });
+    }
+    
+    // إضافة مستمعي الأحداث للتقييمات التفصيلية
+    document.querySelectorAll('.detailed-rating input[type="radio"]').forEach(function(input) {
+        input.addEventListener('change', function() {
+            updateDetailedStars(this.closest('.detailed-rating'), parseInt(this.value));
+            updateOverallRating();
+        });
+    });
+    
+    // إضافة مستمعي الأحداث للتقييم الرئيسي
+    document.querySelectorAll('input[name="rating"]').forEach(function(input) {
+        input.addEventListener('change', function() {
+            updateMainStars(parseInt(this.value));
+        });
+    });
+    
+    // تأثيرات بصرية للنجوم عند التمرير
+    document.querySelectorAll('.star-label').forEach(function(label, index) {
+        label.addEventListener('mouseenter', function() {
+            const rating = 5 - index;
+            updateMainStars(rating);
+        });
+        
+        label.addEventListener('mouseleave', function() {
+            const checkedInput = document.querySelector('input[name="rating"]:checked');
+            if (checkedInput) {
+                updateMainStars(parseInt(checkedInput.value));
+            } else {
+                updateMainStars(0);
+            }
+        });
+    });
+    
+    // تأثيرات بصرية للنجوم التفصيلية
+    document.querySelectorAll('.star-label-small').forEach(function(label, index) {
+        label.addEventListener('mouseenter', function() {
+            const container = this.closest('.detailed-rating');
+            const stars = container.querySelectorAll('.star-label-small');
+            const starIndex = Array.from(stars).indexOf(this);
+            const rating = 5 - starIndex;
+            updateDetailedStars(container, rating);
+        });
+        
+        label.addEventListener('mouseleave', function() {
+            const container = this.closest('.detailed-rating');
+            const checkedInput = container.querySelector('input[type="radio"]:checked');
+            if (checkedInput) {
+                updateDetailedStars(container, parseInt(checkedInput.value));
+            } else {
+                updateDetailedStars(container, 0);
+            }
+        });
+    });
+    
+    // تحقق من صحة النموذج
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const mainRating = document.querySelector('input[name="rating"]:checked');
+        if (!mainRating) {
+            e.preventDefault();
+            alert('يرجى اختيار تقييم عام للطبيب');
+            return false;
+        }
+        
+        // تأكيد الإرسال
+        if (!confirm('هل أنت متأكد من إرسال هذا التقييم؟ لن تتمكن من تعديله لاحقاً.')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+    
+    // تحسين تجربة المستخدم
+    document.querySelectorAll('.form-control').forEach(function(input) {
+        input.addEventListener('focus', function() {
+            this.style.borderColor = '#007bff';
+            this.style.boxShadow = '0 0 0 0.2rem rgba(0,123,255,0.25)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.style.borderColor = '#ced4da';
+            this.style.boxShadow = 'none';
+        });
+    });
+});
+</script>
+{% endblock %}

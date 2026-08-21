@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load i18n %}
+
+{% block title %}{% trans "الرد على الحالة" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h2><i class="fas fa-reply me-2"></i>{% trans "الرد على الحالة الطبية" %}</h2>
+            <p class="text-muted">{% trans "يرجى تقديم تشخيص وتوصيات طبية مفصلة للمريض" %}</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Case Information -->
+        <div class="col-md-4">
+            <div class="dashboard-card">
+                <h5><i class="fas fa-file-medical me-2"></i>{% trans "معلومات الحالة" %}</h5>
+                <hr>
+                
+                <div class="mb-3">
+                    <strong>{% trans "المريض" %}:</strong>
+                    <p>{{ case.patient.user.first_name }} {{ case.patient.user.last_name }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>{% trans "عنوان الحالة" %}:</strong>
+                    <p>{{ case.title }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>{% trans "وصف الحالة" %}:</strong>
+                    <p class="text-muted">{{ case.description }}</p>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>{% trans "الأولوية" %}:</strong>
+                    <span class="badge {% if case.priority == 'urgent' %}bg-danger{% else %}bg-primary{% endif %}">
+                        {% if case.priority == 'urgent' %}
+                            <i class="fas fa-exclamation-triangle me-1"></i>مستعجلة
+                        {% else %}
+                            <i class="fas fa-clock me-1"></i>عادية
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>تاريخ الإرسال:</strong>
+                    <p>{{ case.created_at|date:"d/m/Y H:i" }}</p>
+                </div>
+                
+                {% if case.attachments.exists %}
+                <div class="mb-3">
+                    <strong>المرفقات:</strong>
+                    {% for attachment in case.attachments.all %}
+                        <div class="mb-2">
+                            <a href="{{ attachment.file.url }}" target="_blank" class="btn btn-outline-info btn-sm">
+                                <i class="fas fa-{% if attachment.file_type == 'pdf' %}file-pdf{% elif attachment.file_type == 'image' %}image{% else %}file{% endif %} me-1"></i>
+                                عرض المرفق {{ forloop.counter }}
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Response Form -->
+        <div class="col-md-8">
+            <div class="dashboard-card">
+                <h5><i class="fas fa-stethoscope me-2"></i>الرد الطبي</h5>
+                <hr>
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        {{ form.content|as_crispy_field }}
+                        <div class="d-flex gap-2 mt-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="translateField('id_content','ar')">
+                                <i class="fas fa-language me-1"></i> ترجمة إلى العربية
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="translateField('id_content','en')">
+                                <i class="fas fa-language me-1"></i> Translate to English
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            اكتب ردك الطبي الشامل على الحالة
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.recommendations|as_crispy_field }}
+                        <div class="d-flex gap-2 mt-2">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="translateField('id_recommendations','ar')">
+                                <i class="fas fa-language me-1"></i> ترجمة إلى العربية
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="translateField('id_recommendations','en')">
+                                <i class="fas fa-language me-1"></i> Translate to English
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            قدم التوصيات والنصائح الطبية المفصلة
+                        </div>
+                    </div>
+
+                    <!-- الحقول الاختيارية -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.diagnosis|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.treatment_plan|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.notes|as_crispy_field }}
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>تنبيه مهم:</strong> يرجى التأكد من دقة التشخيص والتوصيات قبل الإرسال. هذا الرد سيصل للمريض مباشرة.
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'doctors:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-right me-2"></i>
+                            العودة للوحة التحكم
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            إرسال الرد الطبي
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+    <script>
+        async function translateField(fieldId, target) {
+            const el = document.getElementById(fieldId);
+            if (!el) return;
+            const text = el.value || el.innerText || '';
+            if (!text.trim()) return;
+            try {
+                const res = await fetch('{% url "patients:instant_translation" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text, target_language: target })
+                });
+                const data = await res.json();
+                const translated = data.translated_text || text;
+                if (el.tagName.toLowerCase() === 'textarea' || el.tagName.toLowerCase() === 'input') {
+                    el.value = translated;
+                } else {
+                    el.innerText = translated;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    </script>
+{% endblock %}
+{% endblock %}

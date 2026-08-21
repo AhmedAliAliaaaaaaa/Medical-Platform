@@ -1,0 +1,620 @@
+/* ========================================
+   MEDICAL PLATFORM DESIGN SYSTEM
+   نظام التصميم الشامل للمنصة الطبية
+======================================== */
+
+/* ========================================
+   1. COLOR PALETTE - لوحة الألوان
+======================================== */
+
+:root {
+    /* Primary Colors - الألوان الأساسية */
+    --primary-50: #f0f9ff;
+    --primary-100: #e0f2fe;
+    --primary-200: #bae6fd;
+    --primary-300: #7dd3fc;
+    --primary-400: #38bdf8;
+    --primary-500: #0ea5e9;
+    --primary-600: #0284c7;
+    --primary-700: #0369a1;
+    --primary-800: #075985;
+    --primary-900: #0c4a6e;
+    
+    /* Secondary Colors - الألوان الثانوية */
+    --secondary-50: #fdf4ff;
+    --secondary-100: #fae8ff;
+    --secondary-200: #f5d0fe;
+    --secondary-300: #f0abfc;
+    --secondary-400: #e879f9;
+    --secondary-500: #d946ef;
+    --secondary-600: #c026d3;
+    --secondary-700: #a21caf;
+    --secondary-800: #86198f;
+    --secondary-900: #701a75;
+    
+    /* Accent Colors - ألوان التمييز */
+    --accent-50: #fff7ed;
+    --accent-100: #ffedd5;
+    --accent-200: #fed7aa;
+    --accent-300: #fdba74;
+    --accent-400: #fb923c;
+    --accent-500: #f97316;
+    --accent-600: #ea580c;
+    --accent-700: #c2410c;
+    --accent-800: #9a3412;
+    --accent-900: #7c2d12;
+    
+    /* Neutral Colors - الألوان المحايدة */
+    --neutral-50: #fafafa;
+    --neutral-100: #f5f5f5;
+    --neutral-200: #e5e5e5;
+    --neutral-300: #d4d4d4;
+    --neutral-400: #a3a3a3;
+    --neutral-500: #737373;
+    --neutral-600: #525252;
+    --neutral-700: #404040;
+    --neutral-800: #262626;
+    --neutral-900: #171717;
+    
+    /* Status Colors - ألوان الحالة */
+    --success-50: #f0fdf4;
+    --success-100: #dcfce7;
+    --success-200: #bbf7d0;
+    --success-300: #86efac;
+    --success-400: #4ade80;
+    --success-500: #22c55e;
+    --success-600: #16a34a;
+    --success-700: #15803d;
+    --success-800: #166534;
+    --success-900: #14532d;
+    
+    --warning-50: #fffbeb;
+    --warning-100: #fef3c7;
+    --warning-200: #fde68a;
+    --warning-300: #fcd34d;
+    --warning-400: #fbbf24;
+    --warning-500: #f59e0b;
+    --warning-600: #d97706;
+    --warning-700: #b45309;
+    --warning-800: #92400e;
+    --warning-900: #78350f;
+    
+    --error-50: #fef2f2;
+    --error-100: #fee2e2;
+    --error-200: #fecaca;
+    --error-300: #fca5a5;
+    --error-400: #f87171;
+    --error-500: #ef4444;
+    --error-600: #dc2626;
+    --error-700: #b91c1c;
+    --error-800: #991b1b;
+    --error-900: #7f1d1d;
+    
+    --info-50: #eff6ff;
+    --info-100: #dbeafe;
+    --info-200: #bfdbfe;
+    --info-300: #93c5fd;
+    --info-400: #60a5fa;
+    --info-500: #3b82f6;
+    --info-600: #2563eb;
+    --info-700: #1d4ed8;
+    --info-800: #1e40af;
+    --info-900: #1e3a8a;
+    
+    /* Medical Theme Colors - ألوان طبية */
+    --medical-blue: #0ea5e9;
+    --medical-green: #22c55e;
+    --medical-purple: #8b5cf6;
+    --medical-pink: #ec4899;
+    --medical-teal: #14b8a6;
+    --medical-indigo: #6366f1;
+    
+    /* Gradients - التدرجات */
+    --gradient-primary: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-700) 100%);
+    --gradient-secondary: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-700) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--accent-500) 0%, var(--accent-700) 100%);
+    --gradient-medical: linear-gradient(135deg, var(--medical-blue) 0%, var(--medical-purple) 50%, var(--medical-pink) 100%);
+    --gradient-success: linear-gradient(135deg, var(--success-400) 0%, var(--success-600) 100%);
+    --gradient-warning: linear-gradient(135deg, var(--warning-400) 0%, var(--warning-600) 100%);
+    --gradient-error: linear-gradient(135deg, var(--error-400) 0%, var(--error-600) 100%);
+    --gradient-info: linear-gradient(135deg, var(--info-400) 0%, var(--info-600) 100%);
+    
+    /* Glass Effect - تأثير الزجاج */
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --glass-backdrop: blur(16px);
+}
+
+/* ========================================
+   2. TYPOGRAPHY SYSTEM - نظام الخطوط
+======================================== */
+
+:root {
+    /* Font Families */
+    --font-primary: 'Tajawal', 'Inter', system-ui, -apple-system, sans-serif;
+    --font-secondary: 'Almarai', 'Poppins', system-ui, -apple-system, sans-serif;
+    --font-display: 'IBM Plex Sans Arabic', 'Montserrat', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    
+    /* Font Sizes */
+    --text-xs: 0.75rem;      /* 12px */
+    --text-sm: 0.875rem;     /* 14px */
+    --text-base: 1rem;       /* 16px */
+    --text-lg: 1.125rem;     /* 18px */
+    --text-xl: 1.25rem;      /* 20px */
+    --text-2xl: 1.5rem;      /* 24px */
+    --text-3xl: 1.875rem;    /* 30px */
+    --text-4xl: 2.25rem;     /* 36px */
+    --text-5xl: 3rem;        /* 48px */
+    --text-6xl: 3.75rem;     /* 60px */
+    --text-7xl: 4.5rem;      /* 72px */
+    --text-8xl: 6rem;        /* 96px */
+    --text-9xl: 8rem;        /* 128px */
+    
+    /* Font Weights */
+    --font-thin: 100;
+    --font-extralight: 200;
+    --font-light: 300;
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --font-extrabold: 800;
+    --font-black: 900;
+    
+    /* Line Heights */
+    --leading-none: 1;
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+    --leading-loose: 2;
+    
+    /* Letter Spacing */
+    --tracking-tighter: -0.05em;
+    --tracking-tight: -0.025em;
+    --tracking-normal: 0em;
+    --tracking-wide: 0.025em;
+    --tracking-wider: 0.05em;
+    --tracking-widest: 0.1em;
+}
+
+/* ========================================
+   3. SPACING SYSTEM - نظام المسافات
+======================================== */
+
+:root {
+    /* Spacing Scale */
+    --space-0: 0;
+    --space-px: 1px;
+    --space-0-5: 0.125rem;   /* 2px */
+    --space-1: 0.25rem;      /* 4px */
+    --space-1-5: 0.375rem;   /* 6px */
+    --space-2: 0.5rem;       /* 8px */
+    --space-2-5: 0.625rem;   /* 10px */
+    --space-3: 0.75rem;      /* 12px */
+    --space-3-5: 0.875rem;   /* 14px */
+    --space-4: 1rem;         /* 16px */
+    --space-5: 1.25rem;      /* 20px */
+    --space-6: 1.5rem;       /* 24px */
+    --space-7: 1.75rem;      /* 28px */
+    --space-8: 2rem;         /* 32px */
+    --space-9: 2.25rem;      /* 36px */
+    --space-10: 2.5rem;      /* 40px */
+    --space-11: 2.75rem;     /* 44px */
+    --space-12: 3rem;        /* 48px */
+    --space-14: 3.5rem;      /* 56px */
+    --space-16: 4rem;        /* 64px */
+    --space-20: 5rem;        /* 80px */
+    --space-24: 6rem;        /* 96px */
+    --space-28: 7rem;        /* 112px */
+    --space-32: 8rem;        /* 128px */
+    --space-36: 9rem;        /* 144px */
+    --space-40: 10rem;       /* 160px */
+    --space-44: 11rem;       /* 176px */
+    --space-48: 12rem;       /* 192px */
+    --space-52: 13rem;       /* 208px */
+    --space-56: 14rem;       /* 224px */
+    --space-60: 15rem;       /* 240px */
+    --space-64: 16rem;       /* 256px */
+    --space-72: 18rem;       /* 288px */
+    --space-80: 20rem;       /* 320px */
+    --space-96: 24rem;       /* 384px */
+}
+
+/* ========================================
+   4. SHADOW SYSTEM - نظام الظلال
+======================================== */
+
+:root {
+    /* Shadow Scale */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --shadow-2xl: 0 50px 100px -20px rgba(0, 0, 0, 0.25);
+    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    
+    /* Colored Shadows */
+    --shadow-primary: 0 10px 25px -5px rgba(14, 165, 233, 0.3);
+    --shadow-secondary: 0 10px 25px -5px rgba(217, 70, 239, 0.3);
+    --shadow-success: 0 10px 25px -5px rgba(34, 197, 94, 0.3);
+    --shadow-warning: 0 10px 25px -5px rgba(245, 158, 11, 0.3);
+    --shadow-error: 0 10px 25px -5px rgba(239, 68, 68, 0.3);
+    --shadow-info: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+}
+
+/* ========================================
+   5. BORDER RADIUS SYSTEM - نظام الحواف
+======================================== */
+
+:root {
+    --radius-none: 0;
+    --radius-sm: 0.125rem;    /* 2px */
+    --radius-base: 0.25rem;   /* 4px */
+    --radius-md: 0.375rem;    /* 6px */
+    --radius-lg: 0.5rem;      /* 8px */
+    --radius-xl: 0.75rem;     /* 12px */
+    --radius-2xl: 1rem;       /* 16px */
+    --radius-3xl: 1.5rem;     /* 24px */
+    --radius-full: 9999px;
+}
+
+/* ========================================
+   6. ANIMATION SYSTEM - نظام الحركات
+======================================== */
+
+:root {
+    /* Timing Functions */
+    --ease-linear: linear;
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* Duration */
+    --duration-75: 75ms;
+    --duration-100: 100ms;
+    --duration-150: 150ms;
+    --duration-200: 200ms;
+    --duration-300: 300ms;
+    --duration-500: 500ms;
+    --duration-700: 700ms;
+    --duration-1000: 1000ms;
+    
+    /* Delays */
+    --delay-75: 75ms;
+    --delay-100: 100ms;
+    --delay-150: 150ms;
+    --delay-200: 200ms;
+    --delay-300: 300ms;
+    --delay-500: 500ms;
+    --delay-700: 700ms;
+    --delay-1000: 1000ms;
+}
+
+/* ========================================
+   7. BREAKPOINTS - نقاط التوقف
+======================================== */
+
+:root {
+    --breakpoint-xs: 475px;
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    --breakpoint-2xl: 1536px;
+}
+
+/* ========================================
+   8. Z-INDEX SYSTEM - نظام الطبقات
+======================================== */
+
+:root {
+    --z-0: 0;
+    --z-10: 10;
+    --z-20: 20;
+    --z-30: 30;
+    --z-40: 40;
+    --z-50: 50;
+    --z-auto: auto;
+    
+    /* Component Z-Index */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+    --z-toast: 1080;
+}
+
+/* ========================================
+   9. GLOBAL RESET & BASE STYLES
+======================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    -moz-tab-size: 4;
+    tab-size: 4;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-primary);
+    font-size: var(--text-base);
+    font-weight: var(--font-normal);
+    line-height: var(--leading-normal);
+    color: var(--neutral-800);
+    background-color: var(--neutral-50);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    padding-top: var(--space-20); /* For fixed header */
+}
+
+/* ========================================
+   10. UTILITY CLASSES - فئات المساعدة
+======================================== */
+
+/* Display */
+.hidden { display: none !important; }
+.block { display: block !important; }
+.inline-block { display: inline-block !important; }
+.inline { display: inline !important; }
+.flex { display: flex !important; }
+.inline-flex { display: inline-flex !important; }
+.grid { display: grid !important; }
+.inline-grid { display: inline-grid !important; }
+
+/* Flex */
+.flex-row { flex-direction: row !important; }
+.flex-col { flex-direction: column !important; }
+.flex-wrap { flex-wrap: wrap !important; }
+.flex-nowrap { flex-wrap: nowrap !important; }
+.items-start { align-items: flex-start !important; }
+.items-center { align-items: center !important; }
+.items-end { align-items: flex-end !important; }
+.justify-start { justify-content: flex-start !important; }
+.justify-center { justify-content: center !important; }
+.justify-end { justify-content: flex-end !important; }
+.justify-between { justify-content: space-between !important; }
+.justify-around { justify-content: space-around !important; }
+
+/* Text Alignment */
+.text-left { text-align: left !important; }
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
+.text-justify { text-align: justify !important; }
+
+/* Font Weights */
+.font-thin { font-weight: var(--font-thin) !important; }
+.font-light { font-weight: var(--font-light) !important; }
+.font-normal { font-weight: var(--font-normal) !important; }
+.font-medium { font-weight: var(--font-medium) !important; }
+.font-semibold { font-weight: var(--font-semibold) !important; }
+.font-bold { font-weight: var(--font-bold) !important; }
+.font-extrabold { font-weight: var(--font-extrabold) !important; }
+
+/* Text Sizes */
+.text-xs { font-size: var(--text-xs) !important; }
+.text-sm { font-size: var(--text-sm) !important; }
+.text-base { font-size: var(--text-base) !important; }
+.text-lg { font-size: var(--text-lg) !important; }
+.text-xl { font-size: var(--text-xl) !important; }
+.text-2xl { font-size: var(--text-2xl) !important; }
+.text-3xl { font-size: var(--text-3xl) !important; }
+.text-4xl { font-size: var(--text-4xl) !important; }
+.text-5xl { font-size: var(--text-5xl) !important; }
+
+/* Colors */
+.text-primary { color: var(--primary-600) !important; }
+.text-secondary { color: var(--secondary-600) !important; }
+.text-success { color: var(--success-600) !important; }
+.text-warning { color: var(--warning-600) !important; }
+.text-error { color: var(--error-600) !important; }
+.text-info { color: var(--info-600) !important; }
+
+/* Background Colors */
+.bg-primary { background-color: var(--primary-600) !important; }
+.bg-secondary { background-color: var(--secondary-600) !important; }
+.bg-success { background-color: var(--success-600) !important; }
+.bg-warning { background-color: var(--warning-600) !important; }
+.bg-error { background-color: var(--error-600) !important; }
+.bg-info { background-color: var(--info-600) !important; }
+
+/* Spacing */
+.m-0 { margin: 0 !important; }
+.m-1 { margin: var(--space-1) !important; }
+.m-2 { margin: var(--space-2) !important; }
+.m-3 { margin: var(--space-3) !important; }
+.m-4 { margin: var(--space-4) !important; }
+.m-5 { margin: var(--space-5) !important; }
+.m-6 { margin: var(--space-6) !important; }
+.m-8 { margin: var(--space-8) !important; }
+
+.p-0 { padding: 0 !important; }
+.p-1 { padding: var(--space-1) !important; }
+.p-2 { padding: var(--space-2) !important; }
+.p-3 { padding: var(--space-3) !important; }
+.p-4 { padding: var(--space-4) !important; }
+.p-5 { padding: var(--space-5) !important; }
+.p-6 { padding: var(--space-6) !important; }
+.p-8 { padding: var(--space-8) !important; }
+
+/* Border Radius */
+.rounded-none { border-radius: var(--radius-none) !important; }
+.rounded-sm { border-radius: var(--radius-sm) !important; }
+.rounded { border-radius: var(--radius-base) !important; }
+.rounded-md { border-radius: var(--radius-md) !important; }
+.rounded-lg { border-radius: var(--radius-lg) !important; }
+.rounded-xl { border-radius: var(--radius-xl) !important; }
+.rounded-2xl { border-radius: var(--radius-2xl) !important; }
+.rounded-3xl { border-radius: var(--radius-3xl) !important; }
+.rounded-full { border-radius: var(--radius-full) !important; }
+
+/* Shadows */
+.shadow-xs { box-shadow: var(--shadow-xs) !important; }
+.shadow-sm { box-shadow: var(--shadow-sm) !important; }
+.shadow { box-shadow: var(--shadow-base) !important; }
+.shadow-md { box-shadow: var(--shadow-md) !important; }
+.shadow-lg { box-shadow: var(--shadow-lg) !important; }
+.shadow-xl { box-shadow: var(--shadow-xl) !important; }
+.shadow-2xl { box-shadow: var(--shadow-2xl) !important; }
+
+/* Transitions */
+.transition-none { transition: none !important; }
+.transition-all { transition: all var(--duration-150) var(--ease-in-out) !important; }
+.transition-colors { transition: color var(--duration-150) var(--ease-in-out), background-color var(--duration-150) var(--ease-in-out), border-color var(--duration-150) var(--ease-in-out) !important; }
+.transition-opacity { transition: opacity var(--duration-150) var(--ease-in-out) !important; }
+.transition-shadow { transition: box-shadow var(--duration-150) var(--ease-in-out) !important; }
+.transition-transform { transition: transform var(--duration-150) var(--ease-in-out) !important; }
+
+/* Transforms */
+.scale-95 { transform: scale(0.95) !important; }
+.scale-100 { transform: scale(1) !important; }
+.scale-105 { transform: scale(1.05) !important; }
+.scale-110 { transform: scale(1.1) !important; }
+
+/* Opacity */
+.opacity-0 { opacity: 0 !important; }
+.opacity-25 { opacity: 0.25 !important; }
+.opacity-50 { opacity: 0.5 !important; }
+.opacity-75 { opacity: 0.75 !important; }
+.opacity-100 { opacity: 1 !important; }
+
+/* ========================================
+   11. RESPONSIVE UTILITIES
+======================================== */
+
+@media (min-width: 640px) {
+    .sm\:block { display: block !important; }
+    .sm\:hidden { display: none !important; }
+    .sm\:flex { display: flex !important; }
+    .sm\:text-sm { font-size: var(--text-sm) !important; }
+    .sm\:text-base { font-size: var(--text-base) !important; }
+    .sm\:text-lg { font-size: var(--text-lg) !important; }
+    .sm\:text-xl { font-size: var(--text-xl) !important; }
+    .sm\:text-2xl { font-size: var(--text-2xl) !important; }
+    .sm\:text-3xl { font-size: var(--text-3xl) !important; }
+}
+
+@media (min-width: 768px) {
+    .md\:block { display: block !important; }
+    .md\:hidden { display: none !important; }
+    .md\:flex { display: flex !important; }
+    .md\:text-sm { font-size: var(--text-sm) !important; }
+    .md\:text-base { font-size: var(--text-base) !important; }
+    .md\:text-lg { font-size: var(--text-lg) !important; }
+    .md\:text-xl { font-size: var(--text-xl) !important; }
+    .md\:text-2xl { font-size: var(--text-2xl) !important; }
+    .md\:text-3xl { font-size: var(--text-3xl) !important; }
+    .md\:text-4xl { font-size: var(--text-4xl) !important; }
+}
+
+@media (min-width: 1024px) {
+    .lg\:block { display: block !important; }
+    .lg\:hidden { display: none !important; }
+    .lg\:flex { display: flex !important; }
+    .lg\:text-base { font-size: var(--text-base) !important; }
+    .lg\:text-lg { font-size: var(--text-lg) !important; }
+    .lg\:text-xl { font-size: var(--text-xl) !important; }
+    .lg\:text-2xl { font-size: var(--text-2xl) !important; }
+    .lg\:text-3xl { font-size: var(--text-3xl) !important; }
+    .lg\:text-4xl { font-size: var(--text-4xl) !important; }
+    .lg\:text-5xl { font-size: var(--text-5xl) !important; }
+}
+
+/* ========================================
+   12. DARK MODE SUPPORT
+======================================== */
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --neutral-50: #171717;
+        --neutral-100: #262626;
+        --neutral-200: #404040;
+        --neutral-300: #525252;
+        --neutral-400: #737373;
+        --neutral-500: #a3a3a3;
+        --neutral-600: #d4d4d4;
+        --neutral-700: #e5e5e5;
+        --neutral-800: #f5f5f5;
+        --neutral-900: #fafafa;
+    }
+    
+    body {
+        background-color: var(--neutral-50);
+        color: var(--neutral-800);
+    }
+}
+
+/* ========================================
+   13. PRINT STYLES
+======================================== */
+
+@media print {
+    * {
+        background: transparent !important;
+        color: black !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+    
+    body {
+        padding-top: 0 !important;
+    }
+    
+    .no-print {
+        display: none !important;
+    }
+}
+
+/* ========================================
+   14. ACCESSIBILITY IMPROVEMENTS
+======================================== */
+
+/* Focus styles */
+*:focus {
+    outline: 2px solid var(--primary-500);
+    outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    :root {
+        --primary-500: #0066cc;
+        --secondary-500: #cc0066;
+        --success-500: #006600;
+        --warning-500: #cc6600;
+        --error-500: #cc0000;
+        --info-500: #0066cc;
+    }
+}

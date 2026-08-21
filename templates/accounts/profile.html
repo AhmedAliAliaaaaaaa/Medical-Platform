@@ -1,0 +1,420 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "الملف الشخصي" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Profile Header -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 text-center">
+                            {% if user.profile_picture %}
+                                <img src="{{ user.profile_picture.url }}" 
+                                     class="rounded-circle mb-3" 
+                                     width="120" height="120"
+                                     alt="{{ user.first_name }}">
+                            {% else %}
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" 
+                                     style="width: 120px; height: 120px;">
+                                    <i class="fas fa-user fa-3x text-white"></i>
+                                </div>
+                            {% endif %}
+                            <h5 class="mb-1">{{ user.first_name }} {{ user.last_name }}</h5>
+                            <p class="text-muted mb-0">
+                                {% if user.user_type == 'patient' %}
+                                    <i class="fas fa-user me-1"></i>
+                                    {% trans "مريض" %}
+                                {% elif user.user_type == 'doctor' %}
+                                    <i class="fas fa-user-md me-1"></i>
+                                    {% trans "طبيب" %}
+                                {% elif user.user_type == 'admin' %}
+                                    <i class="fas fa-user-shield me-1"></i>
+                                    {% trans "مشرف" %}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="info-item mb-3">
+                                        <i class="fas fa-envelope text-primary me-2"></i>
+                                        <strong>{% trans "البريد الإلكتروني" %}:</strong>
+                                        <span class="ms-2">{{ user.email }}</span>
+                                    </div>
+                                    <div class="info-item mb-3">
+                                        <i class="fas fa-user text-primary me-2"></i>
+                                        <strong>{% trans "اسم المستخدم" %}:</strong>
+                                        <span class="ms-2">{{ user.username }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-item mb-3">
+                                        <i class="fas fa-phone text-primary me-2"></i>
+                                        <strong>{% trans "رقم الهاتف" %}:</strong>
+                                        <span class="ms-2">{{ user.phone_number|default:"غير محدد" }}</span>
+                                    </div>
+                                    <div class="info-item mb-3">
+                                        <i class="fas fa-calendar text-primary me-2"></i>
+                                        <strong>{% trans "تاريخ التسجيل" %}:</strong>
+                                        <span class="ms-2">{{ user.date_joined|date:"d/m/Y" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Profile Update Form -->
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-edit me-2"></i>
+                                {% trans "تحديث الملف الشخصي" %}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                                <i class="fas fa-user me-2"></i>
+                                                {% trans "الاسم الأول" %}
+                                            </label>
+                                            {{ form.first_name }}
+                                            {% if form.first_name.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ form.first_name.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                                <i class="fas fa-user me-2"></i>
+                                                {% trans "الاسم الأخير" %}
+                                            </label>
+                                            {{ form.last_name }}
+                                            {% if form.last_name.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {{ form.last_name.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>
+                                        {% trans "البريد الإلكتروني" %}
+                                    </label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.email.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.phone_number.id_for_label }}" class="form-label">
+                                        <i class="fas fa-phone me-2"></i>
+                                        {% trans "رقم الهاتف" %}
+                                    </label>
+                                    {{ form.phone_number }}
+                                    {% if form.phone_number.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.phone_number.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.profile_picture.id_for_label }}" class="form-label">
+                                        <i class="fas fa-image me-2"></i>
+                                        {% trans "الصورة الشخصية" %}
+                                    </label>
+                                    {{ form.profile_picture }}
+                                    {% if form.profile_picture.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {{ form.profile_picture.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        {% trans "اختر صورة شخصية (اختياري)" %}
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% trans "حفظ التغييرات" %}
+                                    </button>
+                                    <a href="{% url 'core:home' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        {% trans "إلغاء" %}
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Information -->
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {% trans "معلومات الحساب" %}
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-item mb-3">
+                                <strong>{% trans "حالة الحساب" %}:</strong>
+                                {% if user.is_active %}
+                                    <span class="badge bg-success ms-2">{% trans "نشط" %}</span>
+                                {% else %}
+                                    <span class="badge bg-danger ms-2">{% trans "معطل" %}</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="info-item mb-3">
+                                <strong>{% trans "آخر دخول" %}:</strong>
+                                <div class="ms-2 small text-muted">
+                                    {% if user.last_login %}
+                                        {{ user.last_login|date:"d/m/Y H:i" }}
+                                    {% else %}
+                                        {% trans "لم يسجل دخول من قبل" %}
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if user.user_type == 'doctor' %}
+                                {% if user.doctor %}
+                                    <div class="info-item mb-3">
+                                        <strong>{% trans "حالة الطبيب" %}:</strong>
+                                        {% if user.doctor.status == 'pending' %}
+                                            <span class="badge bg-warning ms-2">{% trans "قيد المراجعة" %}</span>
+                                        {% elif user.doctor.status == 'approved' %}
+                                            <span class="badge bg-success ms-2">{% trans "معتمد" %}</span>
+                                        {% elif user.doctor.status == 'rejected' %}
+                                            <span class="badge bg-danger ms-2">{% trans "مرفوض" %}</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="info-item mb-3">
+                                        <strong>{% trans "التخصص" %}:</strong>
+                                        <div class="ms-2 small">{{ user.doctor.get_specialization_display }}</div>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if user.user_type == 'patient' %}
+                                {% if user.patient %}
+                                    <div class="info-item mb-3">
+                                        <strong>{% trans "عدد الحالات" %}:</strong>
+                                        <span class="badge bg-primary ms-2">{{ user.patient.medicalcase_set.count }}</span>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card mt-3">
+                        <div class="card-header bg-secondary text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-bolt me-2"></i>
+                                {% trans "إجراءات سريعة" %}
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                {% if user.user_type == 'patient' %}
+                                    <a href="{% url 'patients:dashboard' %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-tachometer-alt me-2"></i>
+                                        {% trans "لوحة التحكم" %}
+                                    </a>
+                                    <a href="{% url 'patients:new_case' %}" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-plus me-2"></i>
+                                        {% trans "حالة جديدة" %}
+                                    </a>
+                                    <a href="{% url 'patients:my_responses' %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-reply-all me-2"></i>
+                                        {% trans "ردود الأطباء" %}
+                                    </a>
+                                    <hr class="my-2">
+                                    <a href="{% url 'accounts:doctor_register' %}" class="btn btn-outline-info btn-sm">
+                                        <i class="fas fa-stethoscope me-2"></i>
+                                        {% trans "انضم كطبيب" %}
+                                    </a>
+                                {% elif user.user_type == 'doctor' %}
+                                    {% if user.doctor.status == 'approved' %}
+                                        <a href="{% url 'doctors:dashboard' %}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-tachometer-alt me-2"></i>
+                                            {% trans "لوحة التحكم" %}
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'doctors:pending' %}" class="btn btn-outline-warning btn-sm">
+                                            <i class="fas fa-clock me-2"></i>
+                                            {% trans "حالة الطلب" %}
+                                        </a>
+                                    {% endif %}
+                                {% elif user.user_type == 'admin' %}
+                                    <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-danger btn-sm">
+                                        <i class="fas fa-cogs me-2"></i>
+                                        {% trans "لوحة الإدارة" %}
+                                    </a>
+                                {% endif %}
+                                
+                                <a href="{% url 'accounts:change_password' %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-key me-2"></i>
+                                    {% trans "تغيير كلمة المرور" %}
+                                </a>
+                                <a href="{% url 'accounts:sessions' %}" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-user-clock me-2"></i>
+                                    {% trans "إدارة الجلسات" %}
+                                </a>
+                                <a href="{% url 'accounts:deactivate' %}" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-user-slash me-2"></i>
+                                    {% trans "تعطيل الحساب" %}
+                                </a>
+                                <a href="{% url 'accounts:delete_account' %}" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-user-times me-2"></i>
+                                    {% trans "حذف الحساب" %}
+                                </a>
+                                <form method="post" action="{% url 'accounts:logout' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-sign-out-alt me-2"></i>
+                                        {% trans "تسجيل الخروج" %}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.info-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.card-header {
+    border-bottom: none;
+    font-weight: 600;
+}
+
+.profile-picture-preview {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 50%;
+    margin-top: 10px;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px 15px;
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Profile picture preview
+    const profilePictureInput = document.getElementById('id_profile_picture');
+    if (profilePictureInput) {
+        profilePictureInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Create or update preview image
+                    let preview = document.querySelector('.profile-picture-preview');
+                    if (!preview) {
+                        preview = document.createElement('img');
+                        preview.className = 'profile-picture-preview';
+                        profilePictureInput.parentNode.appendChild(preview);
+                    }
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Form validation
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const firstName = document.getElementById('id_first_name').value.trim();
+            const lastName = document.getElementById('id_last_name').value.trim();
+            const email = document.getElementById('id_email').value.trim();
+            
+            if (!firstName || !lastName || !email) {
+                e.preventDefault();
+                alert('{% trans "يرجى ملء جميع الحقول المطلوبة" %}');
+                return false;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                e.preventDefault();
+                alert('{% trans "يرجى إدخال بريد إلكتروني صحيح" %}');
+                return false;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

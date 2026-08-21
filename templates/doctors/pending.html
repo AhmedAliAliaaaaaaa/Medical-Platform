@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}قيد المراجعة - المنصة الطبية{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center">
+                <div class="dashboard-card">
+                    <div class="mb-4">
+                        <i class="fas fa-clock fa-4x text-warning"></i>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">شكراً لك!</h2>
+                    
+                    <p class="lead text-muted mb-4">
+                        تم إرسال طلب التسجيل بنجاح. سيتم مراجعة طلبك من قبل الإدارة وستتمكن من تسجيل الدخول باسمك الكامل بعد الموافقة.
+                    </p>
+                    
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>تم إرسال طلبك بنجاح!</strong>
+                        <ul class="list-unstyled mt-2 mb-0">
+                            <li><i class="fas fa-check text-success me-2"></i>تم استلام طلبك وجميع المستندات</li>
+                            <li><i class="fas fa-search text-primary me-2"></i>فريق الإدارة يراجع بياناتك ومؤهلاتك</li>
+                            <li><i class="fas fa-certificate text-warning me-2"></i>التحقق من صحة الترخيص الطبي</li>
+                            <li><i class="fas fa-user-check text-info me-2"></i>بعد الموافقة، ستتمكن من الدخول باسمك الكامل</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <i class="fas fa-clock text-primary fa-2x mb-2"></i>
+                                <h6>مدة المراجعة</h6>
+                                <p class="small text-muted">24-48 ساعة</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <i class="fas fa-envelope text-success fa-2x mb-2"></i>
+                                <h6>إشعار النتيجة</h6>
+                                <p class="small text-muted">عبر البريد الإلكتروني</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <i class="fas fa-phone text-info fa-2x mb-2"></i>
+                                <h6>الدعم الفني</h6>
+                                <p class="small text-muted">متاح 24/7</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>معلومات مهمة:</h5>
+                        <div class="text-start">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-shield-alt text-success me-2"></i>
+                                    جميع البيانات محمية ومشفرة
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-user-check text-primary me-2"></i>
+                                    سيتم التحقق من هويتك ومؤهلاتك
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-bell text-warning me-2"></i>
+                                    ستحصل على إشعار فور اكتمال المراجعة
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'core:home' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-home me-2"></i>
+                            العودة للرئيسية
+                        </a>
+                        <a href="#" class="btn btn-outline-info">
+                            <i class="fas fa-phone me-2"></i>
+                            اتصل بالدعم
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

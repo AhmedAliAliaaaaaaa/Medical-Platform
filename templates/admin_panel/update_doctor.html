@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "تعديل بيانات الطبيب" %} - {% trans "لوحة الإدارة" %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-edit me-2"></i>
+                    {% trans "تعديل بيانات الطبيب" %}: د. {{ object.user.get_full_name }}
+                </h2>
+                <a href="{% url 'admin_panel:doctor_detail' object.id %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    {% trans "العودة لملف الطبيب" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        {% trans "تعديل معلومات الطبيب" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.specialization.id_for_label }}" class="form-label">
+                                    <i class="fas fa-stethoscope me-1"></i>
+                                    {% trans "التخصص" %}
+                                </label>
+                                {{ form.specialization }}
+                                {% if form.specialization.errors %}
+                                    <div class="text-danger">{{ form.specialization.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.license_number.id_for_label }}" class="form-label">
+                                    <i class="fas fa-certificate me-1"></i>
+                                    {% trans "رقم الترخيص" %}
+                                </label>
+                                {{ form.license_number }}
+                                {% if form.license_number.errors %}
+                                    <div class="text-danger">{{ form.license_number.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.experience_years.id_for_label }}" class="form-label">
+                                    <i class="fas fa-graduation-cap me-1"></i>
+                                    {% trans "سنوات الخبرة" %}
+                                </label>
+                                {{ form.experience_years }}
+                                {% if form.experience_years.errors %}
+                                    <div class="text-danger">{{ form.experience_years.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.country.id_for_label }}" class="form-label">
+                                    <i class="fas fa-globe me-1"></i>
+                                    {% trans "البلد" %}
+                                </label>
+                                {{ form.country }}
+                                {% if form.country.errors %}
+                                    <div class="text-danger">{{ form.country.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.consultation_fee.id_for_label }}" class="form-label">
+                                    <i class="fas fa-money-bill me-1"></i>
+                                    {% trans "رسوم الاستشارة" %}
+                                </label>
+                                {{ form.consultation_fee }}
+                                {% if form.consultation_fee.errors %}
+                                    <div class="text-danger">{{ form.consultation_fee.errors }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    {% trans "حالة الطبيب" %}
+                                </label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="text-danger">{{ form.status.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_available }}
+                                <label class="form-check-label" for="{{ form.is_available.id_for_label }}">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    {% trans "متاح للاستشارات" %}
+                                </label>
+                                {% if form.is_available.errors %}
+                                    <div class="text-danger">{{ form.is_available.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.bio.id_for_label }}" class="form-label">
+                                <i class="fas fa-user-circle me-1"></i>
+                                {% trans "نبذة عن الطبيب" %}
+                            </label>
+                            {{ form.bio }}
+                            {% if form.bio.errors %}
+                                <div class="text-danger">{{ form.bio.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'admin_panel:doctor_detail' object.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>
+                                {% trans "إلغاء" %}
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-1"></i>
+                                {% trans "حفظ التغييرات" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- معلومات الطبيب الحالية -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        {% trans "معلومات الطبيب الحالية" %}
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if object.user.profile_picture %}
+                        <img src="{{ object.user.profile_picture.url }}" 
+                             class="rounded-circle mb-3" 
+                             width="100" height="100"
+                             alt="د. {{ object.user.get_full_name }}">
+                    {% else %}
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 100px; height: 100px;">
+                            <i class="fas fa-user-md text-white fa-3x"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <h5>د. {{ object.user.get_full_name }}</h5>
+                    <p class="text-muted">{{ object.get_specialization_display }}</p>
+                    
+                    <div class="text-start mt-3">
+                        <p><strong>{% trans "البريد الإلكتروني" %}:</strong><br>{{ object.user.email }}</p>
+                        <p><strong>{% trans "تاريخ التسجيل" %}:</strong><br>{{ object.created_at|date:"d/m/Y" }}</p>
+                        <p><strong>{% trans "عدد الحالات" %}:</strong><br>{{ object.cases.count }}</p>
+                        <p><strong>{% trans "التقييم" %}:</strong><br>
+                            <span class="text-warning">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= object.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            ({{ object.total_reviews }} {% trans "تقييم" %})
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+</style>
+{% endblock %}

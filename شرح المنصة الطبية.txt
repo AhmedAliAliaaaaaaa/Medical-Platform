@@ -1,0 +1,401 @@
+تقرير شامل عن محتوى المشروع وبنية الصفحات والعلاقات بينها
+هذا المشروع منصة طبية مبنية على Django تمكّن المرضى من رفع حالاتهم الطبية والحصول على ردود من أطباء معتمدين، مع دعم لغتين (العربية والإنجليزية) واتجاه RTL.
+
+أعرض أدناه كل الصفحات الرئيسية حسب التطبيقات (apps) في المشروع، مع دور كل صفحة والعلاقات بينها ومسارات الوصول.
+
+1) اللبّ (Core)
+المسارات: core/urls.py
+/ → الصفحة الرئيسية HomeView
+القوالب:
+templates/core/home_enhanced.html (للعربية افتراضيًا)
+templates/core/home_en.html (للإنجليزية)
+تعرض: أرقام إجمالية (عدد الأطباء المعتمدين، الحالات، المرضى) + أطباء مميزين.
+/about/ → AboutView
+القالب: templates/core/about.html
+/contact/ → ContactView
+القالب: templates/core/contact.html
+نموذج تواصل بسيط مع رسائل نجاح.
+/faq/ → FAQView
+القالب: templates/core/faq.html
+/set-language/ → set_language
+تبديل اللغة وتخزينها في الكوكيز/الـ session، مع دعم نقطة API ترجمة فورية داخل نفس الـ view عند POST خاص.
+علاقات مهمة:
+
+معظم عمليات تسجيل الدخول/الخروج تعيد التوجيه إلى صفحات core أو لوحات التحكم حسب نوع المستخدم.
+الصفحة الرئيسية تعرض بيانات من doctors, patients, accounts.
+2) الحسابات (Accounts)
+المسارات: accounts/urls.py
+/accounts/register/ → RegisterView
+القالب: templates/accounts/register.html
+نموذج إنشاء مستخدم (مريض افتراضيًا)، وإنشاء ملف Patient تلقائيًا عند النوع patient.
+/accounts/login/ → LoginView
+القالب: templates/accounts/login.html
+إعادة التوجيه بعد تسجيل الدخول حسب نوع المستخدم:
+patient → patients:dashboard
+doctor (approved) → doctors:dashboard
+doctor (pending) → doctors:pending
+admin → admin_panel:dashboard
+/accounts/logout/ → LogoutView
+يعيد إلى core:home
+/accounts/profile/ → ProfileView
+القالب: templates/accounts/profile.html
+تعديل بيانات المستخدم المسجّل.
+/accounts/doctor-register/ → DoctorRegisterView
+القالب: templates/accounts/doctor_register.html
+للمستخدم المسجّل: نموذج مختصر (ExistingUserDoctorForm)
+للمستخدم الجديد: نموذج كامل (DoctorRegistrationForm)
+عند نجاح التقديم → تحويل إلى doctors:pending
+/accounts/enhanced-doctor-register/ → EnhancedDoctorRegisterView
+القالب: templates/accounts/enhanced_doctor_register.html
+نموذج محسّن (EnhancedDoctorRegistrationForm) مع تحقق فوري للأسعار والمعاينة
+عند نجاح التقديم → تحويل إلى doctors:pending
+ملاحظة: قمنا بمطابقة تصميم هذه الصفحة مع doctor_register.html كما طلبت، مع الإبقاء على التحقق الفوري بالـ JS.
+صفحات ذات صلة إضافية:
+
+templates/accounts/register_new.html موجودة كبديل/نسخة تصميمية إضافية للتسجيل.
+علاقات مهمة:
+
+نجاح تسجيل الطبيب (أي من صفحتي التسجيل) → صفحة doctors:pending حتى الموافقة.
+تسجيل الدخول يوجّه إلى لوحات التحكم المناسبة حسب الدور.
+3) المرضى (Patients)
+المسارات: patients/urls.py
+/patients/dashboard/ → PatientDashboardView
+القالب: templates/patients/dashboard.html
+يعرض ملخص الحالات، حالات قيد الانتظار/المكتملة، إشعارات غير مقروءة.
+/patients/new-case/ → NewCaseView
+القالب: templates/patients/new_case.html
+إنشاء حالة طبية جديدة + رفع مرفقات (صور، PDF)
+عند النجاح → تحويل إلى patients:select_doctor لتحديد طبيب
+/patients/select-doctor/<case_id>/ → SelectDoctorView
+القالب: templates/patients/select_doctor.html
+اختيار طبيب للحالة + إحصائيات للأسعار (min/max/avg) والعملة الأكثر استخدامًا
+/patients/confirm-case/<case_id>/<doctor_id>/ → ConfirmCaseView
+القالب: templates/patients/confirm_case.html
+تأكيد إرسال الحالة للطبيب المختار
+يحصل ترجمة تلقائية لبيانات الحالة حسب لغة الطبيب المفضلة (إن أمكن)
+بعد التأكيد → الحالة تصبح in_progress وتظهر للطبيب
+/patients/case-detail/<case_id>/ → CaseDetailView
+القالب: templates/patients/case_detail.html
+عرض تفاصيل الحالة وردود الطبيب عند اكتمالها
+/patients/rate-doctor/<case_id>/ → RateDoctorView
+القالب: templates/patients/rate_doctor.html
+تقييم الطبيب بعد اكتمال الحالة + تحديث متوسط تقييمات الطبيب
+/patients/my-responses/ → MyResponsesView
+القالب: templates/patients/my_responses.html
+سرد الحالات المكتملة مع ردود الأطباء
+/patients/notifications/ → NotificationsView
+القالب: templates/patients/notifications.html
+عرض إشعارات المريض + تعليم كمقروء
+جديد/خدمات:
+/patients/payment/<case_id>/<doctor_id>/ → PaymentView
+القالب: templates/patients/payment.html
+اختيار نوع الاستشارة (عادية/طوارئ/متابعة) وحساب السعر وعرض طرق الدفع المفعّلة
+/patients/api/translate/ → InstantTranslationView (API)
+/patients/api/medical-suggestions/ → MedicalSuggestionsView (API)
+علاقات مهمة (تدفق المريض):
+
+Dashboard → New Case → Select Doctor → Confirm Case → Payment (عند الحاجة) → Case Detail → Rate Doctor → My Responses
+Notifications للمريض تأتي من الأطباء (SendNotificationView) أو النظام.
+4) الأطباء (Doctors)
+المسارات: doctors/urls.py
+/doctors/pending/ → PendingApprovalView
+القالب: templates/doctors/pending.html
+انتظار موافقة الإدارة على طلب الانضمام
+/doctors/dashboard/ → DoctorDashboardView
+القالب: templates/doctors/dashboard.html
+عرض الحالات قيد المعالجة والمكتملة وإحصائيات أساسية وتقييمات حديثة وإشعارات
+/doctors/case/<case_id>/ → CaseDetailView
+القالب: templates/doctors/case_detail.html
+عرض تفاصيل حالة مكلّف بها الطبيب
+/doctors/respond/<case_id>/ → RespondToCaseView
+القالب: templates/doctors/respond_case.html
+إرسال رد طبي (نص، PDF، ربما مرفقات) ثم تتحول الحالة إلى completed
+/doctors/my-responses/ → MyResponsesView
+القالب: templates/doctors/my_responses.html
+قائمة ردود الطبيب
+/doctors/my-ratings/ → MyRatingsView
+القالب: templates/doctors/my_ratings.html
+عرض التقييمات والإحصائيات التفصيلية والمتوسطات
+/doctors/send-notification/ → SendNotificationView
+القالب: templates/doctors/send_notification.html
+إرسال إشعارات لمرضى تعامل معهم الطبيب (لمريض محدد أو للجميع)
+/doctors/notifications/ → DoctorNotificationsView
+القالب: templates/doctors/notifications.html
+استلام إشعارات من المرضى/النظام وتعليمها كمقروءة
+علاقات مهمة (تدفق الطبيب):
+
+بعد التسجيل كطبيب → Pending
+بعد الموافقة → Dashboard
+يستقبل الحالات المرسلة من المرضى (ConfirmCase) → يعاينها (CaseDetail) → يرد (RespondToCase) → تكمل الحالة → تظهر للمرضى في MyResponses.
+يمكنه إرسال إشعارات للمرضى الذين تعامل معهم.
+يمكنه متابعة تقييماته وإحصائياتها في MyRatings.
+5) المدفوعات (Payments)
+المسارات: payments/urls.py
+طرق الدفع
+/payments/methods/ → payment_methods
+القالب: templates/payments/payment_methods.html
+إدارة طرق الدفع الخاصة بالمستخدم (إضافة/تعطيل/تعيين افتراضي)
+/payments/methods/delete/<method_id>/ → delete_payment_method
+دفع الاستشارة
+/payments/consultation/<case_id>/ → consultation_payment
+القالب: templates/payments/consultation_payment.html
+معالجة الدفع (Stripe/PayPal) إن تم تهيئتهما
+/payments/success/<payment_id>/ → payment_success
+القالب: templates/payments/payment_success.html
+/payments/cancel/ → payment_cancel
+القالب: templates/payments/payment_cancel.html
+اشتراك الطبيب وأرباحه
+/payments/doctor/subscription/ → doctor_subscription
+القالب: templates/payments/doctor_subscription.html
+تفعيل بوابات الدفع للطبيب عبر اشتراك (basic/premium/professional)
+/payments/doctor/earnings/ → doctor_earnings
+القالب: templates/payments/doctor_earnings.html
+عرض الأرباح والمدفوعات المكتملة
+/payments/doctor/withdrawal/ → withdrawal_request
+القالب: templates/payments/withdrawal_request.html
+طلب سحب رصيد
+سجل المدفوعات
+/payments/history/ → payment_history
+القالب: templates/payments/payment_history.html
+Webhook
+/payments/stripe/webhook/ → stripe_webhook
+تحديث حالة الدفع والأرباح عند نجاح الدفع عبر Stripe
+ملاحظة بيئية:
+
+في التشغيل المحلي الحالي، Stripe/PayPal مُعطّلان (المفاتيح غير موجودة)، لذلك ستعمل الصفحات لكن لن تتم عمليات دفع حقيقية.
+علاقات مهمة:
+
+الدفع مرتبط بالحالة والطبيب: بعد نجاح الدفع قد تُحدّث حالة الحالة/الأرباح.
+صفحة patients/payment.html مكمّلة لتجربة الدفع ضمن تدفق المريض.
+6) لوحة الإدارة الداخلية (Admin Panel مخصصة داخل الموقع)
+القوالب في: templates/admin_panel/
+dashboard.html → نظرة عامة للإدارة
+manage_users.html → إدارة المستخدمين
+manage_doctors.html → إدارة طلبات الأطباء (الموافقة/الرفض) وتفاصيلهم
+manage_cases.html و manage_cases_enhanced.html → إدارة الحالات
+responses.html وresponse_detail.html → عرض ردود الأطباء ومحتوياتها
+notifications.html وsend_notification.html → إرسال إشعارات للمستخدمين
+statistics.html → إحصائيات عامة
+update_user.html / update_doctor.html / update_case.html / delete_user.html → عمليات تحديث/حذف كيانات
+doctor_detail.html / case_detail.html → تفاصيل مخصصة
+علاقات مهمة:
+
+الإدارة تراقب الحالات، الأطباء، المستخدمين، الردود، المدفوعات إجمالًا.
+قرارات الموافقة على الأطباء تؤثر مباشرة على تدفق دخول الطبيب من Pending إلى Dashboard.
+7) القوالب المشتركة والستايلات
+templates/base.html: القالب الأساسي لجميع الصفحات
+الستايلات والسكربتات:
+static/css/* وstatic/js/* (نسخ مطوّرة أيضًا في staticfiles/)
+أمثلة: components.css, doctor-enhanced.css, patient-dashboard.css, language-switcher.css, medical-platform.js, language-switcher.js
+دعم الترجمة:
+locale/ يحتوي ملفات PO/MO
+محوّلات ترجمة فورية في core/translation_service.py وبعض سكربتات الواجهة
+8) تدفقات المستخدم الأساسية
+المريض:
+
+تسجيل/تسجيل دخول (accounts)
+لوحة المريض (patients:dashboard)
+إنشاء حالة (patients:new_case)
+اختيار طبيب (patients:select_doctor)
+تأكيد الحالة للطبيب (patients:confirm_case) مع ترجمة تلقائية للحالة
+الدفع (patients:payment أو payments:consultation) إذا لزم
+انتظار رد الطبيب → تظهر في (patients:case_detail) ثم (patients:my_responses)
+تقييم الطبيب (patients:rate_doctor)
+استلام إشعارات (patients:notifications)
+الطبيب:
+
+التسجيل كطبيب (accounts:doctor_register أو enhanced_doctor_register)
+انتظار الموافقة (doctors:pending)
+بعد الموافقة → لوحة الطبيب (doctors:dashboard)
+استلام حالات موجهة له → عرضها (doctors:case_detail) → الرد (doctors:respond_case)
+متابعة ردوده (doctors:my_responses) وتقييماته (doctors:my_ratings)
+إرسال إشعارات لمرضاه (doctors:send_notification) واستلام إشعارات (doctors:notifications)
+الاشتراك ببوابات الدفع ومتابعة الأرباح والسحوبات (payments/doctor/*)
+الإدارة:
+
+إدارة المستخدمين والأطباء والحالات والردود والإشعارات والإحصائيات من صفحات admin_panel.
+9) ملاحظات خاصة باللغات والواجهة
+النظام يدعم العربية والإنجليزية مع RTL للعربية.
+اختيار القالب الرئيسي للصفحة الرئيسية يتبدل حسب اللغة.
+يوجد محولات ترجمة فورية لواجهة المستخدم وAPI.
+تم ضبط صفحة enhanced_doctor_register لتطابق تصميم doctor_register مع الحفاظ على التحقق الفوري للأسعار.
+إذا رغبت، يمكنني توليد خريطة روابط HTML (sitemap) أو مخطط تدفق رسومي (Mermaid) يوضّح العلاقات بين الصفحات خطوة بخطوة لكل دور. كما أستطيع إضافة روابط تنقل واضحة بين الصفحات في الواجهات لتسهيل الانتقال ضمن التدفقات.
+
+خريطة روابط ومخططات تدفق للمشروع
+1) خريطة روابط HTML (Sitemap)
+ملاحظة: الأقواس <> تعني معلمات ديناميكية في الرابط.
+
+Core
+
+/ → الصفحة الرئيسية (يعتمد القالب على اللغة: home_enhanced.html أو home_en.html)
+/about/ → حول المنصة
+/contact/ → اتصل بنا
+/faq/ → الأسئلة الشائعة
+/set-language/ → تبديل اللغة (يدعم POST/GET)
+Accounts
+
+/accounts/register/ → تسجيل مستخدم (مريض بشكل افتراضي)
+/accounts/login/ → تسجيل الدخول
+/accounts/logout/ → تسجيل الخروج
+/accounts/profile/ → الملف الشخصي
+/accounts/doctor-register/ → تسجيل الطبيب (تصميم أساسي)
+/accounts/enhanced-doctor-register/ → تسجيل الطبيب (نسخة محسنة—مطابقة لتصميم doctor_register + تحقق فوري للأسعار)
+Patients
+
+/patients/dashboard/ → لوحة المريض
+/patients/new-case/ → إنشاء حالة جديدة
+/patients/select-doctor/<case_id>/ → اختيار الطبيب
+/patients/confirm-case/<case_id>/<doctor_id>/ → تأكيد إرسال الحالة للطبيب (مع ترجمة)
+/patients/case-detail/<case_id>/ → تفاصيل الحالة
+/patients/rate-doctor/<case_id>/ → تقييم الطبيب
+/patients/my-responses/ → ردودي
+/patients/notifications/ → إشعارات المريض
+/patients/payment/<case_id>/<doctor_id>/ → صفحة الدفع ضمن تدفق المريض
+APIs:
+/patients/api/translate/
+/patients/api/medical-suggestions/
+Doctors
+
+/doctors/pending/ → في انتظار الموافقة
+/doctors/dashboard/ → لوحة الطبيب
+/doctors/case/<case_id>/ → تفاصيل حالة للطبيب
+/doctors/respond/<case_id>/ → إرسال الرد
+/doctors/my-responses/ → ردودي
+/doctors/my-ratings/ → تقييماتي + إحصائيات
+/doctors/send-notification/ → إرسال إشعارات لمرضى تعامل معهم
+/doctors/notifications/ → إشعارات الطبيب
+Payments
+
+/payments/methods/ → إدارة طرق الدفع
+/payments/methods/delete/<method_id>/ → حذف طريقة دفع
+/payments/consultation/<case_id>/ → دفع الاستشارة (Stripe/PayPal)
+/payments/success/<payment_id>/ → نجاح الدفع
+/payments/cancel/ → إلغاء الدفع
+/payments/doctor/subscription/ → اشتراك الطبيب في بوابات الدفع
+/payments/doctor/earnings/ → أرباح الطبيب
+/payments/doctor/withdrawal/ → طلب سحب
+/payments/history/ → سجل المدفوعات
+/payments/stripe/webhook/ → Webhook لمعالجة Stripe
+2) مخططات تدفق Mermaid
+أ) تدفّق المريض
+Copy
+flowchart TD
+  A[Home /] -->|تسجيل| B[/accounts/register/]
+  A -->|دخول| C[/accounts/login/]
+  C -->|مريض| D[/patients/dashboard/]
+  D --> E[/patients/new-case/]
+  E -->|نجاح| F[/patients/select-doctor/<case_id>/]
+  F --> G[/patients/confirm-case/<case_id>/<doctor_id>/]
+  G --> H{نوع الاستشارة؟}
+  H -->|عادية/طوارئ/متابعة| I[/patients/payment/<case_id>/<doctor_id>/]
+  I -->|نجاح| J[/patients/case-detail/<case_id>/]
+  J --> K[/patients/my-responses/]
+  J --> L[/patients/rate-doctor/<case_id>/]
+  D --> M[/patients/notifications/]
+ب) تدفّق الطبيب
+flowchart TD
+  A[Home /] --> B[/accounts/doctor-register/]
+  A --> C[/accounts/enhanced-doctor-register/]
+  B --> D[تقديم طلب]
+  C --> D
+  D --> E[/doctors/pending/]
+  E -->|الموافقة| F[/doctors/dashboard/]
+  F --> G[/doctors/case/<case_id>/]
+  G --> H[/doctors/respond/<case_id>/]
+  F --> I[/doctors/my-responses/]
+  F --> J[/doctors/my-ratings/]
+  F --> K[/doctors/send-notification/]
+  F --> L[/doctors/notifications/]
+  F --> M[/payments/doctor/subscription/]
+  F --> N[/payments/doctor/earnings/]
+  N --> O[/payments/doctor/withdrawal/]
+ج) تدفّق المدفوعات (عام)
+flowchart LR
+  A[/patients/confirm-case/<case_id>/<doctor_id>/] --> B[/patients/payment/<case_id>/<doctor_id>/]
+  B --> C[/payments/consultation/<case_id>/]
+  C -->|Stripe Intent| D[/payments/stripe/webhook/]
+  D --> E[تحديث Payment + أرباح الطبيب]
+  C -->|نجاح| F[/payments/success/<payment_id>/]
+  C -->|إلغاء| G[/payments/cancel/]
+
+  subgraph إدارة طرق الدفع
+    H[/payments/methods/]
+    H --> I[/payments/methods/delete/<method_id>/]
+  end
+
+  subgraph أرباح الطبيب
+    J[/payments/doctor/subscription/]
+    K[/payments/doctor/earnings/]
+    L[/payments/doctor/withdrawal/]
+  end
+
+  M[/payments/history/]:::muted
+
+  classDef muted fill:#f8f9fa,stroke:#ddd,color:#666;
+3) ربط الصفحات بالقوالب (مختصر)
+Accounts
+register.html, login.html, profile.html, doctor_register.html, enhanced_doctor_register.html
+Patients
+dashboard.html, new_case.html, select_doctor.html, confirm_case.html, case_detail.html, rate_doctor.html, my_responses.html, notifications.html, payment.html
+Doctors
+pending.html, dashboard.html, case_detail.html, respond_case.html, my_responses.html, my_ratings.html, send_notification.html, notifications.html
+Payments
+payment_methods.html, consultation_payment.html, payment_success.html, payment_cancel.html, doctor_subscription.html, doctor_earnings.html, withdrawal_request.html, payment_history.html
+Core
+home_enhanced.html, home_en.html, about.html, contact.html, faq.html
+هل تريدني:
+
+تصدير هذه المخططات كصور SVG وملف HTML Sitemap جاهز للعرض؟
+إضافة روابط فعلية في القوائم الجانبية/العليا لتسهيل التنقل حسب ال
+أبسط طريقة للتشغيل
+إذا كانت الحزم مثبتة لديك سابقًا:
+من مجلد المشروع: c:\Users\asus\Desktop\ge
+شغّل:
+python manage.py runserver
+افتح المتصفح: http://127.0.0.1:8000/
+ملاحظة: يوجد ملف db.sqlite3 جاهز، وغالبًا ستجد مستخدمين تجريبيين (حسب ما هو ظاهر في run.bat):
+
+Admin: nory / 123
+Patient: patient1 / password123
+Doctor: doctor1 / password123
+إذا ظهرت أخطاء لعدم تثبيت الحزم، استخدم الطريقة المختصرة أدناه.
+
+الطريقة المختصرة الموصى بها أول مرة
+نفّذ مرة واحدة فقط:
+تثبيت الحزم:
+pip install -r requirements.txt
+تطبيق الترقيات (احتياطيًا):
+python manage.py migrate
+تشغيل السيرفر:
+python manage.py runserver
+التشغيل بزرّين فقط (سكربتات جاهزة)
+للإعداد الأولي الكامل: انقر setup.bat
+يثبّت الحزم + يطبّق الترقيات + ينشئ superuser + يضيف بيانات تجريبية
+للتشغيل اليومي: انقر run.bat
+يفتح المتصفح ويشغّل السيرفر
+ما هو اختياري وليس مطلوبًا للتشغيل
+إنشاء superuser: فقط إذا تريد دخول Django Admin في /admin/
+إعداد Stripe/PayPal وملف .env: فقط إذا تريد اختبارات دفع حقيقية
+أوامر compilemessages/الترجمة: فقط إذا عدّلت النصوص وتريد تحديث ملفات الترجمة
+التحويل إلى PostgreSQL: للبيئة الإنتاجية فقط، SQLite تعمل محليًا بدون إعدادات إضافية
+باختصار:
+
+للتجربة السريعة: pip install -r requirements.txt ثم python manage.py runserver.
+لاحقًا يكفي تشغيل run.bat فقط. أما بقية الخطوات فهي لتحسين التجربة أو تفعيل ميزات إضافية.دور (مريض/طبيب/أدمن)؟
+لي ذلحين ماهي الصفحة المسولة عن الترجمة
+
+Code agent
+Operation ID: d235cab7-069d-4984-90cf-bf50c3353656
+بناءً على فحص الكود، إليك الصفحات المسؤولة عن الترجمة:
+
+1. الصفحة الرئيسية للترجمة:
+templates/patients/new_case.html - هذه هي الصفحة التي تحتوي على أداة الترجمة الفورية
+
+2. ملف JavaScript المسؤول عن الترجمة:
+static/js/instant-translator.js - يحتوي على كل منطق الترجمة
+
+3. API endpoint للترجمة:
+patients/views.py - الكلاس InstantTranslationView (السطر 436)
+
+4. خدمة الترجمة الأساسية:
+core/translation_service.py - يحتوي على منطق الترجمة الفعلي
