@@ -261,7 +261,13 @@ CORS_ALLOWED_ORIGINS = config(
 
 CSRF_TRUSTED_ORIGINS = config(
     'CSRF_TRUSTED_ORIGINS',
-    default='http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000' if DEBUG else '',
+    default=(
+        'http://localhost:3000,http://127.0.0.1:3000,'
+        'http://localhost:8000,http://127.0.0.1:8000,'
+        'https://*.loca.lt'
+        if DEBUG
+        else ''
+    ),
     cast=lambda value: [origin.strip() for origin in value.split(',') if origin.strip()]
 )
 
@@ -294,7 +300,6 @@ CORS_ALLOW_METHODS = [
 
 # Additional CORS settings for mobile apps
 CORS_PREFLIGHT_MAX_AGE = 86400
-
 
 
 
