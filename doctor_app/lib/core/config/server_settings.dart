@@ -14,8 +14,8 @@ class ServerSettings {
 
   // القيم الافتراضية
   static const String _defaultServerUrl = 'http://127.0.0.1:8000';
-  static const String _androidEmulatorUrl = 'http://10.0.2.2:8000';
-  static const String _productionUrl = 'https://api.medical-platform.com';
+  static const String _androidEmulatorUrl = 'http://192.168.0.194:8000';
+  static const String _productionUrl = String.fromEnvironment('API_BASE_URL');
 
   // الحصول على عنوان الخادم الحالي
   static Future<String> getCurrentServerUrl() async {
@@ -43,6 +43,9 @@ class ServerSettings {
   // الحصول على العنوان الافتراضي حسب المنصة
   static String getDefaultServerUrl() {
     try {
+      if (_productionUrl.isNotEmpty) {
+        return _productionUrl;
+      }
       if (Platform.isAndroid || Platform.isIOS) {
         // على الجهاز الحقيقي: استخدام IP الكمبيوتر المحلي
         // على المحاكي: استخدام 10.0.2.2

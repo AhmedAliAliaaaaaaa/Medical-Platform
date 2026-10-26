@@ -14,3 +14,8 @@ stripe==12.4.0
 requests==2.32.4
 paypalrestsdk==1.13.3
 deep-translator==1.11.4
+dj-database-url==2.2.0
+whitenoise==6.7.0
+gunicorn==23.0.0
+daphne==4.1.2
+channels-redis==4.2.0
