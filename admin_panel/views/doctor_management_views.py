@@ -103,9 +103,8 @@ def get_doctor_password(request, doctor_id):
         # Since Django stores hashed passwords, we can't retrieve the original
         # Instead, we'll return a message indicating this
         return JsonResponse({
-            'success': True,
-            'password': 'كلمة المرور مشفرة - لا يمكن عرضها',
-            'message': _('كلمة المرور مشفرة ولا يمكن عرضها. يمكنك إعادة تعيين كلمة مرور جديدة.')
+            'success': False,
+            'message': _('كلمة المرور مشفرة ولا يمكن عرضها. استخدم إعادة تعيين كلمة المرور لإنشاء كلمة مرور جديدة.')
         })
         
     except Exception as e:

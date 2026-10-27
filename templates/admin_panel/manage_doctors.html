@@ -386,8 +386,8 @@ function togglePassword(doctorId) {
     const eyeIcon = document.getElementById(`eye_${doctorId}`);
     
     if (passwordField.type === 'password') {
-        // Show password - fetch real password from server
-        fetch(`/admin/doctors/${doctorId}/get-password-new/`, {
+        // Django stores passwords as hashes, so the original password cannot be displayed.
+        fetch(`/admin-panel/doctors/${doctorId}/get-password-new/`, {
             method: 'GET',
             headers: {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
@@ -402,12 +402,12 @@ function togglePassword(doctorId) {
                 eyeIcon.classList.remove('fa-eye');
                 eyeIcon.classList.add('fa-eye-slash');
             } else {
-                alert('{% ar "حدث خطأ أثناء جلب كلمة المرور" %}');
+                alert(data.message || data.error || '{% ar "لا يمكن عرض كلمة المرور الأصلية. استخدم إعادة تعيين كلمة المرور لإنشاء كلمة مرور جديدة." %}');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('{% ar "حدث خطأ أثناء جلب كلمة المرور" %}');
+            alert(error.message || '{% ar "حدث خطأ أثناء جلب كلمة المرور" %}');
         });
     } else {
         // Hide password
