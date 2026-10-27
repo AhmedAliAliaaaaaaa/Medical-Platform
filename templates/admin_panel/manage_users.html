@@ -342,7 +342,7 @@
 
                                 <!-- User Details Modal -->
                                 <div class="modal fade" id="userModal{{ user.id }}" tabindex="-1">
-                                    <div class="modal-dialog modal-xl">
+                                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
                                         <div class="modal-content">
                                             <div class="modal-header bg-gradient-primary text-white">
                                                 <h5 class="modal-title">
@@ -810,6 +810,21 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Keep Bootstrap modals out of the table body. Browsers may reparent invalid
+    // table children, which can leave the modal backdrop blocking the page.
+    document.querySelectorAll('.modal[id^="userModal"]').forEach(function(modal) {
+        if (modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+
+        modal.addEventListener('hidden.bs.modal', function() {
+            document.body.classList.remove('modal-open');
+            document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+                backdrop.remove();
+            });
+        });
+    });
+
     // تحسين تجربة المستخدم
     const cards = document.querySelectorAll('.card');
     cards.forEach(card => {
