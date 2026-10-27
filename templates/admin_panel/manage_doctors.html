@@ -423,7 +423,7 @@ function resetPassword(doctorId) {
     const newPassword = prompt('{% ar "أدخل كلمة المرور الجديدة:" %}');
     if (newPassword && newPassword.length >= 6) {
         if (confirm('{% ar "هل أنت متأكد من تغيير كلمة المرور؟" %}')) {
-            fetch(`/admin/doctors/${doctorId}/reset-password/`, {
+            fetch(`/admin-panel/doctors/${doctorId}/reset-password/`, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
@@ -431,7 +431,13 @@ function resetPassword(doctorId) {
                 },
                 body: JSON.stringify({password: newPassword})
             })
-            .then(response => response.json())
+            .then(async response => {
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+                return data;
+            })
             .then(data => {
                 if (data.success) {
                     alert('{% ar "تم تغيير كلمة المرور بنجاح" %}');
@@ -443,12 +449,12 @@ function resetPassword(doctorId) {
                     eyeIcon.classList.remove('fa-eye-slash');
                     eyeIcon.classList.add('fa-eye');
                 } else {
-                    alert('{% ar "حدث خطأ أثناء تغيير كلمة المرور" %}');
+                    alert(data.error || '{% ar "حدث خطأ أثناء تغيير كلمة المرور" %}');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('{% ar "حدث خطأ أثناء تغيير كلمة المرور" %}');
+                alert(error.message || '{% ar "حدث خطأ أثناء تغيير كلمة المرور" %}');
             });
         }
     } else if (newPassword !== null) {
