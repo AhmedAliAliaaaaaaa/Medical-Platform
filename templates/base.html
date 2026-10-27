@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% trans "المنصة الطبية" %}{% endblock %}</title>
+    <title>{% block title %}{% trans "المنصة التنسيقية" %}{% endblock %}</title>
     
     <!-- Bootstrap CSS -->
     {% if LANGUAGE_CODE == 'ar' %}
@@ -22,12 +22,10 @@
     <!-- Design System CSS -->
     <link href="{% static 'css/design-system.css' %}" rel="stylesheet">
     <link href="{% static 'css/components.css' %}" rel="stylesheet">
-    <link href="{% static 'css/enhanced-forms.css' %}" rel="stylesheet">
     
     <!-- Premium Typography & Enhanced Colors -->
     <link href="{% static 'css/premium-typography.css' %}" rel="stylesheet">
     <link href="{% static 'css/enhanced-colors.css' %}" rel="stylesheet">
-    <link href="{% static 'css/global-enhanced-colors.css' %}" rel="stylesheet">
     
     <!-- Premium Layout Enhancements -->
     <link href="{% static 'css/premium-navbar.css' %}" rel="stylesheet">
@@ -202,7 +200,7 @@
                     <div class="space-y-4">
                         <div class="flex items-center gap-3">
                             <i class="fas fa-phone text-primary-400"></i>
-                            <span>+966 50 123 4567</span>
+                            <span>+967 777744455 </span>
                         </div>
                         <div class="flex items-center gap-3">
                             <i class="fas fa-envelope text-primary-400"></i>
@@ -210,7 +208,7 @@
                         </div>
                         <div class="flex items-center gap-3">
                             <i class="fas fa-map-marker-alt text-primary-400"></i>
-                            <span>{% trans "الرياض، المملكة العربية السعودية" %}</span>
+                            <span>{% trans "صنعاء، اليمن" %}</span>
                         </div>
                         <div class="flex items-center gap-3">
                             <i class="fas fa-clock text-primary-400"></i>
@@ -222,7 +220,7 @@
             
             <div class="footer-bottom">
                 <div class="footer-copyright">
-                    <p>&copy; 2024 {% trans "المنصة الطبية" %}. {% trans "جميع الحقوق محفوظة" %}.</p>
+                    <p>&copy; 2026 {% trans "المنصة الطبية" %}. {% trans "جميع الحقوق محفوظة" %}.</p>
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="text-xs bg-success-100 text-success-800 px-3 py-1 rounded-full">
@@ -249,13 +247,6 @@
     
     <!-- Enhanced Language Switcher disabled for main site -->
     <!-- <script src="{% static 'js/enhanced-language-switcher.js' %}"></script> -->
-    <!-- Universal Translator - الحل الجذري الشامل -->
-    <script src="{% static 'js/universal-translator.js' %}"></script>
-    <!-- Auto Text Extractor - استخراج تلقائي للنصوص -->
-    <script src="{% static 'js/auto-text-extractor.js' %}"></script>
-    <!-- Dynamic Content Translator - ترجمة المحتوى الديناميكي -->
-    <script src="{% static 'js/dynamic-content-translator.js' %}"></script>
-    
     {% block extra_js %}{% endblock %}
 </body>
 </html>
