@@ -168,10 +168,17 @@
                                                 </span>
                                             </div>
                                             <div class="mb-3">
-                                                <strong>{% trans "الرسالة" %}:</strong>
-                                                <div class="bg-light p-3 rounded mt-2">
-                                                    {{ notification.message|linebreaks }}
-                                                </div>
+                                                {% if notification.notification_type == 'doctor_message' %}
+                                                    <strong><i class="fas fa-envelope-open-text text-primary me-1"></i>{% trans "نص الرسالة الواردة من الطبيب" %}:</strong>
+                                                    <div class="bg-primary-subtle border border-primary-subtle p-3 rounded mt-2">
+                                                        {{ notification.message|linebreaks }}
+                                                    </div>
+                                                {% else %}
+                                                    <strong>{% trans "الرسالة" %}:</strong>
+                                                    <div class="bg-light p-3 rounded mt-2">
+                                                        {{ notification.message|linebreaks }}
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-6">
@@ -253,7 +260,7 @@
                                         </div>
                                         <div class="modal-footer">
                                             {% if notification.notification_type == 'patient_complaint' or notification.notification_type == 'doctor_complaint' or notification.notification_type == 'doctor_message' %}
-                                                {% if notification.related_patient or notification.related_doctor %}
+                                                {% if notification.related_patient or notification.related_doctor or notification.created_by %}
                                                     <form method="post" action="{% url 'admin_panel:reply_to_complaint' notification.id %}" class="d-flex flex-grow-1 gap-2">
                                                         {% csrf_token %}
                                                         <input type="text" name="reply" class="form-control" placeholder="{% if notification.notification_type == 'doctor_message' %}{% trans 'اكتب ردك للطبيب...' %}{% else %}{% trans 'اكتب رد الإدارة...' %}{% endif %}" required maxlength="2000">

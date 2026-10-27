@@ -316,6 +316,17 @@ class ReplyToComplaintView(AdminRequiredMixin, TemplateView):
                 sender_admin=request.user,
             )
             messages.success(request, _('تم إرسال الرد إلى الطبيب بنجاح.'))
+        elif notification.notification_type == 'doctor_message' and notification.created_by:
+            from doctors.models import Doctor, DoctorNotification
+            doctor = get_object_or_404(Doctor, user=notification.created_by)
+            DoctorNotification.objects.create(
+                doctor=doctor,
+                title=f'رد الإدارة: {notification.title}',
+                message=reply,
+                notification_type='admin',
+                sender_admin=request.user,
+            )
+            messages.success(request, _('تم إرسال الرد إلى الطبيب بنجاح.'))
         else:
             messages.error(request, _('لا يوجد صاحب شكوى مرتبط بهذا الإشعار.'))
         return redirect('admin_panel:notifications')
