@@ -85,11 +85,16 @@
                                         <p class="mb-2 text-muted">{{ notification.message|truncatechars:100 }}</p>
                                         <small class="text-muted">
                                             <i class="fas fa-user me-1"></i>
-                                            {% trans "بواسطة" %}: {{ notification.created_by.first_name }} {{ notification.created_by.last_name }}
-                                            {% if notification.related_patient %}
-                                                <span class="ms-3"><i class="fas fa-user-injured me-1"></i>{% trans "المريض" %}: {{ notification.related_patient.user.get_full_name }}</span>
-                                            {% elif notification.related_doctor %}
-                                                <span class="ms-3"><i class="fas fa-user-md me-1"></i>{% trans "الطبيب" %}: {{ notification.related_doctor.user.get_full_name }}</span>
+                                            {% if notification.notification_type == 'patient_complaint' or notification.notification_type == 'doctor_complaint' %}
+                                                <strong>{% trans "مرسل الشكوى" %}:</strong>
+                                            {% else %}
+                                                {% trans "بواسطة" %}:
+                                            {% endif %}
+                                            {% if notification.created_by %}
+                                                {{ notification.created_by.first_name }} {{ notification.created_by.last_name }}
+                                                <span dir="ltr">(@{{ notification.created_by.username }})</span>
+                                            {% else %}
+                                                {% trans "مستخدم غير معروف" %}
                                             {% endif %}
                                             <i class="fas fa-clock me-1 ms-3"></i>
                                             {{ notification.created_at|date:"d/m/Y H:i" }}
@@ -145,23 +150,38 @@
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <strong>{% trans "أرسل بواسطة" %}:</strong>
-                                                    <p>{{ notification.created_by.first_name }} {{ notification.created_by.last_name }}</p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <strong>{% trans "صاحب الشكوى" %}:</strong>
-                                                    <p>
-                                                        {% if notification.related_patient %}
-                                                            <i class="fas fa-user-injured text-info me-1"></i>
-                                                            {{ notification.related_patient.user.first_name }} {{ notification.related_patient.user.last_name }}
-                                                        {% elif notification.related_doctor %}
-                                                            <i class="fas fa-user-md text-success me-1"></i>
-                                                            {{ notification.related_doctor.user.first_name }} {{ notification.related_doctor.user.last_name }}
+                                                    <strong>
+                                                        {% if notification.notification_type == 'patient_complaint' or notification.notification_type == 'doctor_complaint' %}
+                                                            {% trans "مرسل الشكوى" %}
                                                         {% else %}
-                                                            {% trans "غير محدد" %}
+                                                            {% trans "أرسل بواسطة" %}
+                                                        {% endif %}
+                                                    :</strong>
+                                                    <p>
+                                                        {% if notification.created_by %}
+                                                            <i class="fas fa-user text-primary me-1"></i>
+                                                            {{ notification.created_by.first_name }} {{ notification.created_by.last_name }}
+                                                            <br>
+                                                            <small class="text-muted" dir="ltr">@{{ notification.created_by.username }}</small>
+                                                        {% else %}
+                                                            {% trans "مستخدم غير معروف" %}
                                                         {% endif %}
                                                     </p>
                                                 </div>
+                                                {% if notification.related_patient or notification.related_doctor %}
+                                                    <div class="col-md-6">
+                                                        <strong>{% trans "الملف المرتبط" %}:</strong>
+                                                        <p>
+                                                            {% if notification.related_patient %}
+                                                                <i class="fas fa-user-injured text-info me-1"></i>
+                                                                {% trans "مريض" %}
+                                                            {% else %}
+                                                                <i class="fas fa-user-md text-success me-1"></i>
+                                                                {% trans "طبيب" %}
+                                                            {% endif %}
+                                                        </p>
+                                                    </div>
+                                                {% endif %}
                                                 <div class="col-md-6">
                                                     <strong>{% trans "تاريخ الإرسال" %}:</strong>
                                                     <p>{{ notification.created_at|date:"d/m/Y H:i" }}</p>

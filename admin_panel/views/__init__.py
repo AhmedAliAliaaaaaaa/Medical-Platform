@@ -270,7 +270,11 @@ class NotificationsView(AdminRequiredMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['notifications'] = AdminNotification.objects.order_by('-created_at')
+        context['notifications'] = AdminNotification.objects.select_related(
+            'created_by',
+            'related_patient__user',
+            'related_doctor__user',
+        ).order_by('-created_at')
         return context
 
 class ReplyToComplaintView(AdminRequiredMixin, TemplateView):
