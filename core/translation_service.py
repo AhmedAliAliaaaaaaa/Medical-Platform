@@ -9,6 +9,7 @@ from django.core.cache import cache
 import logging
 import hashlib
 import re
+import requests
 from typing import Dict, Optional, List
 
 logger = logging.getLogger(__name__)
@@ -220,6 +221,14 @@ class TranslationService:
             
         except Exception as e:
             logger.error(f"Translation error: {e}")
+            fallback_result = self.translate_text_mymemory(
+                text,
+                target_lang=target_lang,
+                source_lang=source_lang,
+            )
+            if fallback_result['success']:
+                return fallback_result
+
             return {
                 'original_text': text,
                 'translated_text': text,
@@ -228,7 +237,67 @@ class TranslationService:
                 'success': False,
                 'medical_terms_found': 0,
                 'confidence': 0.0,
-                'error': str(e)
+                'error': f'Google Translate failed: {e}; '
+                f'MyMemory failed: {fallback_result.get("error", "unknown error")}',
+            }
+
+    def translate_text_mymemory(
+        self,
+        text: str,
+        target_lang: str = 'en',
+        source_lang: str = 'auto',
+    ) -> Dict:
+        """Fallback translation provider used when Google is rate-limited."""
+        try:
+            if source_lang == 'auto':
+                source_lang = self.detect_language_enhanced(text)
+
+            response = requests.get(
+                'https://api.mymemory.translated.net/get',
+                params={
+                    'q': text,
+                    'langpair': f'{source_lang}|{target_lang}',
+                },
+                timeout=10,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            translated_text = payload.get('responseData', {}).get('translatedText')
+
+            if not isinstance(translated_text, str) or not translated_text.strip():
+                return {
+                    'original_text': text,
+                    'translated_text': text,
+                    'source_lang': source_lang,
+                    'target_lang': target_lang,
+                    'success': False,
+                    'error': 'Fallback provider returned no translation',
+                }
+
+            result = {
+                'original_text': text,
+                'translated_text': translated_text,
+                'source_lang': source_lang,
+                'target_lang': target_lang,
+                'success': True,
+                'medical_terms_found': 0,
+                'confidence': 0.7,
+            }
+            cache.set(
+                self.get_cache_key(text, source_lang, target_lang),
+                result,
+                self.cache_timeout,
+            )
+            return result
+        except (requests.RequestException, ValueError, TypeError, KeyError) as error:
+            logger.error(f'MyMemory translation error: {error}')
+            return {
+                'original_text': text,
+                'translated_text': text,
+                'source_lang': source_lang,
+                'target_lang': target_lang,
+                'success': False,
+                'error': str(error),
             }
     
     def translate_text(self, text: str, target_lang: str = 'en', source_lang: str = 'auto', use_medical_dict: bool = True) -> Dict:

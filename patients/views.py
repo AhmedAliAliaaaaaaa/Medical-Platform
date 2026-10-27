@@ -457,15 +457,17 @@ class InstantTranslationView(TemplateView):
                 use_medical_dict=True
             )
             
+            response_status = 200 if translation_result.get('success') else 503
             return JsonResponse({
-                'success': True,
+                'success': translation_result.get('success', False),
                 'original_text': translation_result['original_text'],
                 'translated_text': translation_result['translated_text'],
                 'source_language': translation_result['source_lang'],
                 'target_language': translation_result['target_lang'],
                 'confidence': translation_result.get('confidence', 0.0),
-                'medical_terms_found': translation_result.get('medical_terms_found', 0)
-            })
+                'medical_terms_found': translation_result.get('medical_terms_found', 0),
+                'error': translation_result.get('error'),
+            }, status=response_status)
             
         except Exception as e:
             return JsonResponse({
