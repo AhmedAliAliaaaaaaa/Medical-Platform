@@ -273,6 +273,43 @@ class NotificationsView(AdminRequiredMixin, TemplateView):
         context['notifications'] = AdminNotification.objects.order_by('-created_at')
         return context
 
+class ReplyToComplaintView(AdminRequiredMixin, TemplateView):
+    def post(self, request, *args, **kwargs):
+        notification = get_object_or_404(
+            AdminNotification.objects.select_related(
+                'related_patient__user', 'related_doctor__user'
+            ),
+            id=kwargs['notification_id'],
+        )
+        reply = request.POST.get('reply', '').strip()
+        if notification.notification_type not in ('patient_complaint', 'doctor_complaint'):
+            messages.error(request, _('لا يمكن الرد على هذا الإشعار.'))
+        elif not reply:
+            messages.error(request, _('يرجى كتابة نص الرد.'))
+        elif notification.related_patient:
+            from patients.models import PatientNotification
+            PatientNotification.objects.create(
+                patient=notification.related_patient,
+                title=f'رد الإدارة: {notification.title}',
+                message=reply,
+                notification_type='admin',
+                sender_admin=request.user,
+            )
+            messages.success(request, _('تم إرسال الرد إلى المريض بنجاح.'))
+        elif notification.related_doctor:
+            from doctors.models import DoctorNotification
+            DoctorNotification.objects.create(
+                doctor=notification.related_doctor,
+                title=f'رد الإدارة: {notification.title}',
+                message=reply,
+                notification_type='admin',
+                sender_admin=request.user,
+            )
+            messages.success(request, _('تم إرسال الرد إلى الطبيب بنجاح.'))
+        else:
+            messages.error(request, _('لا يوجد صاحب شكوى مرتبط بهذا الإشعار.'))
+        return redirect('admin_panel:notifications')
+
 class SendNotificationView(AdminRequiredMixin, TemplateView):
     """إرسال إشعار جديد للمستخدمين"""
     template_name = 'admin_panel/send_notification.html'

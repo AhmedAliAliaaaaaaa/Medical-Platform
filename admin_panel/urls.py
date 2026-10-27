@@ -45,6 +45,7 @@ urlpatterns = [
     path('users/<int:pk>/edit/', views.UpdateUserView.as_view(), name='update_user'),
     path('users/<int:pk>/delete/', views.DeleteUserView.as_view(), name='delete_user'),
     path('notifications/', views.NotificationsView.as_view(), name='notifications'),
+    path('notifications/<int:notification_id>/reply/', views.ReplyToComplaintView.as_view(), name='reply_to_complaint'),
     path('send-notification/', views.SendNotificationView.as_view(), name='send_notification'),
     path('statistics/', views.StatisticsView.as_view(), name='statistics'),
     path('export-reports/', views.ExportReportsView.as_view(), name='export_reports'),
