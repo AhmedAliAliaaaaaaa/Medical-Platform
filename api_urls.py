@@ -17,6 +17,7 @@ from accounts.api_views import (
 from doctors.api_views import (
     available_doctors,
 )
+from core.views import api_translate
 
 router = DefaultRouter()
 
@@ -45,6 +46,9 @@ urlpatterns = [
     
     # Available doctors for patients
     path('doctors/available/', available_doctors, name='available_doctors'),
+
+    # Translation API used by the Flutter application
+    path('utils/translate/', api_translate, name='translate'),
     
     # Patient APIs
     path('patient/', include('patients.api_urls')),
