@@ -288,7 +288,11 @@ class ReplyToComplaintView(AdminRequiredMixin, TemplateView):
             id=kwargs['notification_id'],
         )
         reply = request.POST.get('reply', '').strip()
-        if notification.notification_type not in ('patient_complaint', 'doctor_complaint'):
+        if notification.notification_type not in (
+            'patient_complaint',
+            'doctor_complaint',
+            'doctor_message',
+        ):
             messages.error(request, _('لا يمكن الرد على هذا الإشعار.'))
         elif not reply:
             messages.error(request, _('يرجى كتابة نص الرد.'))

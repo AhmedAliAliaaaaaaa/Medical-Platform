@@ -281,6 +281,7 @@ def respond_to_case(request, case_id):
             message=f'رد جديد من د. {doctor.user.get_full_name()} يحتاج للمراجعة',
             notification_type='doctor_response',
             related_doctor=doctor,
+            related_patient=case.patient,
             related_case=case,
             related_response=response,
             created_by=request.user
@@ -477,6 +478,7 @@ def send_notification(request):
                 title=f'رسالة من د. {doctor.user.get_full_name()}',
                 message=message,
                 notification_type='doctor_message',
+                related_doctor=doctor,
                 created_by=request.user
             )
         

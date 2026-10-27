@@ -101,8 +101,13 @@
                                                 {% endif %}
                                             {% elif notification.notification_type == 'doctor_message' %}
                                                 <strong>{% trans "الطبيب المرسل" %}:</strong>
-                                                {{ notification.created_by.first_name }} {{ notification.created_by.last_name }}
-                                                <span dir="ltr">(@{{ notification.created_by.username }})</span>
+                                                    {% if notification.related_doctor %}
+                                                        {{ notification.related_doctor.user.first_name }} {{ notification.related_doctor.user.last_name }}
+                                                        <span dir="ltr">(@{{ notification.related_doctor.user.username }})</span>
+                                                    {% else %}
+                                                        {{ notification.created_by.first_name }} {{ notification.created_by.last_name }}
+                                                        <span dir="ltr">(@{{ notification.created_by.username }})</span>
+                                                    {% endif %}
                                             {% elif notification.notification_type == 'patient_complaint' or notification.notification_type == 'doctor_complaint' %}
                                                 <strong>{% trans "مرسل الشكوى" %}:</strong>
                                                 {{ notification.created_by.first_name }} {{ notification.created_by.last_name }}
@@ -192,6 +197,10 @@
                                                             {% else %}
                                                                 {% trans "غير محدد" %}
                                                             {% endif %}
+                                                        {% elif notification.notification_type == 'doctor_message' and notification.related_doctor %}
+                                                            <i class="fas fa-user-md text-success me-1"></i>
+                                                            {{ notification.related_doctor.user.first_name }} {{ notification.related_doctor.user.last_name }}
+                                                            <br><small class="text-muted" dir="ltr">@{{ notification.related_doctor.user.username }}</small>
                                                         {% elif notification.created_by %}
                                                             <i class="fas fa-user text-primary me-1"></i>
                                                             {{ notification.created_by.first_name }} {{ notification.created_by.last_name }}
@@ -213,6 +222,25 @@
                                                             {% endif %}
                                                             {% if notification.related_response %}
                                                                 <br><i class="fas fa-reply text-primary me-1"></i>{% trans "رد طبي مرتبط" %}
+                                                                <br><i class="fas fa-calendar-check text-success me-1"></i>{% trans "تاريخ الرد" %}: {{ notification.related_response.created_at|date:"d/m/Y H:i" }}
+                                                            {% endif %}
+                                                            {% if notification.related_patient and notification.related_case %}
+                                                                <br><i class="fas fa-user-injured text-info me-1"></i>{% trans "المريض" %}: {{ notification.related_patient.user.first_name }} {{ notification.related_patient.user.last_name }}
+                                                            {% endif %}
+                                                            {% if notification.related_case %}
+                                                                <br><i class="fas fa-align-left text-secondary me-1"></i>{% trans "وصف الحالة" %}: {{ notification.related_case.description|truncatechars:180 }}
+                                                                <br><i class="fas fa-calendar text-secondary me-1"></i>{% trans "تاريخ الحالة" %}: {{ notification.related_case.created_at|date:"d/m/Y H:i" }}
+                                                                <br><i class="fas fa-flag text-danger me-1"></i>{% trans "أولوية الحالة" %}: {{ notification.related_case.get_priority_display }}
+                                                                <br><i class="fas fa-info-circle text-secondary me-1"></i>{% trans "حالة المعالجة" %}: {{ notification.related_case.get_status_display }}
+                                                                {% if notification.related_case.symptoms %}
+                                                                    <br><i class="fas fa-notes-medical text-warning me-1"></i>{% trans "الأعراض" %}: {{ notification.related_case.symptoms|truncatechars:180 }}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                            {% if notification.related_response %}
+                                                                <br><i class="fas fa-comment-medical text-primary me-1"></i>{% trans "محتوى رد الطبيب" %}: {{ notification.related_response.content|truncatechars:180 }}
+                                                                {% if notification.related_response.recommendations %}
+                                                                    <br><i class="fas fa-prescription-bottle-medical text-success me-1"></i>{% trans "التوصيات" %}: {{ notification.related_response.recommendations|truncatechars:180 }}
+                                                                {% endif %}
                                                             {% endif %}
                                                         </p>
                                                     </div>
@@ -224,11 +252,11 @@
                                             </div>
                                         </div>
                                         <div class="modal-footer">
-                                            {% if notification.notification_type == 'patient_complaint' or notification.notification_type == 'doctor_complaint' %}
+                                            {% if notification.notification_type == 'patient_complaint' or notification.notification_type == 'doctor_complaint' or notification.notification_type == 'doctor_message' %}
                                                 {% if notification.related_patient or notification.related_doctor %}
                                                     <form method="post" action="{% url 'admin_panel:reply_to_complaint' notification.id %}" class="d-flex flex-grow-1 gap-2">
                                                         {% csrf_token %}
-                                                        <input type="text" name="reply" class="form-control" placeholder="{% trans 'اكتب رد الإدارة...' %}" required maxlength="2000">
+                                                        <input type="text" name="reply" class="form-control" placeholder="{% if notification.notification_type == 'doctor_message' %}{% trans 'اكتب ردك للطبيب...' %}{% else %}{% trans 'اكتب رد الإدارة...' %}{% endif %}" required maxlength="2000">
                                                         <button type="submit" class="btn btn-primary text-nowrap">
                                                             <i class="fas fa-paper-plane me-1"></i>{% trans "إرسال الرد" %}
                                                         </button>
