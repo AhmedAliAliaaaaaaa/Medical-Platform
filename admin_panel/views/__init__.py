@@ -274,6 +274,8 @@ class NotificationsView(AdminRequiredMixin, TemplateView):
             'created_by',
             'related_patient__user',
             'related_doctor__user',
+            'related_case',
+            'related_response',
         ).order_by('-created_at')
         return context
 

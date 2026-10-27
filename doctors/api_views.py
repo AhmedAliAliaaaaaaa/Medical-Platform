@@ -280,6 +280,9 @@ def respond_to_case(request, case_id):
             title='رد طبيب جديد',
             message=f'رد جديد من د. {doctor.user.get_full_name()} يحتاج للمراجعة',
             notification_type='doctor_response',
+            related_doctor=doctor,
+            related_case=case,
+            related_response=response,
             created_by=request.user
         )
         
