@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "رفع شكوى" %} - {% trans "المنصة الطبية" %}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 760px;">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0"><i class="fas fa-comment-medical me-2"></i>{% trans "رفع شكوى للإدارة" %}</h4>
+        </div>
+        <div class="card-body p-4">
+            <p class="text-muted">{% trans "اكتب تفاصيل المشكلة بوضوح، وستراجعها الإدارة." %}</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label" for="subject">{% trans "عنوان الشكوى" %}</label>
+                    <input class="form-control" id="subject" name="subject" maxlength="200" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="message">{% trans "تفاصيل الشكوى" %}</label>
+                    <textarea class="form-control" id="message" name="message" rows="7" required></textarea>
+                </div>
+                <button class="btn btn-danger" type="submit"><i class="fas fa-paper-plane me-1"></i>{% trans "إرسال الشكوى" %}</button>
+                <a class="btn btn-outline-secondary" href="{% url 'doctors:dashboard' %}">{% trans "إلغاء" %}</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _
 from .models import Doctor
 from patients.models import MedicalCase, DoctorResponse
 from .forms import DoctorResponseForm
+from admin_panel.models import AdminNotification
 
 class DoctorRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
@@ -102,6 +103,30 @@ class DoctorDashboardView(TemplateView):
             context['avg_overall_satisfaction'] = 0
         
         return context
+
+class SubmitComplaintView(DoctorRequiredMixin, TemplateView):
+    template_name = 'doctors/submit_complaint.html'
+
+    def post(self, request, *args, **kwargs):
+        subject = request.POST.get('subject', '').strip()
+        message = request.POST.get('message', '').strip()
+        if not subject or not message:
+            messages.error(request, _('يرجى كتابة عنوان الشكوى وتفاصيلها.'))
+            return self.render_to_response({})
+        if len(subject) > 200:
+            messages.error(request, _('عنوان الشكوى طويل جداً.'))
+            return self.render_to_response({})
+
+        doctor = get_object_or_404(Doctor, user=request.user)
+        AdminNotification.objects.create(
+            title=subject,
+            message=message,
+            notification_type='doctor_complaint',
+            related_doctor=doctor,
+            created_by=request.user,
+        )
+        messages.success(request, _('تم إرسال شكواك إلى الإدارة بنجاح.'))
+        return redirect('doctors:dashboard')
 
 class CaseDetailView(DoctorRequiredMixin, DetailView):
     model = MedicalCase

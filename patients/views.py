@@ -15,6 +15,7 @@ from doctors.models import Doctor
 from payments.models import Payment, PaymentMethod
 from .forms import MedicalCaseForm, CaseAttachmentForm, DoctorRatingForm
 from core.translation_service import translation_service
+from admin_panel.models import AdminNotification
 
 class PatientRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
@@ -48,6 +49,30 @@ class PatientDashboardView(PatientRequiredMixin, TemplateView):
         context['all_cases'] = recent_cases_qs[:20]  # عرض أول 20 حالة مع رابط للمزيد
         
         return context
+
+class SubmitComplaintView(PatientRequiredMixin, TemplateView):
+    template_name = 'patients/submit_complaint.html'
+
+    def post(self, request, *args, **kwargs):
+        subject = request.POST.get('subject', '').strip()
+        message = request.POST.get('message', '').strip()
+        if not subject or not message:
+            messages.error(request, _('يرجى كتابة عنوان الشكوى وتفاصيلها.'))
+            return self.render_to_response({})
+        if len(subject) > 200:
+            messages.error(request, _('عنوان الشكوى طويل جداً.'))
+            return self.render_to_response({})
+
+        patient = get_object_or_404(Patient, user=request.user)
+        AdminNotification.objects.create(
+            title=subject,
+            message=message,
+            notification_type='patient_complaint',
+            related_patient=patient,
+            created_by=request.user,
+        )
+        messages.success(request, _('تم إرسال شكواك إلى الإدارة بنجاح.'))
+        return redirect('patients:dashboard')
 
 class NewCaseView(PatientRequiredMixin, CreateView):
     model = MedicalCase

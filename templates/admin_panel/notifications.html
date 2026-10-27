@@ -86,6 +86,11 @@
                                         <small class="text-muted">
                                             <i class="fas fa-user me-1"></i>
                                             {% trans "بواسطة" %}: {{ notification.created_by.first_name }} {{ notification.created_by.last_name }}
+                                            {% if notification.related_patient %}
+                                                <span class="ms-3"><i class="fas fa-user-injured me-1"></i>{% trans "المريض" %}: {{ notification.related_patient.user.get_full_name }}</span>
+                                            {% elif notification.related_doctor %}
+                                                <span class="ms-3"><i class="fas fa-user-md me-1"></i>{% trans "الطبيب" %}: {{ notification.related_doctor.user.get_full_name }}</span>
+                                            {% endif %}
                                             <i class="fas fa-clock me-1 ms-3"></i>
                                             {{ notification.created_at|date:"d/m/Y H:i" }}
                                         </small>
@@ -142,6 +147,18 @@
                                                 <div class="col-md-6">
                                                     <strong>{% trans "أرسل بواسطة" %}:</strong>
                                                     <p>{{ notification.created_by.first_name }} {{ notification.created_by.last_name }}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>{% trans "صاحب الشكوى" %}:</strong>
+                                                    <p>
+                                                        {% if notification.related_patient %}
+                                                            {{ notification.related_patient.user.get_full_name }}
+                                                        {% elif notification.related_doctor %}
+                                                            {{ notification.related_doctor.user.get_full_name }}
+                                                        {% else %}
+                                                            {% trans "غير محدد" %}
+                                                        {% endif %}
+                                                    </p>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <strong>{% trans "تاريخ الإرسال" %}:</strong>

@@ -10,6 +10,7 @@ class AdminNotification(models.Model):
         ('doctor_response', 'رد طبيب جديد'),
         ('doctor_message', 'رسالة من طبيب'),
         ('patient_complaint', 'شكوى مريض'),
+        ('doctor_complaint', 'شكوى طبيب'),
         ('system', 'إشعار نظام'),
         ('general', 'عام'),
     )

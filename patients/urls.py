@@ -14,6 +14,7 @@ urlpatterns = [
     path('rate-doctor/<int:case_id>/', views.RateDoctorView.as_view(), name='rate_doctor'),
     path('my-responses/', views.MyResponsesView.as_view(), name='my_responses'),
     path('notifications/', views.NotificationsView.as_view(), name='notifications'),
+    path('complaint/', views.SubmitComplaintView.as_view(), name='submit_complaint'),
     path('all-cases/', views.AllCasesView.as_view(), name='all_cases'),
     
     # مميزات جديدة - الدفع والترجمة
