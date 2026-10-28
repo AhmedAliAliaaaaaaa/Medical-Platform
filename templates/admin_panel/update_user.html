@@ -21,8 +21,19 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <form method="post" class="row g-3">
+                    <form method="post" enctype="multipart/form-data" class="row g-3">
                         {% csrf_token %}
+
+                        <div class="col-md-6">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="fas fa-at me-1"></i>
+                                اسم المستخدم
+                            </label>
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
                         
                         <div class="col-md-6">
                             <label for="{{ form.first_name.id_for_label }}" class="form-label">
@@ -67,7 +78,7 @@
                                 <div class="text-danger small">{{ form.phone_number.errors }}</div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="col-md-6">
                             <label for="{{ form.user_type.id_for_label }}" class="form-label">
                                 <i class="fas fa-user-tag me-1"></i>
@@ -78,13 +89,45 @@
                                 <div class="text-danger small">{{ form.user_type.errors }}</div>
                             {% endif %}
                         </div>
-                        
+
                         <div class="col-md-6">
+                            <label for="{{ form.profile_picture.id_for_label }}" class="form-label">
+                                <i class="fas fa-image me-1"></i>
+                                صورة الملف الشخصي
+                            </label>
+                            {{ form.profile_picture }}
+                            {% if object.profile_picture %}
+                                <div class="mt-2">
+                                    <img src="{{ object.profile_picture.url }}" alt="{{ object.get_full_name }}" class="img-thumbnail" style="max-height: 120px;">
+                                </div>
+                            {% endif %}
+                            {% if form.profile_picture.errors %}
+                                <div class="text-danger small">{{ form.profile_picture.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <label for="{{ form.is_verified.id_for_label }}" class="form-label">
+                                <i class="fas fa-check-circle me-1"></i>
+                                التحقق
+                            </label>
+                            <div class="form-check mt-2">
+                                {{ form.is_verified }}
+                                <label class="form-check-label" for="{{ form.is_verified.id_for_label }}">
+                                    مستخدم موثق
+                                </label>
+                            </div>
+                            {% if form.is_verified.errors %}
+                                <div class="text-danger small">{{ form.is_verified.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-3">
                             <label for="{{ form.is_active.id_for_label }}" class="form-label">
                                 <i class="fas fa-toggle-on me-1"></i>
                                 حالة الحساب
                             </label>
-                            <div class="form-check">
+                            <div class="form-check mt-2">
                                 {{ form.is_active }}
                                 <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
                                     حساب نشط

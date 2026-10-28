@@ -244,7 +244,17 @@ class ManageUsersView(AdminRequiredMixin, TemplateView):
 class UpdateUserView(AdminRequiredMixin, UpdateView):
     model = CustomUser
     template_name = 'admin_panel/update_user.html'
-    fields = ['first_name', 'last_name', 'email', 'phone_number', 'user_type', 'is_active']
+    fields = [
+        'username',
+        'first_name',
+        'last_name',
+        'email',
+        'phone_number',
+        'profile_picture',
+        'user_type',
+        'is_verified',
+        'is_active',
+    ]
     success_url = reverse_lazy('admin_panel:manage_users')
     
     def form_valid(self, form):
