@@ -38,6 +38,11 @@
                         <i class="fas fa-chart-bar me-2"></i>
                         {% trans "الإحصائيات" %}
                     </a>
+                    <a href="{% url 'admin_panel:messages' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-envelope me-2"></i>
+                        صندوق الرسائل
+                        {% if unread_admin_messages %}<span class="badge bg-danger ms-2">{{ unread_admin_messages }}</span>{% endif %}
+                    </a>
                 </div>
 
 
