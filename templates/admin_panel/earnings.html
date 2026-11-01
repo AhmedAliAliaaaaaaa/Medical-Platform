@@ -17,18 +17,84 @@
     </div>
 
     <div class="card mb-4">
+        <div class="card-header bg-info text-white"><h5 class="mb-0">الدفعات</h5></div>
+        <div class="table-responsive"><table class="table table-striped mb-0">
+            <thead><tr><th>المعرف</th><th>المستخدم</th><th>المبلغ</th><th>الحالة والتفاصيل</th><th>حفظ</th></tr></thead>
+            <tbody>
+            {% for payment in payments %}
+            <tr><form method="post">
+                {% csrf_token %}<input type="hidden" name="action" value="save_payment"><input type="hidden" name="payment_id" value="{{ payment.id }}">
+                <td>{{ payment.payment_id }}</td>
+                <td>{{ payment.user.username }}{% if payment.doctor %}<br>{{ payment.doctor.user.username }}{% endif %}</td>
+                <td>{{ payment.amount }} {{ payment.currency }}</td>
+                <td>
+                    <select class="form-select form-select-sm mb-1" name="status">
+                        <option value="pending" {% if payment.status == 'pending' %}selected{% endif %}>في الانتظار</option>
+                        <option value="processing" {% if payment.status == 'processing' %}selected{% endif %}>قيد المعالجة</option>
+                        <option value="completed" {% if payment.status == 'completed' %}selected{% endif %}>مكتمل</option>
+                        <option value="failed" {% if payment.status == 'failed' %}selected{% endif %}>فشل</option>
+                        <option value="cancelled" {% if payment.status == 'cancelled' %}selected{% endif %}>ملغي</option>
+                        <option value="refunded" {% if payment.status == 'refunded' %}selected{% endif %}>مسترد</option>
+                    </select>
+                    <input class="form-control form-control-sm mb-1" name="transaction_id" value="{{ payment.transaction_id }}" placeholder="معرف المعاملة">
+                    <textarea class="form-control form-control-sm" name="notes" placeholder="ملاحظات">{{ payment.notes }}</textarea>
+                </td>
+                <td><button class="btn btn-sm btn-primary">حفظ</button></td>
+            </form></tr>
+            {% empty %}<tr><td colspan="5" class="text-center">لا توجد دفعات.</td></tr>{% endfor %}
+            </tbody>
+        </table></div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white"><h5 class="mb-0">طرق الدفع المحفوظة</h5></div>
+        <div class="table-responsive"><table class="table table-striped mb-0">
+            <thead><tr><th>المستخدم</th><th>النوع</th><th>الحساب</th><th>الحالة</th><th>إجراء</th></tr></thead>
+            <tbody>
+            {% for method in payment_methods %}
+            <tr><td>{{ method.user.username }}</td><td>{{ method.get_payment_type_display }}</td><td>{% if method.card_number %}****{{ method.card_number|slice:"-4:" }}{% else %}{{ method.bank_name }}{% endif %}</td><td>{% if method.is_active %}نشطة{% else %}غير نشطة{% endif %}</td><td><form method="post" onsubmit="return confirm('حذف طريقة الدفع؟');">{% csrf_token %}<input type="hidden" name="action" value="delete_payment_method"><input type="hidden" name="payment_method_id" value="{{ method.id }}"><button class="btn btn-sm btn-danger">حذف</button></form></td></tr>
+            {% empty %}<tr><td colspan="5" class="text-center">لا توجد طرق دفع.</td></tr>{% endfor %}
+            </tbody>
+        </table></div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white"><h5 class="mb-0">إعدادات المنصة المالية</h5></div>
+        <div class="card-body">
+            <form method="post" class="row g-3">
+                {% csrf_token %}<input type="hidden" name="action" value="save_settings">
+                <div class="col-md-4"><label class="form-label">عمولة المنصة %</label><input class="form-control" type="number" step="0.01" min="0" max="100" name="platform_commission_rate" value="{{ settings.platform_commission_rate|default:10 }}"></div>
+                <div class="col-md-4"><label class="form-label">الحد الأدنى للسحب</label><input class="form-control" type="number" step="0.01" min="0" name="minimum_withdrawal_amount" value="{{ settings.minimum_withdrawal_amount|default:100 }}"></div>
+                <div class="col-md-4"><label class="form-label">سعر الاستشارة الافتراضي</label><input class="form-control" type="number" step="0.01" min="0" name="default_consultation_fee" value="{{ settings.default_consultation_fee|default:100 }}"></div>
+                <div class="col-md-4"><label class="form-label">سعر المتابعة الافتراضي</label><input class="form-control" type="number" step="0.01" min="0" name="default_follow_up_fee" value="{{ settings.default_follow_up_fee|default:50 }}"></div>
+                <div class="col-md-4"><label class="form-label">سعر الطوارئ الافتراضي</label><input class="form-control" type="number" step="0.01" min="0" name="default_emergency_fee" value="{{ settings.default_emergency_fee|default:200 }}"></div>
+                <div class="col-md-4 d-flex align-items-end gap-3"><label><input type="checkbox" name="payment_gateway_enabled" {% if settings.payment_gateway_enabled %}checked{% endif %}> بوابة الدفع مفعلة</label><label><input type="checkbox" name="auto_approve_payments" {% if settings.auto_approve_payments %}checked{% endif %}> اعتماد تلقائي</label></div>
+                <div class="col-12"><button class="btn btn-dark">حفظ الإعدادات</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
         <div class="card-header bg-primary text-white"><h5 class="mb-0">أرباح الأطباء</h5></div>
         <div class="table-responsive">
             <table class="table table-striped mb-0">
-                <thead><tr><th>الطبيب</th><th>الإجمالي</th><th>المتاح</th><th>المعلق</th><th>المسحوب</th></tr></thead>
+                <thead><tr><th>الطبيب</th><th>الأرصدة والرسوم</th><th>حفظ</th></tr></thead>
                 <tbody>
                 {% for row in earnings_rows %}
-                <tr>
+                <tr><form method="post">
+                    {% csrf_token %}<input type="hidden" name="action" value="save_earnings"><input type="hidden" name="earnings_id" value="{{ row.id }}">
                     <td>{{ row.doctor.user.get_full_name|default:row.doctor.user.username }}</td>
-                    <td>{{ row.total_earnings|floatformat:2 }}</td>
-                    <td>{{ row.available_balance|floatformat:2 }}</td>
-                    <td>{{ row.pending_balance|floatformat:2 }}</td>
-                    <td>{{ row.withdrawn_amount|floatformat:2 }}</td>
+                    <td><div class="row g-1">
+                        <div class="col-md-3"><label class="small">الإجمالي</label><input class="form-control form-control-sm" name="total_earnings" value="{{ row.total_earnings }}"></div>
+                        <div class="col-md-3"><label class="small">المتاح</label><input class="form-control form-control-sm" name="available_balance" value="{{ row.available_balance }}"></div>
+                        <div class="col-md-3"><label class="small">المعلق</label><input class="form-control form-control-sm" name="pending_balance" value="{{ row.pending_balance }}"></div>
+                        <div class="col-md-3"><label class="small">المسحوب</label><input class="form-control form-control-sm" name="withdrawn_amount" value="{{ row.withdrawn_amount }}"></div>
+                        <div class="col-md-4"><label class="small">الاستشارة</label><input class="form-control form-control-sm" name="consultation_fee" value="{{ row.consultation_fee }}"></div>
+                        <div class="col-md-4"><label class="small">المتابعة</label><input class="form-control form-control-sm" name="follow_up_fee" value="{{ row.follow_up_fee }}"></div>
+                        <div class="col-md-4"><label class="small">الطوارئ</label><input class="form-control form-control-sm" name="emergency_fee" value="{{ row.emergency_fee }}"></div>
+                    </div></td>
+                    <td><button class="btn btn-sm btn-primary">حفظ</button></td>
+                </form>
                 </tr>
                 {% empty %}<tr><td colspan="5" class="text-center">لا توجد بيانات أرباح.</td></tr>{% endfor %}
                 </tbody>

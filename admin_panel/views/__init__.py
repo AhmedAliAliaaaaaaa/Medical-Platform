@@ -12,7 +12,13 @@ from datetime import timedelta
 from accounts.models import CustomUser
 from doctors.models import Doctor
 from patients.models import MedicalCase, Patient, DoctorResponse
-from payments.models import DoctorEarnings, Payment, WithdrawalRequest, PlatformSettings
+from payments.models import (
+    DoctorEarnings,
+    Payment,
+    PaymentMethod,
+    WithdrawalRequest,
+    PlatformSettings,
+)
 from ..models import AdminMessage, AdminNotification
 
 class AdminRequiredMixin(LoginRequiredMixin):
@@ -305,6 +311,9 @@ class EarningsManagementView(AdminRequiredMixin, TemplateView):
         context['withdrawals'] = WithdrawalRequest.objects.select_related(
             'doctor__user'
         ).order_by('-requested_at')[:50]
+        context['payment_methods'] = PaymentMethod.objects.select_related(
+            'user'
+        ).order_by('-created_at')[:50]
         context['settings'] = PlatformSettings.objects.first()
         context['total_revenue'] = Payment.objects.filter(
             status='completed'
@@ -315,8 +324,59 @@ class EarningsManagementView(AdminRequiredMixin, TemplateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        withdrawal_id = request.POST.get('withdrawal_id')
         action = request.POST.get('action')
+        if action == 'save_settings':
+            settings, _ = PlatformSettings.objects.get_or_create(pk=1)
+            for field in (
+                'platform_commission_rate',
+                'minimum_withdrawal_amount',
+                'default_consultation_fee',
+                'default_follow_up_fee',
+                'default_emergency_fee',
+            ):
+                setattr(settings, field, request.POST.get(field))
+            settings.payment_gateway_enabled = 'payment_gateway_enabled' in request.POST
+            settings.auto_approve_payments = 'auto_approve_payments' in request.POST
+            settings.save()
+            messages.success(request, _('تم حفظ إعدادات الأرباح.'))
+            return redirect('admin_panel:earnings')
+
+        if action == 'save_earnings':
+            earnings = get_object_or_404(
+                DoctorEarnings, pk=request.POST.get('earnings_id')
+            )
+            for field in (
+                'total_earnings',
+                'available_balance',
+                'pending_balance',
+                'withdrawn_amount',
+                'consultation_fee',
+                'follow_up_fee',
+                'emergency_fee',
+            ):
+                setattr(earnings, field, request.POST.get(field))
+            earnings.save()
+            messages.success(request, _('تم تحديث أرباح الطبيب.'))
+            return redirect('admin_panel:earnings')
+
+        if action == 'save_payment':
+            payment = get_object_or_404(Payment, pk=request.POST.get('payment_id'))
+            payment.status = request.POST.get('status')
+            payment.transaction_id = request.POST.get('transaction_id', '').strip()
+            payment.notes = request.POST.get('notes', '').strip()
+            payment.save(update_fields=['status', 'transaction_id', 'notes', 'updated_at'])
+            messages.success(request, _('تم تحديث الدفعة.'))
+            return redirect('admin_panel:earnings')
+
+        if action == 'delete_payment_method':
+            method = get_object_or_404(
+                PaymentMethod, pk=request.POST.get('payment_method_id')
+            )
+            method.delete()
+            messages.success(request, _('تم حذف طريقة الدفع.'))
+            return redirect('admin_panel:earnings')
+
+        withdrawal_id = request.POST.get('withdrawal_id')
         withdrawal = get_object_or_404(
             WithdrawalRequest.objects.select_related('doctor'),
             pk=withdrawal_id,
