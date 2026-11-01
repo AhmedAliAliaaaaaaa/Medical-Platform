@@ -341,7 +341,7 @@ class EarningsManagementView(AdminRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         action = request.POST.get('action')
         if action == 'save_settings':
-            settings, _ = PlatformSettings.objects.get_or_create(pk=1)
+            settings, created = PlatformSettings.objects.get_or_create(pk=1)
             for field in (
                 'platform_commission_rate',
                 'minimum_withdrawal_amount',
