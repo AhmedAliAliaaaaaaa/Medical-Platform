@@ -45,6 +45,10 @@
                         صندوق الرسائل
                         {% if unread_admin_messages %}<span class="badge bg-danger ms-2">{{ unread_admin_messages }}</span>{% endif %}
                     </a>
+                    <a href="{% url 'admin_panel:earnings' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-coins me-2"></i>
+                        إدارة الأرباح
+                    </a>
                 </div>
             </div>
         </div>
@@ -136,6 +140,7 @@
                         <a class="btn btn-info text-white" href="{% url 'admin_panel:manage_users' %}"><i class="fas fa-users me-1"></i>{% trans "إدارة المستخدمين" %}</a>
                         <a class="btn btn-warning" href="{% url 'admin_panel:notifications' %}"><i class="fas fa-bell me-1"></i>{% trans "الإشعارات" %}</a>
                         <a class="btn btn-info text-white" href="{% url 'admin_panel:messages' %}"><i class="fas fa-envelope me-1"></i>صندوق الرسائل{% if unread_admin_messages %} ({{ unread_admin_messages }}){% endif %}</a>
+                        <a class="btn btn-success" href="{% url 'admin_panel:earnings' %}"><i class="fas fa-coins me-1"></i>إدارة الأرباح</a>
                     </div>
                 </div>
             </div>

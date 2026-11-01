@@ -3,7 +3,7 @@ from django.views.generic import TemplateView, CreateView, UpdateView, DeleteVie
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Sum
 from django.utils import timezone
 from django.http import JsonResponse, HttpResponse
 from django.http import JsonResponse, HttpResponse
@@ -12,6 +12,7 @@ from datetime import timedelta
 from accounts.models import CustomUser
 from doctors.models import Doctor
 from patients.models import MedicalCase, Patient, DoctorResponse
+from payments.models import DoctorEarnings, Payment, WithdrawalRequest, PlatformSettings
 from ..models import AdminMessage, AdminNotification
 
 class AdminRequiredMixin(LoginRequiredMixin):
@@ -288,6 +289,68 @@ class NotificationsView(AdminRequiredMixin, TemplateView):
             'related_response',
         ).order_by('-created_at')
         return context
+
+
+class EarningsManagementView(AdminRequiredMixin, TemplateView):
+    template_name = 'admin_panel/earnings.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['earnings_rows'] = DoctorEarnings.objects.select_related(
+            'doctor__user'
+        ).order_by('-total_earnings')
+        context['payments'] = Payment.objects.select_related(
+            'user', 'doctor__user', 'case'
+        ).order_by('-created_at')[:50]
+        context['withdrawals'] = WithdrawalRequest.objects.select_related(
+            'doctor__user'
+        ).order_by('-requested_at')[:50]
+        context['settings'] = PlatformSettings.objects.first()
+        context['total_revenue'] = Payment.objects.filter(
+            status='completed'
+        ).aggregate(total=Sum('amount'))['total'] or 0
+        context['pending_withdrawals'] = WithdrawalRequest.objects.filter(
+            status='pending'
+        ).count()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        withdrawal_id = request.POST.get('withdrawal_id')
+        action = request.POST.get('action')
+        withdrawal = get_object_or_404(
+            WithdrawalRequest.objects.select_related('doctor'),
+            pk=withdrawal_id,
+        )
+        if withdrawal.status != 'pending':
+            messages.error(request, _('تمت معالجة طلب السحب مسبقاً.'))
+            return redirect('admin_panel:earnings')
+
+        earnings = get_object_or_404(DoctorEarnings, doctor=withdrawal.doctor)
+        if action == 'approve':
+            withdrawal.status = 'approved'
+            withdrawal.admin_notes = request.POST.get('admin_notes', '').strip()
+            withdrawal.processed_at = timezone.now()
+            earnings.pending_balance = max(
+                earnings.pending_balance - withdrawal.amount, 0
+            )
+            earnings.withdrawn_amount += withdrawal.amount
+            withdrawal.save()
+            earnings.save()
+            messages.success(request, _('تمت الموافقة على طلب السحب.'))
+        elif action == 'reject':
+            withdrawal.status = 'rejected'
+            withdrawal.admin_notes = request.POST.get('admin_notes', '').strip()
+            withdrawal.processed_at = timezone.now()
+            earnings.pending_balance = max(
+                earnings.pending_balance - withdrawal.amount, 0
+            )
+            earnings.available_balance += withdrawal.amount
+            withdrawal.save()
+            earnings.save()
+            messages.success(request, _('تم رفض طلب السحب وإعادة المبلغ إلى الرصيد المتاح.'))
+        else:
+            messages.error(request, _('إجراء غير صالح.'))
+        return redirect('admin_panel:earnings')
 
 
 class AdminMessagesView(AdminRequiredMixin, TemplateView):

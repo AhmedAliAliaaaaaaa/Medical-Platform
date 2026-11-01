@@ -103,6 +103,10 @@
                                     <span class="badge bg-danger">{{ unread_admin_messages }}</span>
                                 {% endif %}
                             </a>
+                            <a href="{% url 'admin_panel:earnings' %}" class="btn btn-success btn-sm">
+                                <i class="fas fa-coins"></i>
+                                الأرباح
+                            </a>
                         {% endif %}
                         <form method="post" action="{% url 'accounts:logout' %}" class="d-inline">
                             {% csrf_token %}
