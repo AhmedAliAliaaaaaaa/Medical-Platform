@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}مراسلة الإدارة{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white"><h5 class="mb-0">مراسلة الإدارة</h5></div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <select name="recipient" class="form-select mb-3" required>
+                            <option value="">اختر مديرًا</option>
+                            {% for admin in admins %}<option value="{{ admin.pk }}">{{ admin.get_full_name|default:admin.username }}</option>{% endfor %}
+                        </select>
+                        <input name="subject" class="form-control mb-3" placeholder="عنوان الرسالة" required>
+                        <textarea name="body" class="form-control mb-3" rows="6" placeholder="نص الرسالة" required></textarea>
+                        <button class="btn btn-primary w-100">إرسال الرسالة</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white"><h5 class="mb-0">صندوق الرسائل {% if unread_messages_count %}<span class="badge bg-danger">{{ unread_messages_count }} جديدة</span>{% endif %}</h5></div>
+                <div class="card-body">
+                    {% for message in messages_list %}
+                    <div class="border rounded p-3 mb-3 {% if message.recipient_id == request.user.id and not message.is_read %}border-danger bg-light{% endif %}">
+                        <strong>{{ message.subject }}</strong>
+                        <small class="text-muted d-block">{{ message.created_at|date:"d/m/Y H:i" }} — من {{ message.sender.get_full_name|default:message.sender.username }}</small>
+                        <p class="mt-2 mb-0">{{ message.body }}</p>
+                    </div>
+                    {% empty %}<p class="text-muted">لا توجد رسائل.</p>{% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

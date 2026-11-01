@@ -37,3 +37,29 @@ class AdminNotification(models.Model):
         verbose_name = 'إشعار إداري'
         verbose_name_plural = 'الإشعارات الإدارية'
         ordering = ['-created_at']
+
+
+class AdminMessage(models.Model):
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='sent_admin_messages',
+    )
+    recipient = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='received_admin_messages',
+    )
+    subject = models.CharField(max_length=200)
+    body = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.subject} ({self.sender} -> {self.recipient})'
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'رسالة إدارية'
+        verbose_name_plural = 'الرسائل الإدارية'

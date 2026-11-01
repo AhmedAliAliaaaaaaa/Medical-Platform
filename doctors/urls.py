@@ -14,5 +14,6 @@ urlpatterns = [
     path('my-ratings/', views.MyRatingsView.as_view(), name='my_ratings'),
     path('send-notification/', views.SendNotificationView.as_view(), name='send_notification'),
     path('notifications/', views.DoctorNotificationsView.as_view(), name='notifications'),
+    path('messages/', views.DoctorMessagesView.as_view(), name='messages'),
     path('complaint/', views.SubmitComplaintView.as_view(), name='submit_complaint'),
 ]

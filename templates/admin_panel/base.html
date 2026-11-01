@@ -89,6 +89,13 @@
                        href="{% url 'admin_panel:notifications' %}">
                         <i class="fas fa-bell"></i>
                         {% trans "الإشعارات" %}
+                        {% if unread_admin_messages %}<span class="badge bg-danger ms-2">{{ unread_admin_messages }}</span>{% endif %}
+                    </a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'messages' %}active{% endif %}" 
+                       href="{% url 'admin_panel:messages' %}">
+                        <i class="fas fa-envelope"></i>
+                        صندوق الرسائل
+                        {% if unread_admin_messages %}<span class="badge bg-danger ms-2">{{ unread_admin_messages }}</span>{% endif %}
                     </a>
                     
                     <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">

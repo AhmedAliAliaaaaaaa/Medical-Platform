@@ -12,7 +12,7 @@ from datetime import timedelta
 from accounts.models import CustomUser
 from doctors.models import Doctor
 from patients.models import MedicalCase, Patient, DoctorResponse
-from ..models import AdminNotification
+from ..models import AdminMessage, AdminNotification
 
 class AdminRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
@@ -288,6 +288,60 @@ class NotificationsView(AdminRequiredMixin, TemplateView):
             'related_response',
         ).order_by('-created_at')
         return context
+
+
+class AdminMessagesView(AdminRequiredMixin, TemplateView):
+    template_name = 'admin_panel/messages.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['messages_list'] = AdminMessage.objects.filter(
+            Q(sender=self.request.user) | Q(recipient=self.request.user)
+        ).select_related('sender', 'recipient')
+        context['recipients'] = CustomUser.objects.filter(
+            user_type__in=('admin', 'doctor'),
+            is_active=True,
+        ).exclude(pk=self.request.user.pk).order_by('user_type', 'first_name', 'last_name')
+        context['unread_messages_count'] = AdminMessage.objects.filter(
+            recipient=self.request.user,
+            is_read=False,
+        ).count()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        recipient_id = request.POST.get('recipient')
+        subject = request.POST.get('subject', '').strip()
+        body = request.POST.get('body', '').strip()
+        recipient = get_object_or_404(
+            CustomUser,
+            pk=recipient_id,
+            user_type__in=('admin', 'doctor'),
+            is_active=True,
+        )
+        if not subject or not body:
+            messages.error(request, _('يرجى كتابة عنوان الرسالة ونصها.'))
+            return redirect('admin_panel:messages')
+        AdminMessage.objects.create(
+            sender=request.user,
+            recipient=recipient,
+            subject=subject,
+            body=body,
+        )
+        messages.success(request, _('تم إرسال الرسالة بنجاح.'))
+        return redirect('admin_panel:messages')
+
+
+class MarkMessageReadView(AdminRequiredMixin, TemplateView):
+    def post(self, request, *args, **kwargs):
+        message = get_object_or_404(
+            AdminMessage,
+            pk=kwargs['message_id'],
+            recipient=request.user,
+        )
+        message.is_read = True
+        message.read_at = timezone.now()
+        message.save(update_fields=['is_read', 'read_at'])
+        return redirect('admin_panel:messages')
 
 class ReplyToComplaintView(AdminRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):

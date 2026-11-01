@@ -4,6 +4,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
+from django.utils import timezone
+from django.db.models import Q
+from accounts.models import CustomUser
 from .models import Doctor
 from patients.models import MedicalCase, DoctorResponse
 from .forms import DoctorResponseForm
@@ -85,6 +88,11 @@ class DoctorDashboardView(TemplateView):
         # إضافة الإشعارات
         notifications = DoctorNotification.objects.filter(doctor=doctor)
         context['unread_notifications'] = notifications.filter(is_read=False).count()
+        from admin_panel.models import AdminMessage
+        context['unread_messages_count'] = AdminMessage.objects.filter(
+            recipient=self.request.user,
+            is_read=False,
+        ).count()
         
         # حساب متوسط التقييمات التفصيلية
         if ratings.exists():
@@ -344,6 +352,11 @@ class DoctorNotificationsView(DoctorRequiredMixin, TemplateView):
         
         context['notifications'] = notifications
         context['unread_count'] = notifications.filter(is_read=False).count()
+        from admin_panel.models import AdminMessage
+        context['unread_messages_count'] = AdminMessage.objects.filter(
+            recipient=self.request.user,
+            is_read=False,
+        ).count()
         context['doctor'] = doctor
         
         return context
@@ -377,3 +390,49 @@ class DoctorNotificationsView(DoctorRequiredMixin, TemplateView):
             messages.success(request, _('تم تحديد جميع الإشعارات كمقروءة'))
         
         return redirect('doctors:notifications')
+
+
+class DoctorMessagesView(DoctorRequiredMixin, TemplateView):
+    template_name = 'doctors/messages.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from admin_panel.models import AdminMessage
+        AdminMessage.objects.filter(
+            recipient=self.request.user,
+            is_read=False,
+        ).update(is_read=True, read_at=timezone.now())
+        context['messages_list'] = AdminMessage.objects.filter(
+            Q(sender=self.request.user) | Q(recipient=self.request.user)
+        ).select_related('sender', 'recipient')
+        context['admins'] = CustomUser.objects.filter(
+            user_type='admin',
+            is_active=True,
+        ).order_by('first_name', 'last_name')
+        context['unread_messages_count'] = AdminMessage.objects.filter(
+            recipient=self.request.user,
+            is_read=False,
+        ).count()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        from admin_panel.models import AdminMessage
+        recipient = get_object_or_404(
+            CustomUser,
+            pk=request.POST.get('recipient'),
+            user_type='admin',
+            is_active=True,
+        )
+        subject = request.POST.get('subject', '').strip()
+        body = request.POST.get('body', '').strip()
+        if not subject or not body:
+            messages.error(request, _('يرجى كتابة عنوان الرسالة ونصها.'))
+            return redirect('doctors:messages')
+        AdminMessage.objects.create(
+            sender=request.user,
+            recipient=recipient,
+            subject=subject,
+            body=body,
+        )
+        messages.success(request, _('تم إرسال الرسالة إلى الإدارة.'))
+        return redirect('doctors:messages')

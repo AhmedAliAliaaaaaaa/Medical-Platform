@@ -1,0 +1,59 @@
+{% extends 'admin_panel/base.html' %}
+{% load i18n %}
+
+{% block title %}صندوق الرسائل - لوحة الإدارة{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-paper-plane me-2"></i>رسالة جديدة</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <label class="form-label">إلى</label>
+                        <select name="recipient" class="form-select mb-3" required>
+                            <option value="">اختر الطبيب أو المدير</option>
+                            {% for recipient in recipients %}
+                            <option value="{{ recipient.pk }}">{{ recipient.get_full_name|default:recipient.username }} (@{{ recipient.username }}) - {{ recipient.get_user_type_display }}</option>
+                            {% endfor %}
+                        </select>
+                        <input name="subject" class="form-control mb-3" placeholder="عنوان الرسالة" required>
+                        <textarea name="body" class="form-control mb-3" rows="6" placeholder="نص الرسالة" required></textarea>
+                        <button class="btn btn-primary w-100">إرسال الرسالة</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-inbox me-2"></i>صندوق الرسائل
+                        {% if unread_messages_count %}<span class="badge bg-danger">{{ unread_messages_count }} جديدة</span>{% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for message in messages_list %}
+                    <div class="border rounded p-3 mb-3 {% if message.recipient_id == request.user.id and not message.is_read %}border-danger bg-light{% endif %}">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ message.subject }}</strong>
+                            <small class="text-muted">{{ message.created_at|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        <small class="text-muted">من {{ message.sender.get_full_name|default:message.sender.username }} إلى {{ message.recipient.get_full_name|default:message.recipient.username }}</small>
+                        <p class="mb-2 mt-2">{{ message.body }}</p>
+                        {% if message.recipient_id == request.user.id and not message.is_read %}
+                        <form method="post" action="{% url 'admin_panel:mark_message_read' message.id %}">
+                            {% csrf_token %}<button class="btn btn-sm btn-outline-success">تحديد كمقروءة</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                    {% empty %}<p class="text-muted">لا توجد رسائل.</p>{% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

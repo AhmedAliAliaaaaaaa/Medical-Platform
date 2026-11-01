@@ -398,6 +398,9 @@
             <div class="doctor-stat-number">{{ unread_notifications }}</div>
             <div class="doctor-stat-label">{% trans "إشعارات غير مقروءة" %}</div>
             <a href="{% url 'doctors:notifications' %}" class="btn btn-sm btn-outline-primary mt-2">{% trans "عرض الإشعارات" %}</a>
+            <a href="{% url 'doctors:messages' %}" class="btn btn-sm btn-outline-info mt-2">
+                صندوق الرسائل{% if unread_messages_count %} <span class="badge bg-danger">{{ unread_messages_count }}</span>{% endif %}
+            </a>
         </div>
     </div>
     
