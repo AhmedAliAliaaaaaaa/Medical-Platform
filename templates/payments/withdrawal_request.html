@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}طلب سحب الأرباح{% endblock %}
+
+{% block content %}
+<div class="container py-4" dir="rtl">
+    <div class="card shadow-sm mx-auto" style="max-width: 700px;">
+        <div class="card-header bg-success text-white"><h4 class="mb-0">طلب سحب الأرباح</h4></div>
+        <div class="card-body">
+            <div class="alert alert-info">الرصيد المتاح: <strong>{{ earnings.available_balance|floatformat:2 }} ريال</strong> — الحد الأدنى: <strong>{{ platform_settings.minimum_withdrawal_amount|default:100 }} ريال</strong></div>
+            <form method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="mb-3"><label class="form-label">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
+                {% endfor %}
+                <button class="btn btn-success">إرسال طلب السحب</button>
+                <a href="{% url 'payments:doctor_earnings' %}" class="btn btn-outline-secondary">إلغاء</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

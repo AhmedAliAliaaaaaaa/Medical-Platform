@@ -9,7 +9,13 @@ from django.conf import settings
 import json
 import stripe
 
-from .models import Payment, PaymentMethod, DoctorEarnings, WithdrawalRequest
+from .models import (
+    Payment,
+    PaymentMethod,
+    DoctorEarnings,
+    WithdrawalRequest,
+    PlatformSettings,
+)
 from .forms import PaymentMethodForm, ConsultationPaymentForm, DoctorSubscriptionForm, WithdrawalRequestForm
 from .payment_service import payment_service
 from patients.models import MedicalCase
@@ -269,18 +275,19 @@ def doctor_subscription(request):
 @login_required
 def doctor_earnings(request):
     """Doctor earnings dashboard"""
-    if not hasattr(request.user, 'doctor'):
+    doctor = Doctor.objects.filter(user=request.user).first()
+    if doctor is None:
         messages.error(request, 'هذه الصفحة مخصصة للأطباء فقط')
         return redirect('core:home')
     
-    earnings, created = DoctorEarnings.objects.get_or_create(doctor=request.user.doctor)
+    earnings, created = DoctorEarnings.objects.get_or_create(doctor=doctor)
     recent_payments = Payment.objects.filter(
-        doctor=request.user.doctor,
+        doctor=doctor,
         status='completed'
     ).order_by('-paid_at')[:10]
     
     withdrawal_requests = WithdrawalRequest.objects.filter(
-        doctor=request.user.doctor
+        doctor=doctor
     ).order_by('-requested_at')[:5]
     
     context = {
@@ -293,22 +300,33 @@ def doctor_earnings(request):
 @login_required
 def withdrawal_request(request):
     """Create withdrawal request"""
-    if not hasattr(request.user, 'doctor'):
+    doctor = Doctor.objects.filter(user=request.user).first()
+    if doctor is None:
         messages.error(request, 'هذه الصفحة مخصصة للأطباء فقط')
         return redirect('core:home')
     
-    earnings = get_object_or_404(DoctorEarnings, doctor=request.user.doctor)
+    earnings, _ = DoctorEarnings.objects.get_or_create(doctor=doctor)
+    platform_settings = PlatformSettings.objects.first()
     
     if request.method == 'POST':
         form = WithdrawalRequestForm(request.POST)
         if form.is_valid():
             amount = form.cleaned_data['amount']
             
-            if amount > earnings.available_balance:
+            minimum_amount = (
+                platform_settings.minimum_withdrawal_amount
+                if platform_settings else 100
+            )
+            if amount < minimum_amount:
+                messages.error(
+                    request,
+                    f'الحد الأدنى للسحب هو {minimum_amount} ريال',
+                )
+            elif amount > earnings.available_balance:
                 messages.error(request, 'المبلغ المطلوب أكبر من الرصيد المتاح')
             else:
                 withdrawal = WithdrawalRequest.objects.create(
-                    doctor=request.user.doctor,
+                    doctor=doctor,
                     amount=amount,
                     bank_name=form.cleaned_data['bank_name'],
                     bank_account=form.cleaned_data['bank_account'],
@@ -328,6 +346,7 @@ def withdrawal_request(request):
     context = {
         'form': form,
         'earnings': earnings,
+        'platform_settings': platform_settings,
     }
     return render(request, 'payments/withdrawal_request.html', context)
 
