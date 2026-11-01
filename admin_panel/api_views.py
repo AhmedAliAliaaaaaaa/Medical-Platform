@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Avg
 from django.utils import timezone
+from .models import AdminMessage
 
 from doctors.models import Doctor, DoctorNotification
 from patients.models import Patient, MedicalCase, DoctorResponse, PatientNotification, DoctorRating
@@ -28,6 +29,137 @@ def _get_doctor_by_any_id(doctor_id: int) -> Doctor:
         return doctor
     # Not found
     raise Doctor.DoesNotExist
+
+
+def _message_data(message: AdminMessage) -> dict:
+    return {
+        'id': message.id,
+        'subject': message.subject,
+        'body': message.body,
+        'is_read': message.is_read,
+        'created_at': message.created_at.isoformat(),
+        'read_at': message.read_at.isoformat() if message.read_at else None,
+        'sender': {
+            'id': message.sender_id,
+            'username': message.sender.username,
+            'name': message.sender.get_full_name() or message.sender.username,
+            'user_type': message.sender.user_type,
+        },
+        'recipient': {
+            'id': message.recipient_id,
+            'username': message.recipient.username,
+            'name': message.recipient.get_full_name() or message.recipient.username,
+            'user_type': message.recipient.user_type,
+        },
+    }
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def admin_messages(request):
+    if not _is_admin(request.user):
+        return Response({'detail': 'غير مصرح'}, status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == 'POST':
+        recipient_id = request.data.get('recipient_id')
+        subject = str(request.data.get('subject', '')).strip()
+        body = str(request.data.get('body', '')).strip()
+        recipient = User.objects.filter(
+            id=recipient_id,
+            user_type__in=['admin', 'doctor'],
+            is_active=True,
+        ).first()
+        if not recipient or not subject or not body:
+            return Response(
+                {'detail': 'المستلم والعنوان والنص حقول مطلوبة'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        message = AdminMessage.objects.create(
+            sender=request.user,
+            recipient=recipient,
+            subject=subject,
+            body=body,
+        )
+        return Response(_message_data(message), status=status.HTTP_201_CREATED)
+
+    messages = AdminMessage.objects.filter(
+        recipient=request.user
+    ).select_related('sender', 'recipient')
+    return Response({
+        'messages': [_message_data(message) for message in messages],
+        'unread_count': messages.filter(is_read=False).count(),
+        'recipients': [
+            {
+                'id': user.id,
+                'name': user.get_full_name() or user.username,
+                'username': user.username,
+                'user_type': user.user_type,
+            }
+            for user in User.objects.filter(
+                user_type__in=['admin', 'doctor'],
+                is_active=True,
+            ).exclude(id=request.user.id).order_by('user_type', 'first_name')
+        ],
+    })
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def doctor_messages(request):
+    if getattr(request.user, 'user_type', None) != 'doctor':
+        return Response({'detail': 'غير مصرح'}, status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == 'POST':
+        admin_id = request.data.get('recipient_id')
+        subject = str(request.data.get('subject', '')).strip()
+        body = str(request.data.get('body', '')).strip()
+        recipient = User.objects.filter(
+            id=admin_id,
+            user_type='admin',
+            is_active=True,
+        ).first()
+        if not recipient or not subject or not body:
+            return Response(
+                {'detail': 'المستلم والعنوان والنص حقول مطلوبة'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        message = AdminMessage.objects.create(
+            sender=request.user,
+            recipient=recipient,
+            subject=subject,
+            body=body,
+        )
+        return Response(_message_data(message), status=status.HTTP_201_CREATED)
+
+    messages = AdminMessage.objects.filter(
+        recipient=request.user
+    ).select_related('sender', 'recipient')
+    return Response({
+        'messages': [_message_data(message) for message in messages],
+        'unread_count': messages.filter(is_read=False).count(),
+        'recipients': [
+            {
+                'id': user.id,
+                'name': user.get_full_name() or user.username,
+                'username': user.username,
+                'user_type': user.user_type,
+            }
+            for user in User.objects.filter(
+                user_type='admin',
+                is_active=True,
+            ).order_by('first_name')
+        ],
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_message_read(request, message_id: int):
+    message = get_object_or_404(AdminMessage, id=message_id, recipient=request.user)
+    message.is_read = True
+    message.read_at = timezone.now()
+    message.save(update_fields=['is_read', 'read_at'])
+    return Response({'success': True})
 
 
 @api_view(['POST'])

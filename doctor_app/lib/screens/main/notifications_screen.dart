@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:doctor_app/l10n/app_localizations.dart';
 
 import '../../providers/notification_provider.dart';
 import '../../providers/language_provider.dart';
 import '../../utils/constants.dart';
 import '../../utils/helpers.dart';
 import '../../widgets/custom_button.dart';
+import '../messages/messages_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -54,6 +55,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         foregroundColor: AppColors.textOnPrimary,
         automaticallyImplyLeading: false,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.mail_outline),
+            tooltip: languageProvider.isArabic ? 'صندوق الرسائل' : 'Messages',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const MessagesScreen()),
+              );
+            },
+          ),
           if (notificationProvider.unreadCount > 0)
             TextButton(
               onPressed: () => _markAllAsRead(),
@@ -148,10 +158,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   ) {
     return Card(
       margin: const EdgeInsets.only(bottom: AppConstants.mediumSpacing),
-      elevation:
-          notification.isRead
-              ? AppConstants.lowElevation
-              : AppConstants.mediumElevation,
+      elevation: notification.isRead
+          ? AppConstants.lowElevation
+          : AppConstants.mediumElevation,
       child: InkWell(
         onTap: () => _handleNotificationTap(notification),
         borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
@@ -159,14 +168,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           padding: const EdgeInsets.all(AppConstants.mediumSpacing),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppConstants.mediumRadius),
-            color:
-                notification.isRead
-                    ? null
-                    : AppColors.primary.withOpacity(0.05),
-            border:
-                notification.isRead
-                    ? null
-                    : Border.all(color: AppColors.primary.withOpacity(0.2)),
+            color: notification.isRead
+                ? null
+                : AppColors.primary.withOpacity(0.05),
+            border: notification.isRead
+                ? null
+                : Border.all(color: AppColors.primary.withOpacity(0.2)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,10 +209,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         Text(
                           notification.title,
                           style: AppTextStyles.bodyLarge.copyWith(
-                            fontWeight:
-                                notification.isRead
-                                    ? FontWeight.normal
-                                    : FontWeight.w600,
+                            fontWeight: notification.isRead
+                                ? FontWeight.normal
+                                : FontWeight.w600,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -240,10 +246,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               Text(
                 notification.message,
                 style: AppTextStyles.bodyMedium.copyWith(
-                  color:
-                      notification.isRead
-                          ? AppColors.textSecondary
-                          : AppColors.textPrimary,
+                  color: notification.isRead
+                      ? AppColors.textSecondary
+                      : AppColors.textPrimary,
                 ),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
@@ -268,8 +273,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     if (notification.actionUrl != null ||
                         notification.caseId != null)
                       TextButton(
-                        onPressed:
-                            () => _handleNotificationAction(notification),
+                        onPressed: () =>
+                            _handleNotificationAction(notification),
                         child: Text(languageProvider.isArabic ? 'عرض' : 'View'),
                       ),
                   ],
@@ -363,10 +368,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final confirmed = await AppHelpers.showConfirmationDialog(
       context,
       title: languageProvider.isArabic ? 'تأكيد' : 'Confirm',
-      message:
-          languageProvider.isArabic
-              ? 'هل تريد تمييز جميع الإشعارات كمقروءة؟'
-              : 'Do you want to mark all notifications as read?',
+      message: languageProvider.isArabic
+          ? 'هل تريد تمييز جميع الإشعارات كمقروءة؟'
+          : 'Do you want to mark all notifications as read?',
       confirmText: languageProvider.isArabic ? 'نعم' : 'Yes',
       cancelText: languageProvider.isArabic ? 'إلغاء' : 'Cancel',
     );

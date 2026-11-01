@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../models/notification.dart';
+import '../services/notification_api_service.dart';
 
 class NotificationProvider with ChangeNotifier {
   List<AppNotification> _notifications = [];
@@ -21,10 +22,9 @@ class NotificationProvider with ChangeNotifier {
       _notifications.where((notification) => notification.isRead).toList();
 
   // Get notifications by type
-  List<AppNotification> getNotificationsByType(String type) =>
-      _notifications
-          .where((notification) => notification.type == type)
-          .toList();
+  List<AppNotification> getNotificationsByType(String type) => _notifications
+      .where((notification) => notification.type == type)
+      .toList();
 
   // Load notifications
   Future<void> loadNotifications() async {
@@ -33,35 +33,12 @@ class NotificationProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulate API call with mock data
-      await Future.delayed(const Duration(seconds: 1));
-
-      _notifications = [
-        AppNotification(
-          id: '1',
-          title: 'موعد جديد',
-          body: 'لديك موعد جديد مع د. أحمد محمد',
-          type: 'appointment',
-          createdAt: DateTime.now().subtract(const Duration(hours: 1)),
-          isRead: false,
-        ),
-        AppNotification(
-          id: '2',
-          title: 'تحديث الحالة',
-          body: 'تم تحديث حالتك الطبية',
-          type: 'case_update',
-          createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-          isRead: true,
-        ),
-        AppNotification(
-          id: '3',
-          title: 'رسالة جديدة',
-          body: 'لديك رسالة جديدة من الطبيب',
-          type: 'message',
-          createdAt: DateTime.now().subtract(const Duration(days: 1)),
-          isRead: false,
-        ),
-      ];
+      final notifications =
+          await NotificationApiService.getDoctorNotifications();
+      _notifications = notifications
+          .map((item) =>
+              AppNotification.fromJson(Map<String, dynamic>.from(item)))
+          .toList();
 
       _unreadCount = _notifications.where((n) => !n.isRead).length;
       _isLoading = false;
@@ -78,6 +55,7 @@ class NotificationProvider with ChangeNotifier {
     try {
       final index = _notifications.indexWhere((n) => n.id == notificationId);
       if (index != -1 && !_notifications[index].isRead) {
+        await NotificationApiService.markAsRead(int.parse(notificationId));
         _notifications[index] = _notifications[index].copyWith(isRead: true);
         _unreadCount--;
         notifyListeners();
@@ -91,6 +69,7 @@ class NotificationProvider with ChangeNotifier {
   // Mark all as read
   Future<void> markAllAsRead() async {
     try {
+      await NotificationApiService.markAllDoctorNotificationsRead();
       _notifications =
           _notifications.map((n) => n.copyWith(isRead: true)).toList();
       _unreadCount = 0;

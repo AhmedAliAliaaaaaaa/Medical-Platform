@@ -29,6 +29,8 @@ urlpatterns = [
     # Notifications
     path('notifications/broadcast/', api_views.send_broadcast_notification, name='admin_broadcast_notification'),
     path('send-individual-notification/', api_views.send_individual_notification, name='admin_individual_notification'),
+    path('messages/', api_views.admin_messages, name='admin_messages'),
+    path('messages/<int:message_id>/read/', api_views.mark_message_read, name='admin_mark_message_read'),
 
     # Media uploads
     path('doctors/<int:doctor_id>/upload-profile-image/', api_views.upload_doctor_profile_image, name='upload_doctor_profile_image'),

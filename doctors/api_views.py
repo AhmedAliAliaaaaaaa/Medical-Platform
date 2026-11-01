@@ -11,6 +11,7 @@ from .models import Doctor, DoctorNotification
 from patients.models import MedicalCase, DoctorResponse, Patient, PatientNotification, DoctorRating
 from accounts.models import CustomUser
 from payments.models import DoctorEarnings
+from admin_panel.models import AdminMessage
 
 
 @api_view(['GET'])
@@ -299,6 +300,68 @@ def respond_to_case(request, case_id):
         )
 
 
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def doctor_messages(request):
+    if getattr(request.user, 'user_type', None) != 'doctor':
+        return Response({'detail': 'غير مصرح'}, status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == 'POST':
+        recipient = CustomUser.objects.filter(
+            id=request.data.get('recipient_id'),
+            user_type='admin',
+            is_active=True,
+        ).first()
+        subject = str(request.data.get('subject', '')).strip()
+        body = str(request.data.get('body', '')).strip()
+        if not recipient or not subject or not body:
+            return Response(
+                {'detail': 'المستلم والعنوان والنص حقول مطلوبة'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        message = AdminMessage.objects.create(
+            sender=request.user,
+            recipient=recipient,
+            subject=subject,
+            body=body,
+        )
+        return Response(
+            {'id': message.id, 'subject': message.subject},
+            status=status.HTTP_201_CREATED,
+        )
+
+    messages = AdminMessage.objects.filter(
+        recipient=request.user,
+    ).select_related('sender', 'recipient')
+    return Response({
+        'messages': [
+            {
+                'id': message.id,
+                'subject': message.subject,
+                'body': message.body,
+                'is_read': message.is_read,
+                'created_at': message.created_at.isoformat(),
+                'sender': {
+                    'id': message.sender_id,
+                    'name': message.sender.get_full_name() or message.sender.username,
+                },
+            }
+            for message in messages
+        ],
+        'unread_count': messages.filter(is_read=False).count(),
+        'recipients': [
+            {
+                'id': admin.id,
+                'name': admin.get_full_name() or admin.username,
+            }
+            for admin in CustomUser.objects.filter(
+                user_type='admin',
+                is_active=True,
+            ).order_by('first_name')
+        ],
+    })
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mark_notification_read(request, notification_id):
@@ -321,6 +384,22 @@ def mark_notification_read(request, notification_id):
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_message_read(request, message_id):
+    if getattr(request.user, 'user_type', None) != 'doctor':
+        return Response({'detail': 'غير مصرح'}, status=status.HTTP_403_FORBIDDEN)
+    message = get_object_or_404(
+        AdminMessage,
+        id=message_id,
+        recipient=request.user,
+    )
+    message.is_read = True
+    message.read_at = timezone.now()
+    message.save(update_fields=['is_read', 'read_at'])
+    return Response({'success': True})
 
 
 @api_view(['POST'])
