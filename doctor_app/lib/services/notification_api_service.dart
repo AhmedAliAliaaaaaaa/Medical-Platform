@@ -31,9 +31,12 @@ class NotificationApiService {
   }
 
   // Mark Notification as Read
-  static Future<Map<String, dynamic>> markAsRead(int notificationId) async {
+  static Future<Map<String, dynamic>> markAsRead(
+    int notificationId, {
+    String userType = 'doctor',
+  }) async {
     final response = await BaseApiService.post(
-      '/doctor/notifications/$notificationId/mark-read/',
+      '/$userType/notifications/$notificationId/mark-read/',
       {},
     );
     return BaseApiService.handleResponse(response);

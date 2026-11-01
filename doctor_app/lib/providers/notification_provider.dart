@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart';
 import '../models/notification.dart';
 import '../services/notification_api_service.dart';
+import '../services/base_api_service.dart';
 
 class NotificationProvider with ChangeNotifier {
   List<AppNotification> _notifications = [];
   bool _isLoading = false;
   String? _error;
   int _unreadCount = 0;
+  String _userType = 'doctor';
 
   List<AppNotification> get notifications => _notifications;
   bool get isLoading => _isLoading;
@@ -33,8 +35,10 @@ class NotificationProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final notifications =
-          await NotificationApiService.getDoctorNotifications();
+      _userType = await BaseApiService.getUserType() ?? 'doctor';
+      final notifications = _userType == 'patient'
+          ? await NotificationApiService.getPatientNotifications()
+          : await NotificationApiService.getDoctorNotifications();
       _notifications = notifications
           .map((item) =>
               AppNotification.fromJson(Map<String, dynamic>.from(item)))
@@ -55,7 +59,10 @@ class NotificationProvider with ChangeNotifier {
     try {
       final index = _notifications.indexWhere((n) => n.id == notificationId);
       if (index != -1 && !_notifications[index].isRead) {
-        await NotificationApiService.markAsRead(int.parse(notificationId));
+        await NotificationApiService.markAsRead(
+          int.parse(notificationId),
+          userType: _userType,
+        );
         _notifications[index] = _notifications[index].copyWith(isRead: true);
         _unreadCount--;
         notifyListeners();
@@ -69,7 +76,7 @@ class NotificationProvider with ChangeNotifier {
   // Mark all as read
   Future<void> markAllAsRead() async {
     try {
-      await NotificationApiService.markAllDoctorNotificationsRead();
+      await NotificationApiService.markAllAsRead(_userType);
       _notifications =
           _notifications.map((n) => n.copyWith(isRead: true)).toList();
       _unreadCount = 0;
