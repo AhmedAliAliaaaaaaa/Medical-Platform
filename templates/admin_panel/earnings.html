@@ -3,130 +3,118 @@
 
 {% block title %}إدارة الأرباح - لوحة الإدارة{% endblock %}
 
+{% block extra_css %}
+<style>
+    .earnings-page { background: #f5f8fc; border-radius: 18px; padding: 24px; color: #17355d; }
+    .earnings-page .panel { background: #fff; border: 1px solid #e8eef5; border-radius: 14px; box-shadow: 0 4px 16px rgba(27, 67, 112, .06); }
+    .earnings-page .panel-header { padding: 18px 22px; border-bottom: 1px solid #edf1f6; font-weight: 800; font-size: 17px; }
+    .earnings-page .panel-body { padding: 20px; }
+    .earnings-title { font-weight: 800; color: #102f55; }
+    .summary-card { min-height: 112px; display: flex; align-items: center; gap: 16px; padding: 18px; }
+    .summary-icon { width: 52px; height: 52px; border-radius: 13px; display: grid; place-items: center; font-size: 23px; }
+    .summary-label { color: #66809f; font-size: 14px; margin-bottom: 7px; }
+    .summary-value { color: #102f55; font-size: 21px; font-weight: 800; }
+    .summary-green .summary-icon { background: #e5faf7; color: #08aaa3; }
+    .summary-blue .summary-icon { background: #e8f2ff; color: #2471d4; }
+    .summary-purple .summary-icon { background: #f1eaff; color: #7a4dcc; }
+    .summary-red .summary-icon { background: #ffebef; color: #cf4860; }
+    .earnings-page .form-control, .earnings-page .form-select { border-color: #e2eaf3; border-radius: 9px; color: #17355d; }
+    .earnings-page .form-label { color: #66809f; font-size: 13px; font-weight: 700; }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #edf1f6; }
+    .setting-row:last-child { border-bottom: 0; }
+    .setting-name { color: #526d8e; font-size: 14px; }
+    .setting-value { color: #17355d; font-weight: 800; }
+    .service-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid #edf1f6; }
+    .service-row:last-child { border-bottom: 0; }
+    .service-price { font-weight: 800; color: #17355d; }
+    .service-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 11px; background: #e8faf8; color: #05aaa3; }
+    .service-icon.emergency { background: #ffedf0; color: #d84b61; }
+    .chart-wrap { height: 220px; position: relative; overflow: hidden; background: linear-gradient(180deg, #fbfdff, #fff); border-radius: 10px; }
+    .chart-wrap svg { width: 100%; height: 100%; }
+    .chart-tabs .btn { border: 0; color: #69809d; background: #f0f4f8; }
+    .chart-tabs .btn.active { background: #08aaa3; color: #fff; }
+    .earnings-page .table { margin-bottom: 0; color: #29496d; }
+    .earnings-page .table thead th { background: #f3f7fb; color: #607995; font-size: 12px; white-space: nowrap; }
+    .earnings-page .table td { vertical-align: middle; font-size: 13px; }
+    .status-pill { display: inline-block; border-radius: 20px; padding: 5px 11px; font-size: 12px; font-weight: 700; }
+    .status-completed, .status-approved { background: #dff8eb; color: #14945a; }
+    .status-pending { background: #fff1d2; color: #a76b00; }
+    .status-rejected { background: #ffe4e9; color: #c33e55; }
+    .earnings-page .btn-primary { background: #08aaa3; border-color: #08aaa3; }
+    @media (max-width: 768px) { .earnings-page { padding: 12px; } .summary-value { font-size: 18px; } }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-coins me-2"></i>إدارة الأرباح</h2>
-        <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-secondary">لوحة الإدارة</a>
-    </div>
+    <div class="earnings-page" dir="rtl">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="earnings-title mb-0"><i class="fas fa-coins me-2"></i>إدارة الأرباح</h2>
+            <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-secondary">لوحة التحكم</a>
+        </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-4"><div class="card bg-success text-white"><div class="card-body"><small>إجمالي المدفوعات المكتملة</small><h3>{{ total_revenue|floatformat:2 }} ريال</h3></div></div></div>
-        <div class="col-md-4"><div class="card bg-warning text-dark"><div class="card-body"><small>طلبات السحب المعلقة</small><h3>{{ pending_withdrawals }}</h3></div></div></div>
-        <div class="col-md-4"><div class="card bg-info text-white"><div class="card-body"><small>عدد الأطباء المسجلين بالأرباح</small><h3>{{ earnings_rows|length }}</h3></div></div></div>
-    </div>
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-xl-3"><div class="panel summary-card summary-green"><div class="summary-icon"><i class="fas fa-sack-dollar"></i></div><div><div class="summary-label">إجمالي الأرباح</div><div class="summary-value">{{ total_revenue|floatformat:2 }} ر.س</div></div></div></div>
+            <div class="col-12 col-sm-6 col-xl-3"><div class="panel summary-card summary-blue"><div class="summary-icon"><i class="fas fa-chart-column"></i></div><div><div class="summary-label">أرباح هذا الشهر</div><div class="summary-value">{{ monthly_revenue|floatformat:2 }} ر.س</div></div></div></div>
+            <div class="col-12 col-sm-6 col-xl-3"><div class="panel summary-card summary-purple"><div class="summary-icon"><i class="fas fa-wallet"></i></div><div><div class="summary-label">المبالغ المسحوبة</div><div class="summary-value">{{ total_withdrawn|floatformat:2 }} ر.س</div></div></div></div>
+            <div class="col-12 col-sm-6 col-xl-3"><div class="panel summary-card summary-red"><div class="summary-icon"><i class="fas fa-clock"></i></div><div><div class="summary-label">طلبات سحب معلقة</div><div class="summary-value">{{ pending_withdrawals }}</div></div></div></div>
+        </div>
 
-    <div class="card mb-4">
-        <div class="card-header bg-info text-white"><h5 class="mb-0">الدفعات</h5></div>
-        <div class="table-responsive"><table class="table table-striped mb-0">
-            <thead><tr><th>المعرف</th><th>المستخدم</th><th>المبلغ</th><th>الحالة والتفاصيل</th><th>حفظ</th></tr></thead>
-            <tbody>
+        <div class="row g-4 mb-4">
+            <div class="col-lg-7">
+                <div class="panel h-100">
+                    <div class="panel-header d-flex justify-content-between align-items-center">
+                        <span>تحليل الأرباح</span>
+                        <div class="chart-tabs btn-group btn-group-sm"><button class="btn active" type="button">شهري</button><button class="btn" type="button">أسبوعي</button><button class="btn" type="button">يومي</button></div>
+                    </div>
+                    <div class="panel-body"><div class="chart-wrap">
+                        <svg viewBox="0 0 700 220" preserveAspectRatio="none" aria-label="تحليل الأرباح">
+                            <defs><linearGradient id="earningsFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#19b9b1" stop-opacity=".28"/><stop offset="1" stop-color="#19b9b1" stop-opacity=".02"/></linearGradient></defs>
+                            <g stroke="#e9f0f6" stroke-width="1"><line x1="45" y1="25" x2="680" y2="25"/><line x1="45" y1="75" x2="680" y2="75"/><line x1="45" y1="125" x2="680" y2="125"/><line x1="45" y1="175" x2="680" y2="175"/></g>
+                            <path d="M45 178 C120 148, 155 145, 215 160 S305 110, 365 123 S455 135, 515 82 S610 70, 680 35 L680 200 L45 200 Z" fill="url(#earningsFill)"/>
+                            <path d="M45 178 C120 148, 155 145, 215 160 S305 110, 365 123 S455 135, 515 82 S610 70, 680 35" fill="none" stroke="#08aaa3" stroke-width="3"/>
+                            <g fill="#08aaa3"><circle cx="45" cy="178" r="4"/><circle cx="155" cy="145" r="4"/><circle cx="265" cy="150" r="4"/><circle cx="365" cy="123" r="4"/><circle cx="515" cy="82" r="4"/><circle cx="680" cy="35" r="4"/></g>
+                            <g fill="#7187a1" font-size="12"><text x="50" y="215">يناير</text><text x="160" y="215">فبراير</text><text x="270" y="215">مارس</text><text x="370" y="215">أبريل</text><text x="515" y="215">مايو</text><text x="650" y="215">يونيو</text></g>
+                        </svg>
+                    </div></div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="row g-4">
+                    <div class="col-md-6 col-lg-12"><div class="panel"><div class="panel-header">إعدادات المنصة</div><div class="panel-body">
+                        <form method="post">
+                            {% csrf_token %}<input type="hidden" name="action" value="save_settings">
+                            <div class="setting-row"><span class="setting-name">عمولة المنصة</span><span class="d-flex align-items-center gap-2"><input class="form-control form-control-sm" style="width:80px" type="number" step=".01" min="0" max="100" name="platform_commission_rate" value="{{ settings.platform_commission_rate|default:60 }}">%</span></div>
+                            <div class="setting-row"><span class="setting-name">الحد الأدنى للسحب</span><span class="d-flex align-items-center gap-1"><input class="form-control form-control-sm" style="width:95px" type="number" step=".01" min="0" name="minimum_withdrawal_amount" value="{{ settings.minimum_withdrawal_amount|default:100 }}"> ر.س</span></div>
+                            <div class="setting-row"><span class="setting-name">بوابة الدفع</span><label class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="payment_gateway_enabled" {% if settings.payment_gateway_enabled %}checked{% endif %}></label></div>
+                            <div class="setting-row"><span class="setting-name">الاعتماد التلقائي للدفعات</span><label class="form-check form-switch mb-0"><input class="form-check-input" type="checkbox" name="auto_approve_payments" {% if settings.auto_approve_payments %}checked{% endif %}></label></div>
+                            <button class="btn btn-primary w-100 mt-3">حفظ التغييرات</button>
+                        </form>
+                    </div></div></div>
+                    <div class="col-md-6 col-lg-12"><div class="panel"><div class="panel-header">أسعار الخدمات</div><div class="panel-body">
+                        <form method="post">
+                            {% csrf_token %}<input type="hidden" name="action" value="save_settings">
+                            <div class="service-row"><span class="d-flex align-items-center gap-2"><span class="service-icon"><i class="fas fa-stethoscope"></i></span>استشارة</span><span><input class="form-control form-control-sm d-inline-block" style="width:90px" name="default_consultation_fee" value="{{ settings.default_consultation_fee|default:100 }}"> ر.س</span></div>
+                            <div class="service-row"><span class="d-flex align-items-center gap-2"><span class="service-icon"><i class="fas fa-file-medical"></i></span>متابعة</span><span><input class="form-control form-control-sm d-inline-block" style="width:90px" name="default_follow_up_fee" value="{{ settings.default_follow_up_fee|default:50 }}"> ر.س</span></div>
+                            <div class="service-row"><span class="d-flex align-items-center gap-2"><span class="service-icon emergency"><i class="fas fa-bell"></i></span>طوارئ</span><span><input class="form-control form-control-sm d-inline-block" style="width:90px" name="default_emergency_fee" value="{{ settings.default_emergency_fee|default:200 }}"> ر.س</span></div>
+                            <button class="btn btn-primary w-100 mt-3">حفظ الأسعار</button>
+                        </form>
+                    </div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel mb-4">
+            <div class="panel-header">أحدث الدفعات</div>
+            <div class="table-responsive"><table class="table"><thead><tr><th>الطبيب</th><th>المبلغ</th><th>حالة الدفع</th><th>معرف المعاملة</th><th>التاريخ</th><th>إجراء</th></tr></thead><tbody>
             {% for payment in payments %}
-            <tr><form method="post">
-                {% csrf_token %}<input type="hidden" name="action" value="save_payment"><input type="hidden" name="payment_id" value="{{ payment.id }}">
-                <td>{{ payment.payment_id }}</td>
-                <td>{{ payment.user.username }}{% if payment.doctor %}<br>{{ payment.doctor.user.username }}{% endif %}</td>
-                <td>{{ payment.amount }} {{ payment.currency }}</td>
-                <td>
-                    <select class="form-select form-select-sm mb-1" name="status">
-                        <option value="pending" {% if payment.status == 'pending' %}selected{% endif %}>في الانتظار</option>
-                        <option value="processing" {% if payment.status == 'processing' %}selected{% endif %}>قيد المعالجة</option>
-                        <option value="completed" {% if payment.status == 'completed' %}selected{% endif %}>مكتمل</option>
-                        <option value="failed" {% if payment.status == 'failed' %}selected{% endif %}>فشل</option>
-                        <option value="cancelled" {% if payment.status == 'cancelled' %}selected{% endif %}>ملغي</option>
-                        <option value="refunded" {% if payment.status == 'refunded' %}selected{% endif %}>مسترد</option>
-                    </select>
-                    <input class="form-control form-control-sm mb-1" name="transaction_id" value="{{ payment.transaction_id }}" placeholder="معرف المعاملة">
-                    <textarea class="form-control form-control-sm" name="notes" placeholder="ملاحظات">{{ payment.notes }}</textarea>
-                </td>
-                <td><button class="btn btn-sm btn-primary">حفظ</button></td>
-            </form></tr>
-            {% empty %}<tr><td colspan="5" class="text-center">لا توجد دفعات.</td></tr>{% endfor %}
-            </tbody>
-        </table></div>
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-header bg-secondary text-white"><h5 class="mb-0">طرق الدفع المحفوظة</h5></div>
-        <div class="table-responsive"><table class="table table-striped mb-0">
-            <thead><tr><th>المستخدم</th><th>النوع</th><th>الحساب</th><th>الحالة</th><th>إجراء</th></tr></thead>
-            <tbody>
-            {% for method in payment_methods %}
-            <tr><td>{{ method.user.username }}</td><td>{{ method.get_payment_type_display }}</td><td>{% if method.card_number %}****{{ method.card_number|slice:"-4:" }}{% else %}{{ method.bank_name }}{% endif %}</td><td>{% if method.is_active %}نشطة{% else %}غير نشطة{% endif %}</td><td><form method="post" onsubmit="return confirm('حذف طريقة الدفع؟');">{% csrf_token %}<input type="hidden" name="action" value="delete_payment_method"><input type="hidden" name="payment_method_id" value="{{ method.id }}"><button class="btn btn-sm btn-danger">حذف</button></form></td></tr>
-            {% empty %}<tr><td colspan="5" class="text-center">لا توجد طرق دفع.</td></tr>{% endfor %}
-            </tbody>
-        </table></div>
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-header bg-dark text-white"><h5 class="mb-0">إعدادات المنصة المالية</h5></div>
-        <div class="card-body">
-            <form method="post" class="row g-3">
-                {% csrf_token %}<input type="hidden" name="action" value="save_settings">
-                <div class="col-md-4"><label class="form-label">عمولة المنصة %</label><input class="form-control" type="number" step="0.01" min="0" max="100" name="platform_commission_rate" value="{{ settings.platform_commission_rate|default:60 }}"></div>
-                <div class="col-md-4"><label class="form-label">الحد الأدنى للسحب</label><input class="form-control" type="number" step="0.01" min="0" name="minimum_withdrawal_amount" value="{{ settings.minimum_withdrawal_amount|default:100 }}"></div>
-                <div class="col-md-4"><label class="form-label">سعر الاستشارة الافتراضي</label><input class="form-control" type="number" step="0.01" min="0" name="default_consultation_fee" value="{{ settings.default_consultation_fee|default:100 }}"></div>
-                <div class="col-md-4"><label class="form-label">سعر المتابعة الافتراضي</label><input class="form-control" type="number" step="0.01" min="0" name="default_follow_up_fee" value="{{ settings.default_follow_up_fee|default:50 }}"></div>
-                <div class="col-md-4"><label class="form-label">سعر الطوارئ الافتراضي</label><input class="form-control" type="number" step="0.01" min="0" name="default_emergency_fee" value="{{ settings.default_emergency_fee|default:200 }}"></div>
-                <div class="col-md-4 d-flex align-items-end gap-3"><label><input type="checkbox" name="payment_gateway_enabled" {% if settings.payment_gateway_enabled %}checked{% endif %}> بوابة الدفع مفعلة</label><label><input type="checkbox" name="auto_approve_payments" {% if settings.auto_approve_payments %}checked{% endif %}> اعتماد تلقائي</label></div>
-                <div class="col-12"><button class="btn btn-dark">حفظ الإعدادات</button></div>
-            </form>
+            <tr><form method="post">{% csrf_token %}<input type="hidden" name="action" value="save_payment"><input type="hidden" name="payment_id" value="{{ payment.id }}"><td>{% if payment.doctor %}{{ payment.doctor.user.get_full_name|default:payment.doctor.user.username }}{% else %}{{ payment.user.username }}{% endif %}</td><td>{{ payment.amount }} {{ payment.currency }}</td><td><select class="form-select form-select-sm" name="status"><option value="pending" {% if payment.status == 'pending' %}selected{% endif %}>في الانتظار</option><option value="processing" {% if payment.status == 'processing' %}selected{% endif %}>قيد المعالجة</option><option value="completed" {% if payment.status == 'completed' %}selected{% endif %}>مكتملة</option><option value="failed" {% if payment.status == 'failed' %}selected{% endif %}>فاشلة</option></select></td><td><input class="form-control form-control-sm" name="transaction_id" value="{{ payment.transaction_id }}"></td><td>{{ payment.created_at|date:"Y/m/d" }}</td><td><button class="btn btn-sm btn-primary">حفظ</button></td></form></tr>
+            {% empty %}<tr><td colspan="6" class="text-center py-4">لا توجد دفعات.</td></tr>{% endfor %}</tbody></table></div>
         </div>
-    </div>
 
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white"><h5 class="mb-0">أرباح الأطباء</h5></div>
-        <div class="table-responsive">
-            <table class="table table-striped mb-0">
-                <thead><tr><th>الطبيب</th><th>الأرصدة والرسوم</th><th>حفظ</th></tr></thead>
-                <tbody>
-                {% for row in earnings_rows %}
-                <tr><form method="post">
-                    {% csrf_token %}<input type="hidden" name="action" value="save_earnings"><input type="hidden" name="earnings_id" value="{{ row.id }}">
-                    <td>{{ row.doctor.user.get_full_name|default:row.doctor.user.username }}</td>
-                    <td><div class="row g-1">
-                        <div class="col-md-3"><label class="small">الإجمالي</label><input class="form-control form-control-sm" name="total_earnings" value="{{ row.total_earnings }}"></div>
-                        <div class="col-md-3"><label class="small">المتاح</label><input class="form-control form-control-sm" name="available_balance" value="{{ row.available_balance }}"></div>
-                        <div class="col-md-3"><label class="small">المعلق</label><input class="form-control form-control-sm" name="pending_balance" value="{{ row.pending_balance }}"></div>
-                        <div class="col-md-3"><label class="small">المسحوب</label><input class="form-control form-control-sm" name="withdrawn_amount" value="{{ row.withdrawn_amount }}"></div>
-                        <div class="col-md-4"><label class="small">الاستشارة</label><input class="form-control form-control-sm" name="consultation_fee" value="{{ row.consultation_fee }}"></div>
-                        <div class="col-md-4"><label class="small">المتابعة</label><input class="form-control form-control-sm" name="follow_up_fee" value="{{ row.follow_up_fee }}"></div>
-                        <div class="col-md-4"><label class="small">الطوارئ</label><input class="form-control form-control-sm" name="emergency_fee" value="{{ row.emergency_fee }}"></div>
-                    </div></td>
-                    <td><button class="btn btn-sm btn-primary">حفظ</button></td>
-                </form>
-                </tr>
-                {% empty %}<tr><td colspan="5" class="text-center">لا توجد بيانات أرباح.</td></tr>{% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-header bg-warning"><h5 class="mb-0">طلبات السحب</h5></div>
-        <div class="table-responsive">
-            <table class="table table-striped mb-0">
-                <thead><tr><th>الطبيب</th><th>المبلغ</th><th>البنك</th><th>الحالة</th><th>الإجراء</th></tr></thead>
-                <tbody>
-                {% for withdrawal in withdrawals %}
-                <tr>
-                    <td>{{ withdrawal.doctor.user.get_full_name|default:withdrawal.doctor.user.username }}</td>
-                    <td>{{ withdrawal.amount|floatformat:2 }} ريال</td>
-                    <td>{{ withdrawal.bank_name }}</td>
-                    <td>{{ withdrawal.get_status_display }}</td>
-                    <td>
-                    {% if withdrawal.status == 'pending' %}
-                    <form method="post" class="d-inline">
-                        {% csrf_token %}<input type="hidden" name="withdrawal_id" value="{{ withdrawal.id }}">
-                        <button name="action" value="approve" class="btn btn-sm btn-success">موافقة</button>
-                        <button name="action" value="reject" class="btn btn-sm btn-danger">رفض</button>
-                    </form>
-                    {% else %}-{% endif %}
-                    </td>
-                </tr>
-                {% empty %}<tr><td colspan="5" class="text-center">لا توجد طلبات سحب.</td></tr>{% endfor %}
-                </tbody>
-            </table>
+        <div class="row g-4">
+            <div class="col-lg-7"><div class="panel"><div class="panel-header d-flex justify-content-between"><span>أرباح الأطباء</span><span class="text-muted small">الرصيد المتاح: {{ total_available_balance|floatformat:2 }} ر.س</span></div><div class="table-responsive"><table class="table"><thead><tr><th>الطبيب</th><th>الإجمالي</th><th>المتاح</th><th>المعلق</th></tr></thead><tbody>{% for row in earnings_rows %}<tr><td>{{ row.doctor.user.get_full_name|default:row.doctor.user.username }}</td><td>{{ row.total_earnings|floatformat:2 }}</td><td>{{ row.available_balance|floatformat:2 }}</td><td>{{ row.pending_balance|floatformat:2 }}</td></tr>{% empty %}<tr><td colspan="4" class="text-center py-4">لا توجد بيانات أرباح.</td></tr>{% endfor %}</tbody></table></div></div></div>
+            <div class="col-lg-5"><div class="panel"><div class="panel-header d-flex justify-content-between"><span>طلبات السحب</span><span class="text-primary small">عرض الكل</span></div><div class="table-responsive"><table class="table"><thead><tr><th>الطبيب</th><th>المبلغ</th><th>الحالة</th><th></th></tr></thead><tbody>{% for withdrawal in withdrawals %}<tr><td>{{ withdrawal.doctor.user.get_full_name|default:withdrawal.doctor.user.username }}</td><td>{{ withdrawal.amount|floatformat:2 }} ر.س</td><td><span class="status-pill status-{{ withdrawal.status }}">{{ withdrawal.get_status_display }}</span></td><td>{% if withdrawal.status == 'pending' %}<form method="post" class="d-flex gap-1">{% csrf_token %}<input type="hidden" name="withdrawal_id" value="{{ withdrawal.id }}"><button name="action" value="approve" class="btn btn-sm btn-success">موافقة</button><button name="action" value="reject" class="btn btn-sm btn-danger">رفض</button></form>{% endif %}</td></tr>{% empty %}<tr><td colspan="4" class="text-center py-4">لا توجد طلبات سحب.</td></tr>{% endfor %}</tbody></table></div></div></div>
         </div>
     </div>
 </div>

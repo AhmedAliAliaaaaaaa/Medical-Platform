@@ -318,6 +318,21 @@ class EarningsManagementView(AdminRequiredMixin, TemplateView):
         context['total_revenue'] = Payment.objects.filter(
             status='completed'
         ).aggregate(total=Sum('amount'))['total'] or 0
+        context['total_doctor_earnings'] = DoctorEarnings.objects.aggregate(
+            total=Sum('total_earnings')
+        )['total'] or 0
+        context['total_available_balance'] = DoctorEarnings.objects.aggregate(
+            total=Sum('available_balance')
+        )['total'] or 0
+        context['total_withdrawn'] = DoctorEarnings.objects.aggregate(
+            total=Sum('withdrawn_amount')
+        )['total'] or 0
+        now = timezone.now()
+        context['monthly_revenue'] = Payment.objects.filter(
+            status='completed',
+            created_at__year=now.year,
+            created_at__month=now.month,
+        ).aggregate(total=Sum('amount'))['total'] or 0
         context['pending_withdrawals'] = WithdrawalRequest.objects.filter(
             status='pending'
         ).count()
@@ -334,7 +349,8 @@ class EarningsManagementView(AdminRequiredMixin, TemplateView):
                 'default_follow_up_fee',
                 'default_emergency_fee',
             ):
-                setattr(settings, field, request.POST.get(field))
+                if field in request.POST:
+                    setattr(settings, field, request.POST.get(field))
             settings.payment_gateway_enabled = 'payment_gateway_enabled' in request.POST
             settings.auto_approve_payments = 'auto_approve_payments' in request.POST
             settings.save()
