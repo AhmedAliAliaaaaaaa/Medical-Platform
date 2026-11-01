@@ -178,7 +178,7 @@ class WithdrawalRequest(models.Model):
 
 class PlatformSettings(models.Model):
     # رسوم المنصة
-    platform_commission_rate = models.DecimalField(max_digits=5, decimal_places=2, default=10.00)  # نسبة عمولة المنصة
+    platform_commission_rate = models.DecimalField(max_digits=5, decimal_places=2, default=60.00)  # نسبة عمولة المنصة
     minimum_withdrawal_amount = models.DecimalField(max_digits=8, decimal_places=2, default=100.00)
     
     # أسعار افتراضية

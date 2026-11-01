@@ -231,7 +231,14 @@ class PaymentService:
             dict: Fee calculation breakdown
         """
         if commission_rate is None:
-            commission_rate = Decimal(str(settings.PLATFORM_COMMISSION_RATE))
+            from .models import PlatformSettings
+
+            platform_settings = PlatformSettings.objects.first()
+            commission_rate = (
+                platform_settings.platform_commission_rate
+                if platform_settings is not None
+                else Decimal('60')
+            )
         
         platform_fee = amount * (commission_rate / 100)
         doctor_amount = amount - platform_fee
