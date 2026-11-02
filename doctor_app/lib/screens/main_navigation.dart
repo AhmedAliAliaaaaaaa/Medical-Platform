@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:doctor_app/l10n/app_localizations.dart';
 import 'package:doctor_app/screens/patient/cases/create_case_screen.dart';
 import '../providers/language_provider.dart';
 import '../providers/auth_provider.dart';
@@ -16,6 +16,7 @@ import 'analytics/analytics_screen.dart';
 import 'patient/dashboard/professional_patient_dashboard.dart';
 import 'doctor/dashboard/doctor_dashboard.dart';
 import 'auth/pending_approval_screen.dart';
+import 'auth/doctor_registration_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -412,15 +413,9 @@ class _MainNavigationState extends State<MainNavigation>
   }
 
   void _showAddDoctorDialog() {
-    final isRTL = Provider.of<LanguageProvider>(context, listen: false).isRTL;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isRTL ? 'ميزة إضافة طبيب قريباً' : 'Add doctor feature coming soon',
-        ),
-        backgroundColor: AppTheme.primaryBlue,
-      ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const DoctorRegistrationScreen()),
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:doctor_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -865,16 +865,23 @@ class _AppointmentsScreenState extends State<AppointmentsScreen>
     );
   }
 
-  void _rescheduleAppointment(Appointment appointment, bool isRTL) {
+  Future<void> _rescheduleAppointment(Appointment appointment, bool isRTL) async {
+    final date = await showDatePicker(
+      context: context,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      initialDate: appointment.date.isBefore(DateTime.now()) ? DateTime.now() : appointment.date,
+    );
+    if (date == null || !mounted) return;
+    final time = await showTimePicker(context: context, initialTime: appointment.time);
+    if (time == null || !mounted) return;
+    setState(() {
+      appointment.date = date;
+      appointment.time = time;
+      _updateSelectedDayAppointments();
+    });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isRTL
-              ? 'ميزة إعادة الجدولة قريباً'
-              : 'Reschedule feature coming soon',
-        ),
-        backgroundColor: AppTheme.primaryBlue,
-      ),
+      SnackBar(content: Text(isRTL ? 'تمت إعادة جدولة الموعد' : 'Appointment rescheduled')),
     );
   }
 }
@@ -884,8 +891,8 @@ class Appointment {
   final String id;
   final String doctorName;
   final String doctorSpecialization;
-  final DateTime date;
-  final TimeOfDay time;
+  DateTime date;
+  TimeOfDay time;
   AppointmentStatus status;
   final AppointmentType type;
   final double fee;

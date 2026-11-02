@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:doctor_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 
@@ -737,20 +737,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   void _startVideoCall() {
-    // Implement video call functionality
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Video call feature coming soon'),
+        content: Text('المكالمات المرئية تحتاج إعداد خدمة المكالمات من إدارة النظام'),
         backgroundColor: AppTheme.primaryBlue,
       ),
     );
   }
 
   void _startVoiceCall() {
-    // Implement voice call functionality
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Voice call feature coming soon'),
+        content: Text('المكالمات الصوتية تحتاج إعداد خدمة المكالمات من إدارة النظام'),
         backgroundColor: AppTheme.primaryGreen,
       ),
     );

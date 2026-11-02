@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:doctor_app/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import '../../../providers/language_provider.dart';
@@ -702,7 +702,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
           ),
           const SizedBox(height: 16),
 
-          // Placeholder for charts
           Container(
             height: 200,
             decoration: BoxDecoration(
@@ -714,16 +713,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
                 width: 1,
               ),
             ),
-            child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Icon(Icons.bar_chart, size: 48, color: Colors.grey[400]),
-                  const SizedBox(height: 8),
-                  Text(
-                    isRTL ? 'الرسوم البيانية قريباً' : 'Charts Coming Soon',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
+                  _chartRow(isRTL ? 'الحالات المكتملة' : 'Completed cases', _analyticsData['completedCases'] as num, Colors.green),
+                  _chartRow(isRTL ? 'الحالات النشطة' : 'Active cases', _analyticsData['activeCases'] as num, Colors.orange),
+                  _chartRow(isRTL ? 'مرضى جدد' : 'New patients', _analyticsData['newPatients'] as num, Colors.blue),
                 ],
               ),
             ),
@@ -731,6 +728,17 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
         ],
       ),
     );
+  }
+
+  Widget _chartRow(String label, num value, Color color) {
+    final maximum = (_analyticsData['totalCases'] as num).toDouble();
+    final factor = maximum == 0 ? 0.0 : (value.toDouble() / maximum).clamp(0.0, 1.0);
+    return Row(children: [
+      SizedBox(width: 110, child: Text(label, overflow: TextOverflow.ellipsis)),
+      Expanded(child: LinearProgressIndicator(value: factor, minHeight: 12, color: color)),
+      const SizedBox(width: 8),
+      Text(value.toString()),
+    ]);
   }
 
   Widget _buildAnalyticsItem({

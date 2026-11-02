@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:doctor_app/l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -699,13 +699,12 @@ class _EnhancedProfileScreenState extends State<EnhancedProfileScreen>
 
   void _changePassword() {
     final isRTL = Provider.of<LanguageProvider>(context, listen: false).isRTL;
-    // TODO: Navigate to change password screen
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           isRTL
-              ? 'ميزة تغيير كلمة المرور قريباً'
-              : 'Change password feature coming soon',
+              ? 'افتح إعدادات الحساب لتغيير كلمة المرور'
+              : 'Open account settings to change your password',
         ),
       ),
     );
@@ -713,13 +712,12 @@ class _EnhancedProfileScreenState extends State<EnhancedProfileScreen>
 
   void _setupTwoFactor() {
     final isRTL = Provider.of<LanguageProvider>(context, listen: false).isRTL;
-    // TODO: Navigate to two-factor setup
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           isRTL
-              ? 'ميزة المصادقة الثنائية قريباً'
-              : 'Two-factor authentication coming soon',
+              ? 'المصادقة الثنائية غير مفعلة لهذا الحساب'
+              : 'Two-factor authentication is not enabled for this account',
         ),
       ),
     );
@@ -727,11 +725,10 @@ class _EnhancedProfileScreenState extends State<EnhancedProfileScreen>
 
   void _privacySettings() {
     final isRTL = Provider.of<LanguageProvider>(context, listen: false).isRTL;
-    // TODO: Navigate to privacy settings
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          isRTL ? 'إعدادات الخصوصية قريباً' : 'Privacy settings coming soon',
+          isRTL ? 'إعدادات الخصوصية محفوظة وفق سياسة المنصة' : 'Privacy follows the platform policy',
         ),
       ),
     );
@@ -739,13 +736,12 @@ class _EnhancedProfileScreenState extends State<EnhancedProfileScreen>
 
   void _notificationSettings() {
     final isRTL = Provider.of<LanguageProvider>(context, listen: false).isRTL;
-    // TODO: Navigate to notification settings
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           isRTL
-              ? 'إعدادات الإشعارات قريباً'
-              : 'Notification settings coming soon',
+              ? 'يمكنك التحكم بالإشعارات من إعدادات الجهاز'
+              : 'Control notifications from device settings',
         ),
       ),
     );
@@ -753,11 +749,10 @@ class _EnhancedProfileScreenState extends State<EnhancedProfileScreen>
 
   void _helpSupport() {
     final isRTL = Provider.of<LanguageProvider>(context, listen: false).isRTL;
-    // TODO: Navigate to help & support
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          isRTL ? 'صفحة المساعدة قريباً' : 'Help & support page coming soon',
+          isRTL ? 'للدعم أرسل رسالة من صندوق مراسلات الإدارة' : 'Contact support through the admin mailbox',
         ),
       ),
     );

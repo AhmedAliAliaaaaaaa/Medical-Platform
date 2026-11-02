@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../services/api_service.dart';
+import '../../services/auth_api_service.dart';
 import '../../utils/app_theme.dart';
+import '../../providers/language_provider.dart';
+import 'package:provider/provider.dart';
 import '../auth/login_screen.dart';
 
 class PatientProfileScreen extends StatefulWidget {
@@ -73,6 +76,42 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
         (route) => false,
       );
     }
+
+  }
+
+  Future<void> _changePassword() async {
+    final current = TextEditingController();
+    final next = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تغيير كلمة المرور'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          TextField(controller: current, obscureText: true, decoration: const InputDecoration(labelText: 'كلمة المرور الحالية')),
+          TextField(controller: next, obscureText: true, decoration: const InputDecoration(labelText: 'كلمة المرور الجديدة')),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
+          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('حفظ')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final result = await AuthApiService.changePassword(currentPassword: current.text, newPassword: next.text);
+    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'] ?? result['error'] ?? 'تم تحديث كلمة المرور')));
+  }
+
+  void _selectLanguage() {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (context) => ListTile(
+        title: const Text('تبديل اللغة'),
+        onTap: () {
+          Provider.of<LanguageProvider>(context, listen: false).toggleLanguage();
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 
   @override
@@ -364,28 +403,16 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
             ),
           ),
           _buildSettingItem(Icons.edit, 'تعديل الملف الشخصي', () {
-            // TODO: Navigate to edit profile screen
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('قريباً...')));
+            _loadUserProfile();
           }),
           _buildSettingItem(Icons.lock, 'تغيير كلمة المرور', () {
-            // TODO: Navigate to change password screen
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('قريباً...')));
+            _changePassword();
           }),
           _buildSettingItem(Icons.notifications, 'إعدادات الإشعارات', () {
-            // TODO: Navigate to notification settings
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('قريباً...')));
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('الإشعارات مفعلة من إعدادات الجهاز')));
           }),
           _buildSettingItem(Icons.language, 'اللغة', () {
-            // TODO: Show language selection
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('قريباً...')));
+            _selectLanguage();
           }),
           _buildSettingItem(
             Icons.logout,

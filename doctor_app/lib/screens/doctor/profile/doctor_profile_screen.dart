@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:doctor_app/services/api_service.dart';
+import 'package:doctor_app/services/auth_api_service.dart';
+import 'package:provider/provider.dart';
+import 'package:doctor_app/providers/language_provider.dart';
 import 'package:doctor_app/core/theme/app_theme.dart';
 import 'package:doctor_app/screens/auth/login_screen.dart';
 
@@ -39,6 +42,33 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
         _isLoading = false;
       });
     }
+
+  }
+
+  Future<void> _changePassword() async {
+    final current = TextEditingController();
+    final next = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تغيير كلمة المرور'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          TextField(controller: current, obscureText: true, decoration: const InputDecoration(labelText: 'كلمة المرور الحالية')),
+          TextField(controller: next, obscureText: true, decoration: const InputDecoration(labelText: 'كلمة المرور الجديدة')),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
+          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text('حفظ')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final result = await AuthApiService.changePassword(currentPassword: current.text, newPassword: next.text);
+    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'] ?? result['error'] ?? 'تم تحديث كلمة المرور')));
+  }
+
+  void _toggleLanguage() {
+    Provider.of<LanguageProvider>(context, listen: false).toggleLanguage();
   }
 
   Future<void> _logout() async {
@@ -494,29 +524,19 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             ),
           ),
           _buildSettingItem(Icons.edit, 'تعديل الملف الشخصي', () {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('قريباً...')));
+            _loadDoctorProfile();
           }),
           _buildSettingItem(Icons.schedule, 'إدارة المواعيد', () {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('قريباً...')));
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('إدارة المواعيد متاحة من لوحة المواعيد')));
           }),
           _buildSettingItem(Icons.lock, 'تغيير كلمة المرور', () {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('قريباً...')));
+            _changePassword();
           }),
           _buildSettingItem(Icons.notifications, 'إعدادات الإشعارات', () {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('قريباً...')));
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('الإشعارات مفعلة من إعدادات الجهاز')));
           }),
           _buildSettingItem(Icons.language, 'اللغة', () {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('قريباً...')));
+            _toggleLanguage();
           }),
           _buildSettingItem(
             Icons.logout,

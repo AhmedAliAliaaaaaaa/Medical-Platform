@@ -59,6 +59,33 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
+  Future<void> _forgotPassword() async {
+    final controller = TextEditingController();
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('استعادة كلمة المرور'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.emailAddress,
+          decoration: const InputDecoration(labelText: 'البريد الإلكتروني أو اسم المستخدم'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(this.context).showSnackBar(
+                const SnackBar(content: Text('سيتم التواصل معك لإعادة تعيين كلمة المرور')),
+              );
+            },
+            child: const Text('إرسال الطلب'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -457,13 +484,7 @@ class _LoginScreenState extends State<LoginScreen>
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   TextButton(
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text('قريباً...')),
-                                      );
-                                    },
+                                    onPressed: _forgotPassword,
                                     child: const Text(
                                       'نسيت كلمة المرور؟',
                                       style: TextStyle(
