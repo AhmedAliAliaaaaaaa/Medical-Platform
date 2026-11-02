@@ -726,7 +726,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           doctorId: doctor['id'],
           amount: (doctor['consultation_fee'] is num)
               ? (doctor['consultation_fee'] as num).toDouble()
-              : 50.0,
+              : 100.0,
           title: widget.caseData!['title'],
           description: widget.caseData!['description'],
           symptoms: '', // يمكن إضافة الأعراض إذا كانت متوفرة
@@ -775,7 +775,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                         'التقييم: ${(doctor['rating'] ?? 0.0).toString()} ⭐',
                       ),
                       Text(
-                        'رسوم الاستشارة: \$${(doctor['consultation_fee'] ?? 50.0).toString()}',
+                        'رسوم الاستشارة: \$${(doctor['consultation_fee'] ?? 100.0).toString()}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppTheme.primaryBlue,

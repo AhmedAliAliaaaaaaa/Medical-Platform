@@ -4,14 +4,91 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, Sum
 from django.utils import timezone
 from .models import AdminMessage
 
 from doctors.models import Doctor, DoctorNotification
 from patients.models import Patient, MedicalCase, DoctorResponse, PatientNotification, DoctorRating
+from payments.models import DoctorEarnings, Payment, WithdrawalRequest, PlatformSettings
 
 User = get_user_model()
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def admin_earnings(request):
+    if not _is_admin(request.user):
+        return Response({'detail': 'غير مصرح'}, status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == 'POST':
+        action = request.data.get('action')
+        if action == 'save_settings':
+            settings_obj, _ = PlatformSettings.objects.get_or_create(pk=1)
+            for field in (
+                'platform_commission_rate',
+                'minimum_withdrawal_amount',
+                'default_consultation_fee',
+                'default_follow_up_fee',
+                'default_emergency_fee',
+            ):
+                if field in request.data:
+                    setattr(settings_obj, field, request.data[field])
+            settings_obj.payment_gateway_enabled = bool(
+                request.data.get('payment_gateway_enabled', settings_obj.payment_gateway_enabled)
+            )
+            settings_obj.auto_approve_payments = bool(
+                request.data.get('auto_approve_payments', settings_obj.auto_approve_payments)
+            )
+            settings_obj.save()
+            return Response({'message': 'تم حفظ إعدادات الأرباح'})
+
+        withdrawal = get_object_or_404(
+            WithdrawalRequest.objects.select_related('doctor'),
+            pk=request.data.get('withdrawal_id'),
+        )
+        if withdrawal.status != 'pending' or action not in ('approve', 'reject'):
+            return Response({'error': 'طلب السحب أو الإجراء غير صالح'}, status=400)
+        earnings = get_object_or_404(DoctorEarnings, doctor=withdrawal.doctor)
+        withdrawal.status = 'approved' if action == 'approve' else 'rejected'
+        withdrawal.processed_at = timezone.now()
+        if action == 'approve':
+            earnings.pending_balance = max(earnings.pending_balance - withdrawal.amount, 0)
+            earnings.withdrawn_amount += withdrawal.amount
+        else:
+            earnings.pending_balance = max(earnings.pending_balance - withdrawal.amount, 0)
+            earnings.available_balance += withdrawal.amount
+        withdrawal.save()
+        earnings.save()
+        return Response({'message': 'تم تحديث طلب السحب'})
+
+    settings_obj = PlatformSettings.objects.first()
+    return Response({
+        'summary': {
+            'total_revenue': float(Payment.objects.filter(status='completed').aggregate(total=Sum('amount'))['total'] or 0),
+            'total_available_balance': float(DoctorEarnings.objects.aggregate(total=Sum('available_balance'))['total'] or 0),
+            'total_withdrawn': float(DoctorEarnings.objects.aggregate(total=Sum('withdrawn_amount'))['total'] or 0),
+            'pending_withdrawals': WithdrawalRequest.objects.filter(status='pending').count(),
+        },
+        'settings': {
+            'platform_commission_rate': float(settings_obj.platform_commission_rate) if settings_obj else 60,
+            'minimum_withdrawal_amount': float(settings_obj.minimum_withdrawal_amount) if settings_obj else 100,
+            'default_consultation_fee': float(settings_obj.default_consultation_fee) if settings_obj else 100,
+            'default_follow_up_fee': float(settings_obj.default_follow_up_fee) if settings_obj else 75,
+            'default_emergency_fee': float(settings_obj.default_emergency_fee) if settings_obj else 200,
+        },
+        'withdrawals': [
+            {
+                'id': item.id,
+                'doctor': item.doctor.user.get_full_name() or item.doctor.user.username,
+                'amount': float(item.amount),
+                'status': item.status,
+                'status_display': item.get_status_display(),
+                'requested_at': item.requested_at.isoformat(),
+            }
+            for item in WithdrawalRequest.objects.select_related('doctor__user').order_by('-requested_at')[:50]
+        ],
+    })
 
 
 def _is_admin(user: User) -> bool:

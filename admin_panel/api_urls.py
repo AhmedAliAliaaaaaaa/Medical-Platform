@@ -5,6 +5,7 @@ urlpatterns = [
     # Admin dashboard and statistics
     path('dashboard/', api_views.admin_dashboard, name='admin_dashboard_api'),
     path('statistics/', api_views.system_statistics, name='admin_system_statistics'),
+    path('earnings/', api_views.admin_earnings, name='admin_earnings'),
 
     # Doctors management
     path('pending-doctors/', api_views.pending_doctor_applications, name='pending_doctor_applications'),

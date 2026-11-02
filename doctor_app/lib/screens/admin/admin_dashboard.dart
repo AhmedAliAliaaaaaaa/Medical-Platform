@@ -19,6 +19,7 @@ import 'admin_doctor_responses_screen.dart';
 import 'admin_settings_screen.dart';
 import 'analytics_screen.dart';
 import 'reports_screen.dart';
+import 'admin_earnings_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -817,6 +818,15 @@ class _AdminDashboardState extends State<AdminDashboard>
             Navigator.push(context,
                 MaterialPageRoute(builder: (_) => const AdminSettingsScreen()));
           },
+        ),
+        QuickActionItem(
+          label: isRTL ? 'إدارة الأرباح' : 'Earnings',
+          icon: Icons.account_balance_wallet,
+          color: Colors.teal,
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminEarningsScreen()),
+          ),
         ),
       ],
     );

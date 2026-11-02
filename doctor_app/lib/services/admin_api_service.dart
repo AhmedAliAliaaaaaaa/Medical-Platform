@@ -1,6 +1,24 @@
 import 'base_api_service.dart';
 
 class AdminApiService {
+  static Future<Map<String, dynamic>> getEarnings() async {
+    final response = await BaseApiService.get('/admin/earnings/');
+    return BaseApiService.handleResponse(response);
+  }
+
+  static Future<Map<String, dynamic>> updateEarnings({
+    required String action,
+    int? withdrawalId,
+    Map<String, dynamic>? settings,
+  }) async {
+    final response = await BaseApiService.post('/admin/earnings/', {
+      'action': action,
+      if (withdrawalId != null) 'withdrawal_id': withdrawalId,
+      ...?settings,
+    });
+    return BaseApiService.handleResponse(response);
+  }
+
   // Get Admin Dashboard
   static Future<Map<String, dynamic>> getDashboard() async {
     try {
