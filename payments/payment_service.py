@@ -36,6 +36,28 @@ else:
     logger.warning("PayPal is not fully configured (PAYPAL_MODE/CLIENT_ID/CLIENT_SECRET missing). PayPal will be disabled in this environment.")
 
 class PaymentService:
+    @staticmethod
+    def get_service_fee(consultation_type='consultation'):
+        from .models import PlatformSettings
+
+        platform_settings = PlatformSettings.objects.first()
+        defaults = {
+            'consultation': Decimal('100'),
+            'follow_up': Decimal('75'),
+            'emergency': Decimal('200'),
+        }
+        field_names = {
+            'consultation': 'default_consultation_fee',
+            'follow_up': 'default_follow_up_fee',
+            'emergency': 'default_emergency_fee',
+        }
+        if platform_settings is None:
+            return defaults.get(consultation_type, defaults['consultation'])
+        return getattr(
+            platform_settings,
+            field_names.get(consultation_type, field_names['consultation']),
+        )
+
     
     @staticmethod
     def create_stripe_payment_intent(amount, currency='sar', metadata=None):

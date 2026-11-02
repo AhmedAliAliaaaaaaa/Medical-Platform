@@ -134,7 +134,7 @@ class DoctorEarnings(models.Model):
     
     # إعدادات الدفع
     consultation_fee = models.DecimalField(max_digits=8, decimal_places=2, default=100.00)
-    follow_up_fee = models.DecimalField(max_digits=8, decimal_places=2, default=50.00)
+    follow_up_fee = models.DecimalField(max_digits=8, decimal_places=2, default=75.00)
     emergency_fee = models.DecimalField(max_digits=8, decimal_places=2, default=200.00)
     
     updated_at = models.DateTimeField(auto_now=True)
@@ -184,7 +184,7 @@ class PlatformSettings(models.Model):
     
     # أسعار افتراضية
     default_consultation_fee = models.DecimalField(max_digits=8, decimal_places=2, default=100.00)
-    default_follow_up_fee = models.DecimalField(max_digits=8, decimal_places=2, default=50.00)
+    default_follow_up_fee = models.DecimalField(max_digits=8, decimal_places=2, default=75.00)
     default_emergency_fee = models.DecimalField(max_digits=8, decimal_places=2, default=200.00)
     
     # إعدادات الدفع

@@ -198,6 +198,7 @@ def doctor_subscription(request):
             amount = subscription_amounts[subscription_type]
             
             # Create subscription payment
+            amount = payment_service.get_service_fee(consultation_type)
             payment = Payment.objects.create(
                 user=request.user,
                 doctor=request.user.doctor,

@@ -35,7 +35,7 @@ class Doctor(models.Model):
     experience_years = models.PositiveIntegerField(default=0)
     consultation_fee = models.DecimalField(max_digits=10, decimal_places=2, default=100.00, verbose_name="رسوم الاستشارة")
     emergency_fee = models.DecimalField(max_digits=10, decimal_places=2, default=200.00, verbose_name="رسوم الطوارئ")
-    follow_up_fee = models.DecimalField(max_digits=10, decimal_places=2, default=50.00, verbose_name="رسوم المتابعة")
+    follow_up_fee = models.DecimalField(max_digits=10, decimal_places=2, default=75.00, verbose_name="رسوم المتابعة")
     currency = models.CharField(max_length=3, default='SAR', verbose_name="العملة")
     accepts_insurance = models.BooleanField(default=False, verbose_name="يقبل التأمين")
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
@@ -85,6 +85,5 @@ class DoctorNotification(models.Model):
         verbose_name = 'إشعار الطبيب'
         verbose_name_plural = 'إشعارات الأطباء'
         ordering = ['-created_at']
-
 
 

@@ -349,14 +349,15 @@ class PaymentView(PatientRequiredMixin, TemplateView):
         
         # تحديد نوع الاستشارة والسعر
         consultation_type = self.request.GET.get('type', 'consultation')
+        from payments.payment_service import payment_service
         if consultation_type == 'emergency':
-            amount = doctor.emergency_fee
+            amount = payment_service.get_service_fee('emergency')
             service_name = 'استشارة طوارئ'
         elif consultation_type == 'follow_up':
-            amount = doctor.follow_up_fee
+            amount = payment_service.get_service_fee('follow_up')
             service_name = 'متابعة'
         else:
-            amount = doctor.consultation_fee
+            amount = payment_service.get_service_fee('consultation')
             service_name = 'استشارة طبية'
         
         context.update({
@@ -386,12 +387,13 @@ class PaymentView(PatientRequiredMixin, TemplateView):
         consultation_type = request.POST.get('consultation_type', 'consultation')
         
         # تحديد المبلغ
+        from payments.payment_service import payment_service
         if consultation_type == 'emergency':
-            amount = doctor.emergency_fee
+            amount = payment_service.get_service_fee('emergency')
         elif consultation_type == 'follow_up':
-            amount = doctor.follow_up_fee
+            amount = payment_service.get_service_fee('follow_up')
         else:
-            amount = doctor.consultation_fee
+            amount = payment_service.get_service_fee('consultation')
         
         try:
             # إنشاء عملية دفع
