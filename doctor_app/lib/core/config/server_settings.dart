@@ -4,8 +4,8 @@ import '../../services/base_api_service.dart';
 
 class ServerSettings {
   // متغيرات ثابتة لعنوان الخادم
-  static String _currentServerUrl = 'http://127.0.0.1:8000';
-  static String _currentApiUrl = 'http://127.0.0.1:8000/api';
+  static String _currentServerUrl = 'https://cisco.pythonanywhere.com';
+  static String _currentApiUrl = 'https://cisco.pythonanywhere.com/api';
   // تخزين آمن للإعدادات
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
@@ -13,13 +13,19 @@ class ServerSettings {
   static const String _serverUrlKey = 'server_url';
 
   // القيم الافتراضية
-  static const String _defaultServerUrl = 'http://127.0.0.1:8000';
-  static const String _androidEmulatorUrl = 'http://192.168.0.194:8000';
-  static const String _productionUrl = String.fromEnvironment('API_BASE_URL');
+  static const String _defaultServerUrl = 'https://cisco.pythonanywhere.com';
+  static const String _androidEmulatorUrl = 'https://cisco.pythonanywhere.com';
+  static const String _productionUrl = 'https://cisco.pythonanywhere.com';
 
   // الحصول على عنوان الخادم الحالي
   static Future<String> getCurrentServerUrl() async {
     try {
+      if (_productionUrl.isNotEmpty) {
+        _currentServerUrl = _productionUrl;
+        _currentApiUrl = '$_productionUrl/api';
+        return _productionUrl;
+      }
+
       // محاولة الحصول على عنوان الخادم المخزن
       final storedUrl = await _secureStorage.read(key: _serverUrlKey);
 

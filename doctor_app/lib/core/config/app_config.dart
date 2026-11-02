@@ -4,14 +4,14 @@ import 'server_settings.dart';
 class AppConfig {
   // إعدادات الخادم
   static const String _defaultBaseUrl =
-      'http://127.0.0.1:8000'; // تم تغييره للسيرفر المحلي
+      'https://cisco.pythonanywhere.com';
   static const String _fallbackUrl =
       'https://api.medical-platform.com'; // السيرفر الاحتياطي
 
   // إعدادات التطبيق
   static const String appName = 'تطبيق الاستشارات الطبية';
   static const String appVersion = '1.0.0';
-  static const bool debugMode = true;
+  static const bool debugMode = false;
 
   // إعدادات API
   static const int apiTimeout = 30; // seconds
@@ -71,8 +71,8 @@ class AppConfig {
   static Map<String, dynamic> getEnvironmentConfig() {
     if (isProduction) {
       return {
-        'baseUrl': 'https://your-production-domain.com',
-        'apiUrl': 'https://your-production-domain.com/api',
+        'baseUrl': 'https://cisco.pythonanywhere.com',
+        'apiUrl': 'https://cisco.pythonanywhere.com/api',
         'enableLogging': false,
         'enableSSL': true,
       };
