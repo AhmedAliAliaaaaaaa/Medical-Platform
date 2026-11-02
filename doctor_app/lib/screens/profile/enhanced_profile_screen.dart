@@ -9,6 +9,8 @@ import '../../providers/auth_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../widgets/enhanced_card.dart';
 import '../../widgets/enhanced_inputs.dart';
+import '../../services/auth_api_service.dart';
+import '../../services/patient_api_service.dart';
 
 class EnhancedProfileScreen extends StatefulWidget {
   const EnhancedProfileScreen({super.key});
@@ -567,6 +569,30 @@ class _EnhancedProfileScreenState extends State<EnhancedProfileScreen>
                 isRTL ? 'معلومات التطبيق والإصدار' : 'App info and version',
             onTap: _aboutApp,
           ),
+          _buildSettingItem(
+            icon: Icons.medical_services,
+            title: isRTL ? 'خدماتنا' : 'Our Services',
+            subtitle: isRTL ? 'الخدمات التي تقدمها المنصة' : 'Platform services',
+            onTap: _showServices,
+          ),
+          _buildSettingItem(
+            icon: Icons.report_problem,
+            title: isRTL ? 'رفع شكوى' : 'Submit Complaint',
+            subtitle: isRTL ? 'إرسال شكوى إلى الإدارة' : 'Send a complaint to administration',
+            onTap: _submitComplaint,
+          ),
+          _buildSettingItem(
+            icon: Icons.question_answer,
+            title: isRTL ? 'الأسئلة الشائعة' : 'FAQ',
+            subtitle: isRTL ? 'إجابات عن الأسئلة المتكررة' : 'Frequently asked questions',
+            onTap: _showFaq,
+          ),
+          _buildSettingItem(
+            icon: Icons.contact_mail,
+            title: isRTL ? 'تواصل معنا' : 'Contact Us',
+            subtitle: isRTL ? 'طرق التواصل مع المنصة' : 'Contact the platform',
+            onTap: _showContact,
+          ),
 
           const SizedBox(height: 16),
 
@@ -663,8 +689,14 @@ class _EnhancedProfileScreenState extends State<EnhancedProfileScreen>
     });
 
     try {
-      // TODO: Save profile data to server
-      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      await AuthApiService.updateUserProfile({
+        'first_name': _firstNameController.text.trim(),
+        'last_name': _lastNameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'phone_number': _phoneController.text.trim(),
+        'bio': _bioController.text.trim(),
+        'address': _addressController.text.trim(),
+      });
 
       setState(() {
         _isEditing = false;
@@ -706,6 +738,49 @@ class _EnhancedProfileScreenState extends State<EnhancedProfileScreen>
               ? 'افتح إعدادات الحساب لتغيير كلمة المرور'
               : 'Open account settings to change your password',
         ),
+      ),
+    );
+  }
+
+  Future<void> _submitComplaint() async {
+    final subject = TextEditingController();
+    final message = TextEditingController();
+    final send = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('رفع شكوى'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          TextField(controller: subject, decoration: const InputDecoration(labelText: 'العنوان')),
+          TextField(controller: message, maxLines: 4, decoration: const InputDecoration(labelText: 'التفاصيل')),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('إرسال')),
+        ],
+      ),
+    );
+    if (send != true) return;
+    try {
+      final result = await PatientApiService.submitComplaint(
+        subject: subject.text.trim(),
+        message: message.text.trim(),
+      );
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'] ?? 'تم إرسال الشكوى')));
+    } catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تعذر إرسال الشكوى: $error')));
+    }
+  }
+
+  void _showServices() => _showInfoDialog('خدماتنا', 'الاستشارات الطبية، متابعة الحالات، التواصل مع الأطباء، وإدارة المدفوعات.');
+  void _showContact() => _showInfoDialog('تواصل معنا', 'يمكنك التواصل مع الإدارة من صندوق الرسائل أو عبر صفحة التواصل في الموقع.');
+  void _showFaq() => _showInfoDialog('الأسئلة الشائعة', 'اختر طبيبًا، ادفع رسوم الاستشارة، ثم تابع رد الطبيب من قائمة الحالات.');
+  void _showInfoDialog(String title, String message) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('إغلاق'))],
       ),
     );
   }

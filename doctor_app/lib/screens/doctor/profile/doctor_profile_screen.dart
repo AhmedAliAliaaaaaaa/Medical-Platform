@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:doctor_app/services/api_service.dart';
+import 'package:doctor_app/services/doctor_api_service.dart';
 import 'package:doctor_app/services/auth_api_service.dart';
 import 'package:provider/provider.dart';
 import 'package:doctor_app/providers/language_provider.dart';
@@ -69,6 +70,40 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
 
   void _toggleLanguage() {
     Provider.of<LanguageProvider>(context, listen: false).toggleLanguage();
+  }
+
+  Future<void> _editProfile() async {
+    final doctor = (_doctorProfile?['doctor'] as Map?)?.cast<String, dynamic>() ?? {};
+    final bio = TextEditingController(text: doctor['bio']?.toString() ?? '');
+    final country = TextEditingController(text: doctor['country']?.toString() ?? '');
+    final experience = TextEditingController(text: doctor['experience_years']?.toString() ?? '');
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('تعديل الملف الشخصي'),
+        content: SingleChildScrollView(child: Column(children: [
+          TextField(controller: bio, maxLines: 3, decoration: const InputDecoration(labelText: 'نبذة')),
+          TextField(controller: country, decoration: const InputDecoration(labelText: 'الدولة')),
+          TextField(controller: experience, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'سنوات الخبرة')),
+        ])),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('حفظ')),
+        ],
+      ),
+    );
+    if (saved != true) return;
+    try {
+      await DoctorApiService.updateProfile({
+        'bio': bio.text.trim(),
+        'country': country.text.trim(),
+        'experience_years': int.tryParse(experience.text.trim()) ?? 0,
+      });
+      await _loadDoctorProfile();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث الملف الشخصي')));
+    } catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تعذر تحديث الملف: $error')));
+    }
   }
 
   Future<void> _logout() async {
@@ -524,7 +559,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
             ),
           ),
           _buildSettingItem(Icons.edit, 'تعديل الملف الشخصي', () {
-            _loadDoctorProfile();
+            _editProfile();
           }),
           _buildSettingItem(Icons.schedule, 'إدارة المواعيد', () {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('إدارة المواعيد متاحة من لوحة المواعيد')));

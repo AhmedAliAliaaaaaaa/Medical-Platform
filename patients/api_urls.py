@@ -16,4 +16,5 @@ urlpatterns = [
     path('notifications/mark-all-read/', api_views.mark_all_notifications_read, name='mark_all_notifications_read'),
     # Attachments upload for cases
     path('cases/<int:case_id>/attachments/', api_views.upload_case_attachments, name='upload_case_attachments'),
+    path('complaints/', api_views.submit_complaint, name='submit_complaint_api'),
 ]

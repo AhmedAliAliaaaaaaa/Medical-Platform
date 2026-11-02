@@ -3,7 +3,8 @@ import '../../services/messaging_api_service.dart';
 import '../../utils/constants.dart';
 
 class MessagesScreen extends StatefulWidget {
-  const MessagesScreen({super.key});
+  final String userType;
+  const MessagesScreen({super.key, this.userType = 'doctor'});
 
   @override
   State<MessagesScreen> createState() => _MessagesScreenState();
@@ -27,7 +28,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _error = null;
     });
     try {
-      final data = await MessagingApiService.getMessages('doctor');
+      final data = await MessagingApiService.getMessages(widget.userType);
       if (!mounted) return;
       setState(() {
         _messages = data['messages'] as List<dynamic>? ?? [];
@@ -100,7 +101,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   return;
                 }
                 await MessagingApiService.sendMessage(
-                  userType: 'doctor',
+                  userType: widget.userType,
                   recipientId: recipientId,
                   subject: subject.text.trim(),
                   body: body.text.trim(),
@@ -123,7 +124,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Future<void> _markRead(Map<String, dynamic> message) async {
     if (message['is_read'] == true) return;
     await MessagingApiService.markAsRead(
-      userType: 'doctor',
+      userType: widget.userType,
       messageId: message['id'] as int,
     );
     await _load();
@@ -133,7 +134,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('صندوق الرسائل'),
+        title: Text(widget.userType == 'admin' ? 'مراسلات الإدارة' : 'صندوق الرسائل'),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         actions: [

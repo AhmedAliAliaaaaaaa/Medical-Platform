@@ -4,6 +4,16 @@ import 'base_api_service.dart';
 import '../core/config/server_settings.dart';
 
 class PatientApiService {
+  static Future<Map<String, dynamic>> submitComplaint({
+    required String subject,
+    required String message,
+  }) async {
+    final response = await BaseApiService.post('/patient/complaints/', {
+      'subject': subject,
+      'message': message,
+    });
+    return BaseApiService.handleResponse(response);
+  }
   // Get Patient Notifications
   static Future<Map<String, dynamic>> getNotifications({
     bool? isRead,

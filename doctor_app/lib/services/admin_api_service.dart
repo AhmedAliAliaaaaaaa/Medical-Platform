@@ -111,14 +111,9 @@ class AdminApiService {
 
   // Get All Doctors
   static Future<List<dynamic>> getAllDoctors() async {
-    try {
-      final response = await BaseApiService.get('/admin/doctors/');
-      final data = BaseApiService.handleResponse(response);
-      return data['doctors'] ?? [];
-    } catch (e) {
-      print('⚠️ AdminApiService.getAllDoctors fallback: $e');
-      return [];
-    }
+    final response = await BaseApiService.get('/admin/doctors/');
+    final data = BaseApiService.handleResponse(response);
+    return (data['doctors'] ?? data['results'] ?? []) as List<dynamic>;
   }
 
   // Get Doctor Details
@@ -134,14 +129,9 @@ class AdminApiService {
 
   // Get All Patients
   static Future<List<dynamic>> getAllPatients() async {
-    try {
-      final response = await BaseApiService.get('/admin/patients/');
-      final data = BaseApiService.handleResponse(response);
-      return data['patients'] ?? [];
-    } catch (e) {
-      print('⚠️ AdminApiService.getAllPatients fallback: $e');
-      return [];
-    }
+    final response = await BaseApiService.get('/admin/patients/');
+    final data = BaseApiService.handleResponse(response);
+    return (data['patients'] ?? data['results'] ?? []) as List<dynamic>;
   }
 
   // Get Pending Doctors (alias for getPendingDoctorApplications)

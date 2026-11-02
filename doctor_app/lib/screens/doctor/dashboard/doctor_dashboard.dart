@@ -13,6 +13,7 @@ import '../ratings/my_ratings_screen.dart';
 import '../profile/doctor_profile_screen.dart';
 import '../earnings/earnings_screen.dart';
 import '../../auth/login_screen.dart';
+import '../../messages/messages_screen.dart';
 import 'notification_sender.dart';
 
 /// لوحة تحكم الطبيب المحسنة - مبسطة ومنظمة
@@ -1006,6 +1007,24 @@ class _ImprovedDoctorDashboardState extends State<ImprovedDoctorDashboard> {
                   },
                 ),
                 ListTile(
+                  leading: const Icon(Icons.mail),
+                  title: const Text('مراسلة الإدارة'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MessagesScreen(userType: 'doctor'),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.report_problem),
+                  title: const Text('رفع شكوى'),
+                  onTap: _showComplaintDialog,
+                ),
+                ListTile(
                   leading: const Icon(Icons.person),
                   title: const Text('الملف الشخصي'),
                   onTap: () {
@@ -1030,6 +1049,36 @@ class _ImprovedDoctorDashboardState extends State<ImprovedDoctorDashboard> {
         ],
       ),
     );
+  }
+
+  Future<void> _showComplaintDialog() async {
+    Navigator.pop(context);
+    final subject = TextEditingController();
+    final message = TextEditingController();
+    final send = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('رفع شكوى'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          TextField(controller: subject, decoration: const InputDecoration(labelText: 'العنوان')),
+          TextField(controller: message, maxLines: 4, decoration: const InputDecoration(labelText: 'التفاصيل')),
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('إرسال')),
+        ],
+      ),
+    );
+    if (send != true) return;
+    try {
+      final result = await DoctorApiService.submitComplaint(
+        subject: subject.text.trim(),
+        message: message.text.trim(),
+      );
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'] ?? 'تم إرسال الشكوى')));
+    } catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تعذر إرسال الشكوى: $error')));
+    }
   }
 
   // فتح أول حالة جديدة

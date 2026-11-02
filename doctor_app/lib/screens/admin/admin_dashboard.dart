@@ -20,6 +20,7 @@ import 'admin_settings_screen.dart';
 import 'analytics_screen.dart';
 import 'reports_screen.dart';
 import 'admin_earnings_screen.dart';
+import '../messages/messages_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -398,10 +399,12 @@ class _AdminDashboardState extends State<AdminDashboard>
       ),
       child: Row(
         children: [
-          IconButton(
-            onPressed: () => Scaffold.of(context).openEndDrawer(),
-            icon: const Icon(Icons.menu),
-            color: AdminConstants.darkBlue,
+          Builder(
+            builder: (context) => IconButton(
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              icon: const Icon(Icons.menu),
+              color: AdminConstants.darkBlue,
+            ),
           ),
           const SizedBox(width: AdminConstants.spacingSmall),
           Text(
@@ -941,6 +944,30 @@ class _AdminDashboardState extends State<AdminDashboard>
                   context,
                   MaterialPageRoute(
                       builder: (_) => const NotificationsManagementScreen()));
+            }),
+            _drawerItem(Icons.account_balance_wallet, 'إدارة الأرباح', () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(
+                builder: (_) => const AdminEarningsScreen(),
+              ));
+            }),
+            _drawerItem(Icons.assessment, 'التقارير', () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(
+                builder: (_) => const ReportsScreen(),
+              ));
+            }),
+            _drawerItem(Icons.mail, 'مراسلات الأطباء', () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(
+                builder: (_) => const MessagesScreen(userType: 'admin'),
+              ));
+            }),
+            _drawerItem(Icons.report_problem, 'الشكاوى', () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(
+                builder: (_) => const NotificationsManagementScreen(),
+              ));
             }),
 
             const Divider(color: Colors.white24),

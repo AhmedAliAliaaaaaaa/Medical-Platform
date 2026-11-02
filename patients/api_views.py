@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 
 from .models import Patient, MedicalCase, DoctorResponse, PatientNotification, CaseAttachment
+from admin_panel.models import AdminNotification
 from doctors.models import Doctor
 from doctors.models import DoctorNotification
 from accounts.models import CustomUser
@@ -535,3 +536,19 @@ def create_case(request):
 def patient_dashboard_legacy(request):
     """Legacy function - use patient_dashboard instead"""
     return patient_dashboard(request)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_complaint(request):
+    patient = get_object_or_404(Patient, user=request.user)
+    title = str(request.data.get('subject', '')).strip()
+    message = str(request.data.get('message', '')).strip()
+    if not title or not message:
+        return Response({'detail': 'عنوان الشكوى والتفاصيل مطلوبة'}, status=status.HTTP_400_BAD_REQUEST)
+    AdminNotification.objects.create(
+        title=title,
+        message=message,
+        notification_type='patient_complaint',
+        related_patient=patient,
+        created_by=request.user,
+    )
+    return Response({'message': 'تم إرسال الشكوى إلى الإدارة'}, status=status.HTTP_201_CREATED)

@@ -1,6 +1,16 @@
 import 'base_api_service.dart';
 
 class DoctorApiService {
+  static Future<Map<String, dynamic>> submitComplaint({
+    required String subject,
+    required String message,
+  }) async {
+    final response = await BaseApiService.post('/doctor/complaints/', {
+      'subject': subject,
+      'message': message,
+    });
+    return BaseApiService.handleResponse(response);
+  }
   // Get Doctor Dashboard
   static Future<Map<String, dynamic>> getDashboard() async {
     try {
@@ -429,18 +439,10 @@ class DoctorApiService {
       if (result != null && result is Map<String, dynamic>) {
         return result;
       }
-      return {
-        'total_earnings': 0.0,
-        'available_balance': 0.0,
-        'pending_balance': 0.0
-      };
+      throw Exception('تنسيق بيانات الأرباح غير صحيح');
     } catch (e) {
       print('❌ DoctorApiService: Error getting earnings: $e');
-      return {
-        'total_earnings': 0.0,
-        'available_balance': 0.0,
-        'pending_balance': 0.0
-      };
+      rethrow;
     }
   }
 

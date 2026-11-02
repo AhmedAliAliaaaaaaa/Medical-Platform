@@ -10,8 +10,9 @@ from datetime import timedelta
 from .models import Doctor, DoctorNotification
 from patients.models import MedicalCase, DoctorResponse, Patient, PatientNotification, DoctorRating
 from accounts.models import CustomUser
-from payments.models import DoctorEarnings
+from payments.models import DoctorEarnings, WithdrawalRequest
 from admin_panel.models import AdminMessage
+from admin_panel.models import AdminNotification
 
 
 @api_view(['GET'])
@@ -496,6 +497,20 @@ def doctor_earnings_api(request):
             'total_earnings': float(earnings.total_earnings),
             'available_balance': float(earnings.available_balance),
             'pending_balance': float(earnings.pending_balance),
+            'withdrawn_amount': float(earnings.withdrawn_amount),
+            'withdrawals': [
+                {
+                    'id': withdrawal.id,
+                    'amount': float(withdrawal.amount),
+                    'status': withdrawal.status,
+                    'status_display': withdrawal.get_status_display(),
+                    'requested_at': withdrawal.requested_at,
+                    'processed_at': withdrawal.processed_at,
+                }
+                for withdrawal in WithdrawalRequest.objects.filter(
+                    doctor=doctor
+                ).order_by('-requested_at')[:20]
+            ],
         })
     except Exception as e:
         return Response(
@@ -711,3 +726,19 @@ def mark_all_notifications_read(request):
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_complaint(request):
+    doctor = get_object_or_404(Doctor, user=request.user)
+    title = str(request.data.get('subject', '')).strip()
+    message = str(request.data.get('message', '')).strip()
+    if not title or not message:
+        return Response({'detail': 'عنوان الشكوى والتفاصيل مطلوبة'}, status=status.HTTP_400_BAD_REQUEST)
+    AdminNotification.objects.create(
+        title=title,
+        message=message,
+        notification_type='doctor_complaint',
+        related_doctor=doctor,
+        created_by=request.user,
+    )
+    return Response({'message': 'تم إرسال الشكوى إلى الإدارة'}, status=status.HTTP_201_CREATED)

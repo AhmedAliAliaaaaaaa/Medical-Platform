@@ -528,6 +528,9 @@ def system_statistics(request):
     total_cases = MedicalCase.objects.count()
     completed_cases = MedicalCase.objects.filter(status='completed').count()
     active_doctors = Doctor.objects.filter(status='approved', is_available=True).count()
+    total_patients = Patient.objects.count()
+    pending_doctors = Doctor.objects.filter(status='pending').count()
+    pending_cases = MedicalCase.objects.filter(status__in=['pending', 'in_progress']).count()
 
     # أعلى التخصصات حسب عدد الأطباء
     top_specs = (
@@ -544,8 +547,16 @@ def system_statistics(request):
         'total_cases': total_cases,
         'completed_cases': completed_cases,
         'active_doctors': active_doctors,
+        'total_patients': total_patients,
+        'pending_doctors': pending_doctors,
+        'pending_cases': pending_cases,
+        'average_response_time': 0,
+        'patient_satisfaction': 0,
+        'doctor_satisfaction': 0,
         'growth': {'users': 0, 'cases': 0, 'revenue': 0},
         'top_specializations': top_specializations,
+        'monthly_cases': [],
+        'revenue': {'total': 0, 'this_month': 0, 'last_month': 0},
     })
 
 

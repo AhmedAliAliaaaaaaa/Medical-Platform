@@ -16,4 +16,5 @@ urlpatterns = [
     path('my-patients/', api_views.my_patients, name='my_patients'),
     path('available/', api_views.available_doctors, name='available_doctors'),
     path('earnings/', api_views.doctor_earnings_api, name='doctor_earnings_api'),
+    path('complaints/', api_views.submit_complaint, name='submit_doctor_complaint_api'),
 ]
