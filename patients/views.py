@@ -418,6 +418,8 @@ class PaymentView(PatientRequiredMixin, TemplateView):
             payment.status = 'completed'
             payment.paid_at = timezone.now()
             payment.save()
+            from payments.payment_service import payment_service
+            payment_service.distribute_completed_payment(payment)
             
             # تحديث حالة الحالة الطبية
             case.doctor = doctor

@@ -249,6 +249,29 @@ class PaymentService:
             'doctor_amount': doctor_amount,
             'commission_rate': commission_rate
         }
+
+    @staticmethod
+    def distribute_completed_payment(payment):
+        """Credit the doctor's share once after a completed payment."""
+        from .models import DoctorEarnings
+
+        if payment.status != 'completed' or not payment.doctor:
+            return None
+        if payment.earnings_distributed:
+            return None
+
+        earnings, _ = DoctorEarnings.objects.get_or_create(doctor=payment.doctor)
+        fee_breakdown = PaymentService.calculate_platform_fee(payment.amount)
+        earnings.total_earnings += fee_breakdown['doctor_amount']
+        earnings.available_balance += fee_breakdown['doctor_amount']
+        earnings.save(update_fields=[
+            'total_earnings',
+            'available_balance',
+            'updated_at',
+        ])
+        payment.earnings_distributed = True
+        payment.save(update_fields=['earnings_distributed', 'updated_at'])
+        return fee_breakdown
     
     @staticmethod
     def process_consultation_payment(patient, doctor, case, amount, payment_method='stripe'):

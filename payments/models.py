@@ -108,6 +108,7 @@ class Payment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     paid_at = models.DateTimeField(null=True, blank=True)
+    earnings_distributed = models.BooleanField(default=False)
     
     def __str__(self):
         return f"دفعة {self.payment_id} - {self.amount} {self.currency}"

@@ -152,13 +152,7 @@ def stripe_webhook(request):
                 payment.case.status = 'in_progress'
                 payment.case.save()
             
-            # Update doctor earnings
-            if payment.doctor:
-                earnings, created = DoctorEarnings.objects.get_or_create(doctor=payment.doctor)
-                fee_breakdown = payment_service.calculate_platform_fee(payment.amount)
-                earnings.total_earnings += fee_breakdown['doctor_amount']
-                earnings.available_balance += fee_breakdown['doctor_amount']
-                earnings.save()
+            payment_service.distribute_completed_payment(payment)
                 
         except Payment.DoesNotExist:
             pass
