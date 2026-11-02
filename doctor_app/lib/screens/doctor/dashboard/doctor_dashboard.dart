@@ -11,8 +11,9 @@ import '../responses/doctor_responses_screen.dart';
 import '../cases/all_patient_cases_screen.dart';
 import '../ratings/my_ratings_screen.dart';
 import '../profile/doctor_profile_screen.dart';
+import '../earnings/earnings_screen.dart';
 import '../../auth/login_screen.dart';
-import 'notification_sender_fixed.dart';
+import 'notification_sender.dart';
 
 /// لوحة تحكم الطبيب المحسنة - مبسطة ومنظمة
 class ImprovedDoctorDashboard extends StatefulWidget {
@@ -531,6 +532,8 @@ class _ImprovedDoctorDashboardState extends State<ImprovedDoctorDashboard> {
       _ActionItem('ردودي السابقة', Icons.forum_outlined, _openMyResponses),
       _ActionItem('جميع الحالات', Icons.folder_open, _openAllCases),
       _ActionItem('تقييمي', Icons.star_border_rounded, _openMyRatings),
+      _ActionItem('أرباحي وطلبات السحب', Icons.account_balance_wallet,
+          _openEarnings),
       _ActionItem(
           'إشعارات المرضى', Icons.notification_add, _openNotificationSender),
       _ActionItem(
@@ -995,6 +998,14 @@ class _ImprovedDoctorDashboardState extends State<ImprovedDoctorDashboard> {
                   },
                 ),
                 ListTile(
+                  leading: const Icon(Icons.account_balance_wallet),
+                  title: const Text('أرباحي وطلبات السحب'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _openEarnings();
+                  },
+                ),
+                ListTile(
                   leading: const Icon(Icons.person),
                   title: const Text('الملف الشخصي'),
                   onTap: () {
@@ -1068,7 +1079,7 @@ class _ImprovedDoctorDashboardState extends State<ImprovedDoctorDashboard> {
   void _openNotificationSender() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const NotificationSenderFixed()),
+      MaterialPageRoute(builder: (_) => const NotificationSender()),
     );
   }
 
@@ -1077,6 +1088,13 @@ class _ImprovedDoctorDashboardState extends State<ImprovedDoctorDashboard> {
       context,
       MaterialPageRoute(builder: (_) => const MyResponsesScreen()),
     ).then((_) => _loadDashboard());
+  }
+
+  void _openEarnings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const EarningsScreen()),
+    );
   }
 }
 
