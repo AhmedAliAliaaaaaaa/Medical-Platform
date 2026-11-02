@@ -630,6 +630,12 @@ def available_doctors(request):
                 'country': doctor.country,
                 'rating': float(doctor.rating),
                 'total_reviews': doctor.total_reviews,
+                'is_available': doctor.is_available,
+                'consultation_fee': float(doctor.consultation_fee),
+                'emergency_fee': float(doctor.emergency_fee),
+                'follow_up_fee': float(doctor.follow_up_fee),
+                'currency': doctor.currency,
+                'preferred_language': doctor.preferred_language,
             })
         
         return Response({'doctors': doctors_data})
