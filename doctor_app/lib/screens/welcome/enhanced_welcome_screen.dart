@@ -326,37 +326,6 @@ class _EnhancedWelcomeScreenState extends State<EnhancedWelcomeScreen>
               ),
             ),
 
-            // Join as Doctor (green)
-            SizedBox(
-              height: ResponsiveHelper.getCardHeight(context, 48),
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const DoctorRegistrationScreen(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryGreen,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      ResponsiveHelper.getBorderRadius(context, 28),
-                    ),
-                  ),
-                  elevation: 6,
-                ),
-                icon: const Icon(Icons.medical_services),
-                label: Text(
-                  isRTL ? 'انضم كطبيب' : 'Join as Doctor',
-                  style: TextStyle(
-                    fontSize: ResponsiveHelper.getFontSize(context, 16),
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ),
 
             // Login (teal)
             SizedBox(

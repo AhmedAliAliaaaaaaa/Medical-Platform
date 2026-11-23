@@ -338,6 +338,11 @@ class _NotificationSenderFixedState extends State<NotificationSenderFixed> {
         title: const Text('إرسال إشعار للمرضى'),
         backgroundColor: Colors.blue[600],
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'العودة إلى لوحة الطبيب',
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: _isLoading
           ? const Center(

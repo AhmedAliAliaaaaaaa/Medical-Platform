@@ -137,6 +137,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
         title: Text(widget.userType == 'admin' ? 'مراسلات الإدارة' : 'صندوق الرسائل'),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'العودة',
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           IconButton(onPressed: _compose, icon: const Icon(Icons.edit)),
         ],
