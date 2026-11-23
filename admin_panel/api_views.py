@@ -309,8 +309,8 @@ def admin_dashboard(request):
     approved_doctors = Doctor.objects.filter(status='approved').count()
     pending_doctors = Doctor.objects.filter(status='pending').count()
     total_cases = MedicalCase.objects.count()
-    completed_cases = MedicalCase.objects.filter(status__in=['completed', 'answered']).count()
-    pending_cases = MedicalCase.objects.filter(status__in=['pending', 'new', 'in_progress']).count()
+    completed_cases = MedicalCase.objects.filter(status='completed').count()
+    pending_cases = MedicalCase.objects.filter(status__in=['pending', 'in_progress']).count()
 
     # أحدث الحالات (آخر 10)
     recent_cases_qs = MedicalCase.objects.select_related('patient__user', 'doctor__user').order_by('-created_at')[:10]
@@ -526,11 +526,11 @@ def system_statistics(request):
 
     total_users = User.objects.count()
     total_cases = MedicalCase.objects.count()
-    completed_cases = MedicalCase.objects.filter(status__in=['completed', 'answered']).count()
+    completed_cases = MedicalCase.objects.filter(status='completed').count()
     active_doctors = Doctor.objects.filter(status='approved', is_available=True).count()
     total_patients = Patient.objects.count()
     pending_doctors = Doctor.objects.filter(status='pending').count()
-    pending_cases = MedicalCase.objects.filter(status__in=['pending', 'new', 'in_progress']).count()
+    pending_cases = MedicalCase.objects.filter(status__in=['pending', 'in_progress']).count()
 
     # أعلى التخصصات حسب عدد الأطباء
     top_specs = (
