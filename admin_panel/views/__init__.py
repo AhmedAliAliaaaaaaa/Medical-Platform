@@ -40,8 +40,12 @@ class AdminDashboardView(AdminRequiredMixin, TemplateView):
         context['total_doctors'] = Doctor.objects.filter(status='approved').count()
         context['pending_doctors'] = Doctor.objects.filter(status='pending').count()
         context['total_cases'] = MedicalCase.objects.count()
-        context['pending_cases'] = MedicalCase.objects.filter(status='pending').count()
-        context['completed_cases'] = MedicalCase.objects.filter(status='completed').count()
+        context['pending_cases'] = MedicalCase.objects.filter(
+            status__in=['pending', 'new', 'in_progress']
+        ).count()
+        context['completed_cases'] = MedicalCase.objects.filter(
+            status__in=['completed', 'answered']
+        ).count()
         
         # Recent activities
         context['recent_cases'] = MedicalCase.objects.order_by('-created_at')[:5]
@@ -104,9 +108,15 @@ class ManageCasesView(AdminRequiredMixin, TemplateView):
         ).prefetch_related('attachments', 'responses').order_by('-created_at')
         
         # Statistics
-        context['pending_cases'] = MedicalCase.objects.filter(status='pending').count()
-        context['in_progress_cases'] = MedicalCase.objects.filter(status='in_progress').count()
-        context['completed_cases'] = MedicalCase.objects.filter(status='completed').count()
+        context['pending_cases'] = MedicalCase.objects.filter(
+            status__in=['pending', 'new']
+        ).count()
+        context['in_progress_cases'] = MedicalCase.objects.filter(
+            status__in=['in_progress', 'answered']
+        ).count()
+        context['completed_cases'] = MedicalCase.objects.filter(
+            status='completed'
+        ).count()
         context['cancelled_cases'] = MedicalCase.objects.filter(status='cancelled').count()
         
         return context
@@ -1042,8 +1052,12 @@ class TestAdminView(TemplateView):
         context['total_doctors'] = Doctor.objects.filter(status='approved').count()
         context['pending_doctors'] = Doctor.objects.filter(status='pending').count()
         context['total_cases'] = MedicalCase.objects.count()
-        context['pending_cases'] = MedicalCase.objects.filter(status='pending').count()
-        context['completed_cases'] = MedicalCase.objects.filter(status='completed').count()
+        context['pending_cases'] = MedicalCase.objects.filter(
+            status__in=['pending', 'new', 'in_progress']
+        ).count()
+        context['completed_cases'] = MedicalCase.objects.filter(
+            status__in=['completed', 'answered']
+        ).count()
         
         # Recent activities
         context['recent_cases'] = MedicalCase.objects.order_by('-created_at')[:5]
