@@ -256,11 +256,6 @@
                                         <i class="fas fa-reply-all me-2"></i>
                                         {% trans "ردود الأطباء" %}
                                     </a>
-                                    <hr class="my-2">
-                                    <a href="{% url 'accounts:doctor_register' %}" class="btn btn-outline-info btn-sm">
-                                        <i class="fas fa-stethoscope me-2"></i>
-                                        {% trans "انضم كطبيب" %}
-                                    </a>
                                 {% elif user.user_type == 'doctor' %}
                                     {% if user.doctor.status == 'approved' %}
                                         <a href="{% url 'doctors:dashboard' %}" class="btn btn-outline-primary btn-sm">
