@@ -68,6 +68,10 @@ class MedicalPlatform {
             mobileToggle.addEventListener('click', () => {
                 navLinks.classList.toggle('active');
                 mobileToggle.classList.toggle('active');
+                const headerNav = mobileToggle.closest('.header-nav');
+                if (headerNav) {
+                    headerNav.classList.toggle('menu-open');
+                }
             });
         }
 

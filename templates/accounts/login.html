@@ -246,24 +246,65 @@
     
     @media (max-width: 768px) {
         .login-container {
-            padding: 10px;
+            align-items: flex-start;
+            min-height: auto;
+            padding: 12px;
+            padding-bottom: 24px;
         }
         
         .login-header {
-            padding: 20px;
+            padding: 18px 16px;
+        }
+
+        .login-header h2 {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .login-header p {
+            font-size: 13px;
         }
         
         .login-body {
-            padding: 25px;
+            padding: 18px 16px;
         }
         
         .register-section {
-            padding: 20px;
+            padding: 16px;
         }
         
         .btn-register {
             display: block;
-            margin: 10px 0;
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        .form-floating input {
+            height: 58px;
+            font-size: 16px;
+        }
+
+        .btn-login {
+            min-height: 56px;
+            padding: 14px;
+        }
+    }
+
+    @media (max-width: 380px) {
+        body {
+            padding-top: 64px !important;
+        }
+
+        .login-container {
+            padding: 8px;
+        }
+
+        .login-card {
+            border-radius: 18px;
+        }
+
+        .login-header h2 {
+            font-size: 20px;
         }
     }
 </style>
