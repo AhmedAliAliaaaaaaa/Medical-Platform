@@ -1,4 +1,4 @@
-{% extends 'admin_panel/base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 
 {% block title %}صندوق الرسائل - لوحة الإدارة{% endblock %}
@@ -15,12 +15,51 @@
 </style>
 {% endblock %}
 
-{% block admin_content %}
-<div class="container-fluid admin-messages-page">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <h2 class="mb-0 fw-bold text-primary"><i class="fas fa-envelope me-2"></i>صندوق الرسائل</h2>
-    </div>
-    <div class="row g-4">
+{% block content %}
+<div class="container-fluid py-4 admin-messages-page">
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        {% trans "لوحة الإدارة" %}
+                    </h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'admin_panel:dashboard' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2"></i>{% trans "الرئيسية" %}
+                    </a>
+                    <a href="{% url 'admin_panel:manage_doctors' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user-md me-2"></i>{% trans "إدارة الأطباء" %}
+                    </a>
+                    <a href="{% url 'admin_panel:manage_cases' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-file-medical me-2"></i>{% trans "إدارة الحالات" %}
+                    </a>
+                    <a href="{% url 'admin_panel:manage_users' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users me-2"></i>{% trans "إدارة المستخدمين" %}
+                    </a>
+                    <a href="{% url 'admin_panel:responses' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-reply-all me-2"></i>{% trans "ردود الأطباء" %}
+                    </a>
+                    <a href="{% url 'admin_panel:notifications' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-bell me-2"></i>{% trans "الإشعارات" %}
+                    </a>
+                    <a href="{% url 'admin_panel:messages' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-envelope me-2"></i>صندوق الرسائل
+                        {% if unread_admin_messages %}<span class="badge bg-danger ms-2">{{ unread_admin_messages }}</span>{% endif %}
+                    </a>
+                    <a href="{% url 'admin_panel:earnings' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-coins me-2"></i>إدارة الأرباح
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="mb-0 fw-bold text-primary"><i class="fas fa-envelope me-2"></i>صندوق الرسائل</h2>
+            </div>
+            <div class="row g-4">
         <div class="col-lg-5">
             <div class="card">
                 <div class="card-header bg-primary text-white">
@@ -67,6 +106,8 @@
                     </div>
                     {% empty %}<p class="text-muted">لا توجد رسائل.</p>{% endfor %}
                 </div>
+            </div>
+        </div>
             </div>
         </div>
     </div>
