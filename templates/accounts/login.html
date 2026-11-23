@@ -122,10 +122,14 @@
     .form-floating input:not(:placeholder-shown) + label,
     .form-floating input.has-value + label,
     .form-floating input:-webkit-autofill + label {
-        top: 15px;
-        font-size: 12px;
-        color: #667eea;
-        transform: translateY(0);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+    }
+
+    .form-floating input + label {
+        opacity: 1;
+        visibility: visible;
     }
     
     .btn-login {
