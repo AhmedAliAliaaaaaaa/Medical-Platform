@@ -35,8 +35,13 @@
                                 <option value="">{% trans "اختر المريض" %}</option>
                                 <option value="all">{% trans "جميع مرضاي" %}</option>
                                 {% for patient in my_patients %}
-                                    <option value="{{ patient.patient__id }}">
-                                        {{ patient.patient__user__first_name }} {{ patient.patient__user__last_name }}
+                                    <option value="{{ patient.id }}">
+                                        {% if patient.full_name %}
+                                            {{ patient.full_name }}
+                                        {% else %}
+                                            {{ patient.user.username }}
+                                        {% endif %}
+                                        {% if patient.email %} - {{ patient.email }}{% endif %}
                                     </option>
                                 {% endfor %}
                             </select>

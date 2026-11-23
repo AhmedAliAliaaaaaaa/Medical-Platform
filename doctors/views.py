@@ -274,13 +274,18 @@ class SendNotificationView(DoctorRequiredMixin, TemplateView):
         doctor = get_object_or_404(Doctor, user=self.request.user)
         
         # جلب المرضى الذين تعامل معهم الطبيب
-        context['my_patients'] = MedicalCase.objects.filter(
-            doctor=doctor
-        ).select_related('patient__user').values(
-            'patient__id', 
-            'patient__user__first_name', 
-            'patient__user__last_name'
-        ).distinct()
+        patients = Patient.objects.filter(
+            id__in=MedicalCase.objects.filter(doctor=doctor).values_list('patient_id', flat=True).distinct()
+        ).select_related('user').order_by('user__first_name', 'user__last_name', 'user__username')
+        context['my_patients'] = [
+            {
+                'id': patient.id,
+                'full_name': patient.user.get_full_name().strip(),
+                'user': patient.user,
+                'email': patient.user.email,
+            }
+            for patient in patients
+        ]
         
         context['doctor'] = doctor
         return context
@@ -295,6 +300,9 @@ class SendNotificationView(DoctorRequiredMixin, TemplateView):
         
         if not title or not message:
             messages.error(request, _('يجب ملء جميع الحقول المطلوبة'))
+            return redirect('doctors:send_notification')
+        if not patient_id:
+            messages.error(request, _('يرجى اختيار المريض المستهدف أو اختيار جميع مرضاي'))
             return redirect('doctors:send_notification')
         
         from patients.models import PatientNotification, Patient

@@ -7,13 +7,31 @@
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2><i class="fas fa-user-clock me-2"></i>{% trans "إدارة الجلسات" %}</h2>
-    <form method="post">
-      {% csrf_token %}
-      <input type="hidden" name="kill" value="all">
-      <button type="submit" class="btn btn-outline-danger">
-        <i class="fas fa-sign-out-alt me-1"></i>{% trans "إنهاء جميع الجلسات" %}
-      </button>
-    </form>
+    <div class="d-flex gap-2">
+      {% if user.user_type == 'doctor' %}
+        <a href="{% url 'doctors:dashboard' %}" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-right me-1"></i>
+          {% trans "العودة إلى لوحة الطبيب" %}
+        </a>
+      {% elif user.user_type == 'patient' %}
+        <a href="{% url 'patients:dashboard' %}" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-right me-1"></i>
+          {% trans "العودة إلى لوحة المريض" %}
+        </a>
+      {% elif user.user_type == 'admin' %}
+        <a href="{% url 'admin_panel:dashboard' %}" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-right me-1"></i>
+          {% trans "العودة إلى لوحة الإدارة" %}
+        </a>
+      {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="kill" value="all">
+        <button type="submit" class="btn btn-outline-danger">
+          <i class="fas fa-sign-out-alt me-1"></i>{% trans "إنهاء جميع الجلسات" %}
+        </button>
+      </form>
+    </div>
   </div>
 
   {% if sessions %}

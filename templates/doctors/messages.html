@@ -8,7 +8,13 @@
     <div class="row g-4">
         <div class="col-lg-5">
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white"><h5 class="mb-0">مراسلة الإدارة</h5></div>
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">مراسلة الإدارة</h5>
+                    <a href="{% url 'doctors:dashboard' %}" class="btn btn-light btn-sm">
+                        <i class="fas fa-arrow-right me-1"></i>
+                        العودة إلى لوحة الطبيب
+                    </a>
+                </div>
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
