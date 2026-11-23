@@ -33,6 +33,7 @@ class CustomAuthenticationForm(AuthenticationForm):
         password = self.cleaned_data.get('password')
 
         if username is not None and password:
+            username = username.strip()
             self.user_cache = authenticate(
                 self.request, 
                 username=username, 

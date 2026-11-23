@@ -30,6 +30,7 @@ class RegisterView(CreateView):
 
 class LoginView(BaseLoginView):
     template_name = 'accounts/login.html'
+    authentication_form = CustomAuthenticationForm
     redirect_authenticated_user = True
     
     def get_success_url(self):
