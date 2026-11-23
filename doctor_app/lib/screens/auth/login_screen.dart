@@ -68,15 +68,19 @@ class _LoginScreenState extends State<LoginScreen>
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(labelText: 'البريد الإلكتروني أو اسم المستخدم'),
+          decoration: const InputDecoration(
+              labelText: 'البريد الإلكتروني أو اسم المستخدم'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('إلغاء')),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(this.context).showSnackBar(
-                const SnackBar(content: Text('سيتم التواصل معك لإعادة تعيين كلمة المرور')),
+                const SnackBar(
+                    content: Text('سيتم التواصل معك لإعادة تعيين كلمة المرور')),
               );
             },
             child: const Text('إرسال الطلب'),
@@ -134,7 +138,8 @@ class _LoginScreenState extends State<LoginScreen>
           // الطبيب معتمد
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const ImprovedDoctorDashboard()),
+            MaterialPageRoute(
+                builder: (context) => const ImprovedDoctorDashboard()),
           );
         } else {
           throw Exception('حساب الطبيب غير مفعل. يرجى التواصل مع الإدارة.');
@@ -359,8 +364,9 @@ class _LoginScreenState extends State<LoginScreen>
                               TextFormField(
                                 controller: _usernameController,
                                 decoration: InputDecoration(
-                                  labelText:
-                                      'اسم المستخدم أو البريد الإلكتروني',
+                                  hintText: 'اسم المستخدم أو البريد الإلكتروني',
+                                  floatingLabelBehavior:
+                                      FloatingLabelBehavior.never,
                                   prefixIcon: const Icon(Icons.person),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -383,7 +389,9 @@ class _LoginScreenState extends State<LoginScreen>
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
                                 decoration: InputDecoration(
-                                  labelText: 'كلمة المرور',
+                                  hintText: 'كلمة المرور',
+                                  floatingLabelBehavior:
+                                      FloatingLabelBehavior.never,
                                   prefixIcon: const Icon(Icons.lock),
                                   suffixIcon: IconButton(
                                     icon: Icon(
