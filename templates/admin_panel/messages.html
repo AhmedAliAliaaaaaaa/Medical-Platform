@@ -3,8 +3,23 @@
 
 {% block title %}صندوق الرسائل - لوحة الإدارة{% endblock %}
 
+{% block extra_css %}
+<style>
+    .admin-messages-page .card,
+    .admin-messages-page .message-card { border: 0; border-radius: 16px; box-shadow: 0 8px 24px rgba(15, 23, 42, .08); }
+    .admin-messages-page .card-header { border: 0; border-radius: 16px 16px 0 0 !important; background: linear-gradient(135deg, #1E3A8A 0%, #2563eb 100%) !important; }
+    .admin-messages-page .message-card { border: 1px solid #edf1f7 !important; border-radius: 14px !important; }
+    .admin-messages-page .form-control,
+    .admin-messages-page .form-select { border-radius: 10px; min-height: 46px; }
+    .admin-messages-page .btn-primary { background: #2563eb; border-color: #2563eb; border-radius: 10px; }
+</style>
+{% endblock %}
+
 {% block admin_content %}
-<div class="container-fluid">
+<div class="container-fluid admin-messages-page">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h2 class="mb-0 fw-bold text-primary"><i class="fas fa-envelope me-2"></i>صندوق الرسائل</h2>
+    </div>
     <div class="row g-4">
         <div class="col-lg-5">
             <div class="card">
