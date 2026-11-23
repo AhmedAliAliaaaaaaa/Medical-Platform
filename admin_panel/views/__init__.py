@@ -54,12 +54,38 @@ class ManageDoctorsView(AdminRequiredMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['pending_doctors'] = Doctor.objects.filter(status='pending').select_related('user')
-        context['approved_doctors'] = Doctor.objects.filter(status='approved').select_related('user')
-        context['rejected_doctors'] = Doctor.objects.filter(status='rejected').select_related('user')
-        context['available_doctors'] = Doctor.objects.filter(
-            status='approved', is_available=True
-        ).select_related('user')
+        doctors = Doctor.objects.select_related('user').all()
+        search = self.request.GET.get('search', '').strip()
+        status_filter = self.request.GET.get('status', '').strip()
+        specialization = self.request.GET.get('specialization', '').strip()
+        availability = self.request.GET.get('availability', '').strip()
+
+        if search:
+            doctors = doctors.filter(
+                Q(user__first_name__icontains=search)
+                | Q(user__last_name__icontains=search)
+                | Q(user__username__icontains=search)
+                | Q(user__email__icontains=search)
+                | Q(specialization__icontains=search)
+                | Q(country__icontains=search)
+            )
+        if status_filter:
+            doctors = doctors.filter(status=status_filter)
+        if specialization:
+            doctors = doctors.filter(specialization=specialization)
+        if availability == 'available':
+            doctors = doctors.filter(is_available=True)
+        elif availability == 'unavailable':
+            doctors = doctors.filter(is_available=False)
+
+        context['pending_doctors'] = doctors.filter(status='pending')
+        context['approved_doctors'] = doctors.filter(status='approved')
+        context['rejected_doctors'] = doctors.filter(status='rejected')
+        context['available_doctors'] = doctors.filter(status='approved', is_available=True)
+        context['search'] = search
+        context['status_filter'] = status_filter
+        context['specialization_filter'] = specialization
+        context['availability_filter'] = availability
         return context
 
 class ApproveDoctorView(AdminRequiredMixin, TemplateView):
@@ -97,11 +123,34 @@ class ManageCasesView(AdminRequiredMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['all_cases'] = MedicalCase.objects.select_related(
+        cases = MedicalCase.objects.select_related(
             'patient__user', 'doctor__user'
         ).prefetch_related('attachments', 'responses').select_related(
             'patient__user', 'doctor__user'
-        ).prefetch_related('attachments', 'responses').order_by('-created_at')
+        ).prefetch_related('attachments', 'responses')
+
+        search = self.request.GET.get('search', '').strip()
+        status_filter = self.request.GET.get('status', '').strip()
+        priority = self.request.GET.get('priority', '').strip()
+        if search:
+            cases = cases.filter(
+                Q(title__icontains=search)
+                | Q(description__icontains=search)
+                | Q(patient__user__first_name__icontains=search)
+                | Q(patient__user__last_name__icontains=search)
+                | Q(patient__user__username__icontains=search)
+                | Q(doctor__user__first_name__icontains=search)
+                | Q(doctor__user__last_name__icontains=search)
+            )
+        if status_filter:
+            cases = cases.filter(status=status_filter)
+        if priority:
+            cases = cases.filter(priority=priority)
+
+        context['all_cases'] = cases.order_by('-created_at')
+        context['search'] = search
+        context['status_filter'] = status_filter
+        context['priority_filter'] = priority
         
         # Statistics
         context['pending_cases'] = MedicalCase.objects.filter(status='pending').count()
@@ -236,9 +285,29 @@ class ManageUsersView(AdminRequiredMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        # جلب جميع المستخدمين مع العلاقات المرتبطة
-        context['all_users'] = CustomUser.objects.select_related('patient', 'doctor').order_by('-date_joined')
+        users = CustomUser.objects.select_related('patient', 'doctor').all()
+        search = self.request.GET.get('search', '').strip()
+        user_type = self.request.GET.get('user_type', '').strip()
+        active = self.request.GET.get('active', '').strip()
+
+        if search:
+            users = users.filter(
+                Q(first_name__icontains=search)
+                | Q(last_name__icontains=search)
+                | Q(username__icontains=search)
+                | Q(email__icontains=search)
+            )
+        if user_type:
+            users = users.filter(user_type=user_type)
+        if active == 'active':
+            users = users.filter(is_active=True)
+        elif active == 'inactive':
+            users = users.filter(is_active=False)
+
+        context['all_users'] = users.order_by('-date_joined')
+        context['search'] = search
+        context['user_type_filter'] = user_type
+        context['active_filter'] = active
         
         # الإحصائيات
         context['total_users'] = CustomUser.objects.count()
@@ -247,6 +316,46 @@ class ManageUsersView(AdminRequiredMixin, TemplateView):
         context['admins_count'] = CustomUser.objects.filter(user_type='admin').count()
         
         return context
+
+    def post(self, request, *args, **kwargs):
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        password = request.POST.get('password', '').strip()
+        user_type = request.POST.get('user_type', 'patient').strip()
+
+        if not username or not email or not password:
+            messages.error(request, _('اسم المستخدم والبريد وكلمة المرور حقول مطلوبة'))
+            return redirect('admin_panel:manage_users')
+        if CustomUser.objects.filter(username=username).exists():
+            messages.error(request, _('اسم المستخدم مستخدم بالفعل'))
+            return redirect('admin_panel:manage_users')
+        if CustomUser.objects.filter(email__iexact=email).exists():
+            messages.error(request, _('البريد الإلكتروني مستخدم بالفعل'))
+            return redirect('admin_panel:manage_users')
+        if user_type not in ('patient', 'doctor', 'admin'):
+            messages.error(request, _('نوع المستخدم غير صالح'))
+            return redirect('admin_panel:manage_users')
+
+        user = CustomUser.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            user_type=user_type,
+        )
+        if user_type == 'patient':
+            from patients.models import Patient
+            Patient.objects.get_or_create(user=user)
+        elif user_type == 'admin':
+            user.is_staff = True
+            user.is_superuser = True
+            user.save(update_fields=['is_staff', 'is_superuser'])
+
+        messages.success(request, _('تم إضافة المستخدم بنجاح'))
+        return redirect('admin_panel:manage_users')
 
 class UpdateUserView(AdminRequiredMixin, UpdateView):
     model = CustomUser
@@ -267,6 +376,17 @@ class UpdateUserView(AdminRequiredMixin, UpdateView):
     def form_valid(self, form):
         messages.success(self.request, f'تم تحديث بيانات المستخدم {form.instance.get_full_name()} بنجاح!')
         return super().form_valid(form)
+
+class ToggleUserStatusView(AdminRequiredMixin, TemplateView):
+    def post(self, request, *args, **kwargs):
+        user = get_object_or_404(CustomUser, pk=kwargs['pk'])
+        if user.pk == request.user.pk:
+            messages.error(request, _('لا يمكنك تعطيل حسابك الحالي'))
+            return redirect('admin_panel:manage_users')
+        user.is_active = request.POST.get('active') == '1'
+        user.save(update_fields=['is_active'])
+        messages.success(request, _('تم تحديث حالة المستخدم بنجاح'))
+        return redirect('admin_panel:manage_users')
 
 class DeleteUserView(AdminRequiredMixin, DeleteView):
     model = CustomUser

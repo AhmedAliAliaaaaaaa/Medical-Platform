@@ -97,9 +97,8 @@
                             </h4>
                         </div>
                         <div class="col-md-6 text-end">
-                            <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#filterModal">
-                                <i class="fas fa-filter me-1"></i>
-                                {% trans "تصفية" %}
+                            <button class="btn btn-light btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#userFilters">
+                                <i class="fas fa-filter me-1"></i>{% trans "تصفية" %}
                             </button>
                             <button class="btn btn-light btn-sm" onclick="exportUsers()">
                                 <i class="fas fa-download me-1"></i>
@@ -113,6 +112,32 @@
                     </div>
                 </div>
                 <div class="card-body">
+                    <div class="collapse mb-3" id="userFilters">
+                        <form method="get" class="row g-2">
+                            <div class="col-md-4">
+                                <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="{% trans 'البحث بالاسم أو البريد أو اسم المستخدم' %}">
+                            </div>
+                            <div class="col-md-3">
+                                <select name="user_type" class="form-select">
+                                    <option value="">كل أنواع المستخدمين</option>
+                                    <option value="patient" {% if user_type_filter == 'patient' %}selected{% endif %}>مريض</option>
+                                    <option value="doctor" {% if user_type_filter == 'doctor' %}selected{% endif %}>طبيب</option>
+                                    <option value="admin" {% if user_type_filter == 'admin' %}selected{% endif %}>مشرف</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="active" class="form-select">
+                                    <option value="">كل الحالات</option>
+                                    <option value="active" {% if active_filter == 'active' %}selected{% endif %}>نشط</option>
+                                    <option value="inactive" {% if active_filter == 'inactive' %}selected{% endif %}>غير نشط</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-grid">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-1"></i>تطبيق</button>
+                            </div>
+                        </form>
+                    </div>
+
                     <!-- Users Table -->
                     <div class="table-responsive">
                         <table class="table table-striped table-hover">
@@ -309,19 +334,23 @@
                                                 <li><hr class="dropdown-divider"></li>
                                                 {% if user.is_active %}
                                                     <li>
-                                                        <button class="dropdown-item text-warning" 
-                                                                onclick="toggleUserStatus({{ user.id }}, false)">
-                                                            <i class="fas fa-pause me-2"></i>
-                                                            {% trans "تعطيل الحساب" %}
-                                                        </button>
+                                                        <form method="post" action="{% url 'admin_panel:toggle_user_status' user.id %}">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="active" value="0">
+                                                            <button type="submit" class="dropdown-item text-warning">
+                                                                <i class="fas fa-pause me-2"></i>{% trans "تعطيل الحساب" %}
+                                                            </button>
+                                                        </form>
                                                     </li>
                                                 {% else %}
                                                     <li>
-                                                        <button class="dropdown-item text-success" 
-                                                                onclick="toggleUserStatus({{ user.id }}, true)">
-                                                            <i class="fas fa-play me-2"></i>
-                                                            {% trans "تفعيل الحساب" %}
-                                                        </button>
+                                                        <form method="post" action="{% url 'admin_panel:toggle_user_status' user.id %}">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" name="active" value="1">
+                                                            <button type="submit" class="dropdown-item text-success">
+                                                                <i class="fas fa-play me-2"></i>{% trans "تفعيل الحساب" %}
+                                                            </button>
+                                                        </form>
                                                     </li>
                                                 {% endif %}
                                                 <li>
@@ -934,4 +963,56 @@ function hideLoading(element) {
     element.classList.remove('loading');
 }
 </script>
+
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">
+                        <i class="fas fa-user-plus me-2"></i>{% trans "إضافة مستخدم" %}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "اسم المستخدم" %}</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{% trans "الاسم الأول" %}</label>
+                            <input type="text" name="first_name" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{% trans "اسم العائلة" %}</label>
+                            <input type="text" name="last_name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "البريد الإلكتروني" %}</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "كلمة المرور" %}</label>
+                        <input type="password" name="password" class="form-control" minlength="6" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{% trans "نوع الحساب" %}</label>
+                        <select name="user_type" class="form-select" required>
+                            <option value="patient">مريض</option>
+                            <option value="doctor">طبيب</option>
+                            <option value="admin">مشرف</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "إلغاء" %}</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-plus me-1"></i>{% trans "إضافة" %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

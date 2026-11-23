@@ -43,6 +43,7 @@ urlpatterns = [
     # Other
     path('users/', views.ManageUsersView.as_view(), name='manage_users'),
     path('users/<int:pk>/edit/', views.UpdateUserView.as_view(), name='update_user'),
+    path('users/<int:pk>/toggle-status/', views.ToggleUserStatusView.as_view(), name='toggle_user_status'),
     path('users/<int:pk>/delete/', views.DeleteUserView.as_view(), name='delete_user'),
     path('notifications/', views.NotificationsView.as_view(), name='notifications'),
     path('earnings/', views.EarningsManagementView.as_view(), name='earnings'),

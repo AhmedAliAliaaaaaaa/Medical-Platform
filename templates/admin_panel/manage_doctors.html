@@ -116,10 +116,16 @@
                             </h4>
                         </div>
                         <div class="col-md-6 text-end">
-                            <div class="input-group input-group-sm" style="max-width: 280px; float: inline-end;">
-                                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                <input type="text" class="form-control table-search" placeholder="{% trans 'بحث...' %}" data-table-target="#doctorsTable">
-                            </div>
+                            <form method="get" class="d-flex gap-2 justify-content-md-end">
+                                <input type="text" name="search" value="{{ search }}" class="form-control form-control-sm" placeholder="{% trans 'بحث في الأطباء...' %}">
+                                <select name="status" class="form-select form-select-sm">
+                                    <option value="">كل الحالات</option>
+                                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>معلّق</option>
+                                    <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>معتمد</option>
+                                    <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>مرفوض</option>
+                                </select>
+                                <button class="btn btn-light btn-sm" type="submit"><i class="fas fa-search"></i></button>
+                            </form>
                         </div>
                     </div>
                 </div>
