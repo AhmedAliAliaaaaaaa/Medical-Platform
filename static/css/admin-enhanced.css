@@ -47,7 +47,10 @@
   top: 0;
   z-index: 1000;
   transition: all 0.3s ease;
+  height: 100vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
 }
 
 .admin-sidebar .nav-link {
