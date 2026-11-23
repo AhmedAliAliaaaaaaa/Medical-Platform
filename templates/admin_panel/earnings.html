@@ -1,4 +1,4 @@
-{% extends 'admin_panel/base.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 
 {% block title %}إدارة الأرباح - لوحة الإدارة{% endblock %}
@@ -45,8 +45,47 @@
 </style>
 {% endblock %}
 
-{% block admin_content %}
+{% block content %}
 <div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        {% trans "لوحة الإدارة" %}
+                    </h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'admin_panel:dashboard' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tachometer-alt me-2"></i>{% trans "الرئيسية" %}
+                    </a>
+                    <a href="{% url 'admin_panel:manage_doctors' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user-md me-2"></i>{% trans "إدارة الأطباء" %}
+                    </a>
+                    <a href="{% url 'admin_panel:manage_cases' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-file-medical me-2"></i>{% trans "إدارة الحالات" %}
+                    </a>
+                    <a href="{% url 'admin_panel:manage_users' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-users me-2"></i>{% trans "إدارة المستخدمين" %}
+                    </a>
+                    <a href="{% url 'admin_panel:responses' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-reply-all me-2"></i>{% trans "ردود الأطباء" %}
+                    </a>
+                    <a href="{% url 'admin_panel:notifications' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-bell me-2"></i>{% trans "الإشعارات" %}
+                    </a>
+                    <a href="{% url 'admin_panel:messages' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-envelope me-2"></i>صندوق الرسائل
+                        {% if unread_admin_messages %}<span class="badge bg-danger ms-2">{{ unread_admin_messages }}</span>{% endif %}
+                    </a>
+                    <a href="{% url 'admin_panel:earnings' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-coins me-2"></i>إدارة الأرباح
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
     <div class="earnings-page" dir="rtl">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="earnings-title mb-0"><i class="fas fa-coins me-2"></i>إدارة الأرباح</h2>
@@ -115,6 +154,8 @@
         <div class="row g-4">
             <div class="col-lg-7"><div class="panel"><div class="panel-header d-flex justify-content-between"><span>أرباح الأطباء</span><span class="text-muted small">الرصيد المتاح: {{ total_available_balance|floatformat:2 }} ر.س</span></div><div class="table-responsive"><table class="table"><thead><tr><th>الطبيب</th><th>الإجمالي</th><th>المتاح</th><th>المعلق</th></tr></thead><tbody>{% for row in earnings_rows %}<tr><td>{{ row.doctor.user.get_full_name|default:row.doctor.user.username }}</td><td>{{ row.total_earnings|floatformat:2 }}</td><td>{{ row.available_balance|floatformat:2 }}</td><td>{{ row.pending_balance|floatformat:2 }}</td></tr>{% empty %}<tr><td colspan="4" class="text-center py-4">لا توجد بيانات أرباح.</td></tr>{% endfor %}</tbody></table></div></div></div>
             <div class="col-lg-5"><div class="panel"><div class="panel-header d-flex justify-content-between"><span>طلبات السحب</span><span class="text-primary small">عرض الكل</span></div><div class="table-responsive"><table class="table"><thead><tr><th>الطبيب</th><th>المبلغ</th><th>الحالة</th><th></th></tr></thead><tbody>{% for withdrawal in withdrawals %}<tr><td>{{ withdrawal.doctor.user.get_full_name|default:withdrawal.doctor.user.username }}</td><td>{{ withdrawal.amount|floatformat:2 }} ر.س</td><td><span class="status-pill status-{{ withdrawal.status }}">{{ withdrawal.get_status_display }}</span></td><td>{% if withdrawal.status == 'pending' %}<form method="post" class="d-flex gap-1">{% csrf_token %}<input type="hidden" name="withdrawal_id" value="{{ withdrawal.id }}"><button name="action" value="approve" class="btn btn-sm btn-success">موافقة</button><button name="action" value="reject" class="btn btn-sm btn-danger">رفض</button></form>{% endif %}</td></tr>{% empty %}<tr><td colspan="4" class="text-center py-4">لا توجد طلبات سحب.</td></tr>{% endfor %}</tbody></table></div></div></div>
+        </div>
+    </div>
         </div>
     </div>
 </div>
